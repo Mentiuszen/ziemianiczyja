@@ -33,6 +33,18 @@ export class GeometryData {
    for(const [base,radius,n] of [[a,r,axis.map(v=>-v)],[b,top,axis]])this.face([base,point(base,radius,t),point(base,radius,next)],[n,n,n],[[.5,.5],[.5+Math.cos(t)*.5,.5+Math.sin(t)*.5],[.5+Math.cos(next)*.5,.5+Math.sin(next)*.5]],color);
   }return this;
  }
+ cushion(x,y,z,w,h,d,yaw=0,color=[1,1,1,1]){
+  const half=[w/2,h/2,d/2],r=Math.min(w,h,d)*.23,c=Math.cos(yaw),s=Math.sin(yaw);
+  const rot=p=>[p[0]*c+p[2]*s,p[1],p[2]*c-p[0]*s];
+  const vertex=p=>{const q=p.map((v,i)=>Math.max(-half[i]+r,Math.min(half[i]-r,v))),n=unit(sub(p,q)),v=rot(q.map((t,i)=>t+n[i]*r));return{p:[x+v[0],y+v[1],z+v[2]],n:rot(n)};};
+  for(let axis=0;axis<3;axis++)for(const sign of [-1,1]){
+   const u=(axis+1)%3,v=(axis+2)%3,us=[-half[u],-half[u]+r,half[u]-r,half[u]],vs=[-half[v],-half[v]+r,half[v]-r,half[v]];
+   for(let j=0;j<3;j++)for(let k=0;k<3;k++){
+    const verts=[[us[j],vs[k]],[us[j+1],vs[k]],[us[j+1],vs[k+1]],[us[j],vs[k+1]]].map(([a,b])=>{const p=[0,0,0];p[axis]=half[axis]*sign;p[u]=a;p[v]=b;return vertex(p);});
+    this.face(verts.map(x=>x.p),verts.map(x=>x.n),[[us[j]+half[u],vs[k]+half[v]],[us[j+1]+half[u],vs[k]+half[v]],[us[j+1]+half[u],vs[k+1]+half[v]],[us[j]+half[u],vs[k+1]+half[v]]],color);
+   }
+  }return this;
+ }
  ellipsoid(x,y,z,rx,ry,rz,segments=12,rings=8,yaw=0,color=[1,1,1,1]){
   const c=Math.cos(yaw),s=Math.sin(yaw),rot=p=>[p[0]*c+p[2]*s,p[1],p[2]*c-p[0]*s];
   const vertex=(row,col)=>{const a=row/rings*Math.PI,b=col/segments*Math.PI*2,q=[Math.sin(a)*Math.cos(b),Math.cos(a),Math.sin(a)*Math.sin(b)],p=rot([q[0]*rx,q[1]*ry,q[2]*rz]);return {p:[x+p[0],y+p[1],z+p[2]],n:rot(unit([q[0]/rx,q[1]/ry,q[2]/rz])),uv:[col/segments,row/rings]};};

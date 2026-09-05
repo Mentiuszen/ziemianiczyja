@@ -1,16 +1,36 @@
-import {northZ,RUIN_BUILDINGS} from '../data/world-map.js';
+import {northZ,RUIN_BUILDINGS,HQ} from '../data/world-map.js';
 import {TRENCHES,RAMPS} from '../data/cambrai.js';
 import {rng} from '../core/math.js';
 /** Collision descriptors are also consumed by the renderer, avoiding separate walls. */
 export function makeLayout(terrain){const boxes=[];let serial=0;
- const rawBox=(x,y,z,w,h,d,mat='wood',extra={})=>{const b={id:`solid-${serial++}`,x,y,z,w,h,d,mat,...extra,min:{x:x-w/2,y:y-h/2,z:z-d/2},max:{x:x+w/2,y:y+h/2,z:z+d/2}};if(extra.yaw){const c=Math.abs(Math.cos(extra.yaw)),s=Math.abs(Math.sin(extra.yaw)),rx=(w*c+d*s)/2,rz=(w*s+d*c)/2;b.min.x=x-rx;b.max.x=x+rx;b.min.z=z-rz;b.max.z=z+rz;}boxes.push(b);return b;};
+ const rawBox=(x,y,z,w,h,d,mat='wood',extra={})=>{const b={id:`solid-${serial++}`,x,y,z,w,h,d,mat,walkableTop:!['fence','revetment','stump','roof-beam','hq-wall','hq-roof'].includes(extra.kind)&&!extra.wire,...extra,min:{x:x-w/2,y:y-h/2,z:z-d/2},max:{x:x+w/2,y:y+h/2,z:z+d/2}};if(extra.yaw){const c=Math.abs(Math.cos(extra.yaw)),s=Math.abs(Math.sin(extra.yaw)),rx=(w*c+d*s)/2,rz=(w*s+d*c)/2;b.min.x=x-rx;b.max.x=x+rx;b.min.z=z-rz;b.max.z=z+rz;}boxes.push(b);return b;};
  const box=(x,y,z,w,h,d,mat,extra)=>rawBox(x,y,northZ(z),w,h,d,mat,extra);
  const groundBox=(x,z,w,h,d,mat='wood',extra={})=>box(x,terrain.height(x,northZ(z))+h/2,z,w,h,d,mat,extra);
+ // Roofed, physically closed command post. The eastern doorway is a real opening.
+ const floor=terrain.height(HQ.x,HQ.z)+.20;
+ rawBox(HQ.x,floor-.10,HQ.z,HQ.w+.12,.20,HQ.d+.12,'wood',{kind:'hq-floor',walkableTop:true});
+ for(const dz of [-HQ.d/2,HQ.d/2])rawBox(HQ.x,floor+1.6,HQ.z+dz,HQ.w+.35,3.2,.34,'wood',{kind:'hq-wall'});
+ // A small window in the west wall, with sill and lintel rather than a painted opening.
+ for(const dz of [-2.8,2.8])rawBox(HQ.x-HQ.w/2,floor+1.6,HQ.z+dz,.34,3.2,2.8,'wood',{kind:'hq-wall'});
+ rawBox(HQ.x-HQ.w/2,floor+.46,HQ.z,.34,.92,2.8,'wood',{kind:'hq-wall'});
+ rawBox(HQ.x-HQ.w/2,floor+2.77,HQ.z,.34,.86,2.8,'wood',{kind:'hq-wall'});
+ for(const dz of [-2.78,2.78])rawBox(HQ.x+HQ.w/2,floor+1.6,HQ.z+dz,.34,3.2,2.82,'wood',{kind:'hq-wall'});
+ rawBox(HQ.x+HQ.w/2,floor+2.8,HQ.z,.34,.8,2.75,'wood',{kind:'hq-wall'});
+ rawBox(HQ.x,floor+3.36,HQ.z,HQ.w+.65,.32,HQ.d+.65,'darkwood',{kind:'hq-roof'});
+ for(const z of [HQ.z-2.8,HQ.z,HQ.z+2.8])rawBox(HQ.x,floor+3.04,z,HQ.w,.18,.20,'darkwood',{kind:'hq-beam',walkableTop:false});
+ rawBox(33,floor+1.08,-5.85,2.9,.16,1.45,'wood',{kind:'briefing-table',walkableTop:false});
+ for(const x of [31.7,34.3])for(const z of [-6.45,-5.25])rawBox(x,floor+.49,z,.12,.98,.12,'darkwood',{kind:'table-leg',walkableTop:false});
+ rawBox(28.1,floor+.39,-4.7,1.1,.78,.8,'crate',{kind:'briefing-crate'});
+ rawBox(36.5,floor+.36,-10.9,1.5,.72,.8,'crate',{kind:'briefing-crate'});
+ // Two deliberately destructible narrow wire sections; all other fences remain solid.
+ for(const [id,x] of [['wire-tank-1',13],['wire-tank-2',-13]])rawBox(x,terrain.height(x,31)+.45,31,5.4,.9,.62,'wire',{id,wire:true,breakable:true,walkableTop:false});
  // Machine-gun shelter: physical roof, rear entrance, front firing aperture.
  const y=terrain.height(23,60);
  box(19.8,y+1.2,60,.65,2.4,6.4,'concrete');box(26.2,y+1.2,60,.65,2.4,6.4,'concrete');
  box(23,y+2.45,60,7.2,.55,7,'concrete');
  box(23,y+.43,57,6.4,.86,.7,'bags');box(23,y+2,57,6.4,.55,.7,'concrete');
+ // Real narrow embrasure: oblique rifle/tank fire meets concrete, never hidden invulnerability.
+ for(const x of [21.15,24.85])box(x,y+1.30,57,2.75,.89,.7,'concrete',{kind:'embrasure-cheek'});
  box(20.8,y+1.2,63,2.6,2.4,.65,'concrete');box(25.4,y+1.2,63,1.9,2.4,.65,'concrete');
  // Forward dressing shelter. Its entrance does not depend on a surviving NPC.
  const ay=terrain.height(-27,69);
@@ -27,7 +47,7 @@ export function makeLayout(terrain){const boxes=[];let serial=0;
  box(-.7,ry+.65,113,3,1.3,.8,'brick');box(8.6,ry+.6,113,3,1.2,.8,'brick');
  box(4,ry+1.2,118.8,2.2,.16,1,'wood',{table:true});box(3.2,ry+.57,118.8,.14,1.14,.7,'wood');box(4.8,ry+.57,118.8,.14,1.14,.7,'wood');
  // Authored cover. Gaps are wide enough for navigation.
- for(const [x,z,w] of [[-37,39,5],[-19,35,4],[27,37,5],[37,45,5],[-2,71,4],[33,77,5],[-13,86,5],[21,101,4],[-15,132,5],[24,136,6],[0,132,5]])groundBox(x,z,w,.95,1.15,'bags',{cover:true});
+ for(const [x,z,w] of [[-37,39,5],[-19,35,4],[27,37,5],[37,45,5],[-2,71,4],[33,77,5],[-21,86,5],[21,101,4],[-15,132,5],[24,136,6],[0,132,5]])groundBox(x,z,w,.95,1.15,'bags',{cover:true});
  for(const [x,z,w,h,d] of [[-43,117,6,3,1],[-38,122,1,3.5,9],[29,119,1,4,8],[33,115,8,2,1],[38,130,7,3,1],[42,134,1,2,7],[-39,91,5,1.8,1],[35,91,1,2.2,6]])groundBox(x,z,w,h,d,'brick');
  // Initial supplies and protected posts.
  for(const [x,z] of [[3,4],[-26,65],[6,117],[-9,2],[28,57],[31,94]])groundBox(x,z,1.3,.65,.85,'crate');

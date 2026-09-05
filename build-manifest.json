@@ -1,17 +1,17 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "runtime": "Babylon.js 8.46.2",
   "builder": "Node static copy (Vite migration pending)",
-  "totalBytes": 31277748,
-  "gzipBytes": 21051713,
+  "totalBytes": 32391247,
+  "gzipBytes": 21486957,
   "files": [
     {
       "path": "ASSET_LICENSES.md",
-      "bytes": 3832
+      "bytes": 4405
     },
     {
       "path": "CHANGELOG.md",
-      "bytes": 2807
+      "bytes": 3744
     },
     {
       "path": "LICENSE",
@@ -19,11 +19,11 @@
     },
     {
       "path": "README.md",
-      "bytes": 7498
+      "bytes": 8993
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 5300
+      "bytes": 6124
     },
     {
       "path": "docs/CHARACTER_ART.md",
@@ -31,19 +31,19 @@
     },
     {
       "path": "docs/CONTINUATION.md",
-      "bytes": 1388
+      "bytes": 1249
     },
     {
       "path": "docs/HISTORY.md",
-      "bytes": 4722
+      "bytes": 6791
     },
     {
       "path": "docs/IMPLEMENTATION_PLAN.md",
-      "bytes": 371
+      "bytes": 713
     },
     {
       "path": "docs/KNOWN_ISSUES.md",
-      "bytes": 3455
+      "bytes": 3684
     },
     {
       "path": "docs/MASTER_PROMPT.md",
@@ -51,19 +51,19 @@
     },
     {
       "path": "docs/PERFORMANCE.md",
-      "bytes": 4857
+      "bytes": 5682
     },
     {
       "path": "docs/REQUIREMENTS.md",
-      "bytes": 3613
+      "bytes": 1999
     },
     {
       "path": "docs/TECH_SOURCES.md",
-      "bytes": 3699
+      "bytes": 4600
     },
     {
       "path": "docs/TEST_REPORT.md",
-      "bytes": 8741
+      "bytes": 10200
     },
     {
       "path": "index.html",
@@ -80,6 +80,18 @@
     {
       "path": "public/assets/models/british.glb",
       "bytes": 1171048
+    },
+    {
+      "path": "public/assets/models/dfw.glb",
+      "bytes": 362444
+    },
+    {
+      "path": "public/assets/models/dh5.glb",
+      "bytes": 374892
+    },
+    {
+      "path": "public/assets/models/field-gun-77.glb",
+      "bytes": 203384
     },
     {
       "path": "public/assets/models/german-v1.glb",
@@ -156,6 +168,10 @@
     {
       "path": "public/assets/textures/brick.jpg",
       "bytes": 266905
+    },
+    {
+      "path": "public/assets/textures/briefing-map.jpg",
+      "bytes": 128801
     },
     {
       "path": "public/assets/textures/concrete-normal.png",
@@ -235,23 +251,23 @@
     },
     {
       "path": "src/ai/navigation.js",
-      "bytes": 4334
+      "bytes": 4758
     },
     {
       "path": "src/ai/soldier.js",
-      "bytes": 8496
+      "bytes": 10121
     },
     {
       "path": "src/app.js",
-      "bytes": 9744
+      "bytes": 10668
     },
     {
       "path": "src/audio/audio.js",
-      "bytes": 6226
+      "bytes": 6680
     },
     {
       "path": "src/combat/ballistics.js",
-      "bytes": 3217
+      "bytes": 4205
     },
     {
       "path": "src/combat/health.js",
@@ -271,7 +287,7 @@
     },
     {
       "path": "src/core/player.js",
-      "bytes": 4888
+      "bytes": 5153
     },
     {
       "path": "src/core/pool.js",
@@ -279,11 +295,19 @@
     },
     {
       "path": "src/core/simulation.js",
-      "bytes": 6698
+      "bytes": 8564
+    },
+    {
+      "path": "src/data/briefing.js",
+      "bytes": 1566
     },
     {
       "path": "src/data/cambrai.js",
-      "bytes": 4776
+      "bytes": 6171
+    },
+    {
+      "path": "src/data/support.js",
+      "bytes": 977
     },
     {
       "path": "src/data/weapons.js",
@@ -291,15 +315,19 @@
     },
     {
       "path": "src/data/world-map.js",
-      "bytes": 806
+      "bytes": 935
     },
     {
       "path": "src/input/input.js",
-      "bytes": 6807
+      "bytes": 7212
     },
     {
       "path": "src/missions/director.js",
-      "bytes": 3135
+      "bytes": 5952
+    },
+    {
+      "path": "src/performance/frame-limiter.js",
+      "bytes": 790
     },
     {
       "path": "src/performance/gpu-timer.js",
@@ -319,7 +347,7 @@
     },
     {
       "path": "src/render/assets.js",
-      "bytes": 1594
+      "bytes": 1621
     },
     {
       "path": "src/render/babylon.js",
@@ -331,11 +359,11 @@
     },
     {
       "path": "src/render/effects.js",
-      "bytes": 7008
+      "bytes": 7308
     },
     {
       "path": "src/render/geometry-data.js",
-      "bytes": 3617
+      "bytes": 4579
     },
     {
       "path": "src/render/geometry.js",
@@ -343,11 +371,15 @@
     },
     {
       "path": "src/render/landscape.js",
-      "bytes": 9050
+      "bytes": 8744
     },
     {
       "path": "src/render/quality.js",
       "bytes": 1105
+    },
+    {
+      "path": "src/render/sandbags.js",
+      "bytes": 761
     },
     {
       "path": "src/render/sky-geometry.js",
@@ -359,7 +391,11 @@
     },
     {
       "path": "src/render/spatial-batches.js",
-      "bytes": 1560
+      "bytes": 1634
+    },
+    {
+      "path": "src/render/support-view.js",
+      "bytes": 4545
     },
     {
       "path": "src/render/terrain-mesh.js",
@@ -367,15 +403,15 @@
     },
     {
       "path": "src/render/view.js",
-      "bytes": 13958
+      "bytes": 14223
     },
     {
       "path": "src/save/schema.js",
-      "bytes": 3344
+      "bytes": 5726
     },
     {
       "path": "src/save/store.js",
-      "bytes": 3763
+      "bytes": 3837
     },
     {
       "path": "src/ui/damage-feedback.js",
@@ -387,23 +423,31 @@
     },
     {
       "path": "src/ui/style.css",
-      "bytes": 19600
+      "bytes": 19865
     },
     {
       "path": "src/ui/ui.js",
-      "bytes": 23601
+      "bytes": 24858
+    },
+    {
+      "path": "src/vehicles/air-support.js",
+      "bytes": 2341
+    },
+    {
+      "path": "src/vehicles/field-gun.js",
+      "bytes": 2397
     },
     {
       "path": "src/vehicles/tank.js",
-      "bytes": 2726
+      "bytes": 6179
     },
     {
       "path": "src/world/collision.js",
-      "bytes": 6009
+      "bytes": 6414
     },
     {
       "path": "src/world/layout.js",
-      "bytes": 7045
+      "bytes": 9037
     },
     {
       "path": "src/world/spatial-index.js",
@@ -411,7 +455,7 @@
     },
     {
       "path": "src/world/terrain.js",
-      "bytes": 2865
+      "bytes": 3123
     },
     {
       "path": "vendor/babylon-runtime/LICENSE-APACHE-2.0.txt",

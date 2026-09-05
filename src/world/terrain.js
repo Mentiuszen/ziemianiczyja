@@ -1,4 +1,4 @@
-import {MAP,LANDMARKS,roadX,RUIN_BUILDINGS} from '../data/world-map.js';
+import {MAP,LANDMARKS,roadX,RUIN_BUILDINGS,HQ} from '../data/world-map.js';
 import {clamp,lerp,smooth,rng,segmentDistance} from '../core/math.js';
 import {TRENCHES,RAMPS} from '../data/cambrai.js';
 /** Shared triangular height field: rendering, movement, sight and projectiles agree. */
@@ -23,6 +23,9 @@ export class Terrain {
   // A shallow winding supply lane and wheel ruts, not a flat decorative stripe.
   const road=Math.abs(x-roadX(z));if(cut<.1&&road<3.6){y-=.12*(1-smooth(2.6,3.6,road));for(const side of [-1,1])y-=.065*Math.exp(-(((x-roadX(z)-side*.8)/.22)**2));}
   for(const h of RUIN_BUILDINGS)if(Math.abs(x-h.x)<h.w/2+.6&&Math.abs(z-h.z)<h.d/2+.6)y=this.base(h.x,h.z);
+  // Level HQ apron and artillery emplacement. Keep passage outside the room physical.
+  if(Math.abs(x-HQ.x)<HQ.w/2+1.2&&Math.abs(z-HQ.z)<HQ.d/2+1.2){y=this.base(HQ.x,HQ.z);cut=0;}
+  if(Math.abs(x-36)<4.5&&Math.abs(z-110)<4.5){y=this.base(36,110);cut=0;}
   const edge=Math.max(smooth(94,107,Math.abs(x)),smooth(214,239,z),1-smooth(-32,-24,z));
   return y-cut+edge*(2.5+.8*Math.sin(z*.037+x*.032));
  }

@@ -35,7 +35,9 @@ export class Effects {
     const p=this.world.player,dist=Math.hypot(p.pos.x-pos.x,p.pos.y+1-pos.y,p.pos.z-pos.z);this.trauma=Math.min(1,this.trauma+Math.max(0,1-dist/19)*.65);
    }
   }
-  if(e.type==='cannon')this.particle(e.pos,'flash',1.1,.09);
+  if(e.type==='cannon'){this.particle(e.pos,'flash',1.1,.09);this.particle(e.pos,'dust',.72,1.4,{x:.25,y:.25,z:0});}
+  if(e.type==='breach'){for(let i=0;i<8;i++)this.particle(e.pos,'debris',.7,.65,{x:(i-4)*.7,y:1.2,z:.8});}
+  if(e.type==='tank-hit'){this.particle(e.pos,'flash',.48,.09);this.particle(e.pos,'dust',.70,1.2,{x:.1,y:.5,z:.1});}
  }
  update(world,dt){this.world=world;this.trauma=Math.max(0,this.trauma-dt*2.6);let keep=0;
   for(const p of this.active){p.ttl-=dt;if(p.ttl<=0){this.release(p.kind,p.mesh);continue;}const t=1-p.ttl/p.life;
@@ -45,7 +47,7 @@ export class Effects {
    if(p.kind==='mark')p.mesh.visibility=Math.min(.65,p.ttl/8);
    this.active[keep++]=p;
   }this.active.length=keep;
-  const live=new Set();for(const p of [...world.grenades,...world.shells]){live.add(p.id);let mesh=this.projectiles.get(p.id);if(!mesh){mesh=this.acquire('projectile');if(!mesh)continue;this.projectiles.set(p.id,mesh);}mesh.position.set(p.pos.x,p.pos.y,p.pos.z);mesh.rotation.x+=dt*3;mesh.rotation.z+=dt*2;}
+  const live=new Set();for(const p of [...world.grenades,...world.shells,...world.air.bombs]){live.add(p.id);let mesh=this.projectiles.get(p.id);if(!mesh){mesh=this.acquire('projectile');if(!mesh)continue;this.projectiles.set(p.id,mesh);}mesh.position.set(p.pos.x,p.pos.y,p.pos.z);mesh.rotation.x+=dt*3;mesh.rotation.z+=dt*2;}
   for(const [id,mesh] of this.projectiles)if(!live.has(id)){this.release('projectile',mesh);this.projectiles.delete(id);}
  }
  dispose(){this.active.length=0;this.projectiles.clear();for(const pool of Object.values(this.pools))pool.dispose();for(const mesh of Object.values(this.templates))mesh.dispose();for(const m of [this.smokeMat,this.fireMat,this.tracerMat,this.markMat])m.dispose();}

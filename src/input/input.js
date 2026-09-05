@@ -16,6 +16,9 @@ export class Input {
     this.capture = null;
     this.abort = new AbortController();
     const options = { signal: this.abort.signal, capture: true };
+    // Cancelling pointerdown can suppress compatibility mousemove in Firefox.
+    // Never mix pointer buttons with a mouse-only motion owner.
+    this.pointerMotion = typeof window.PointerEvent === 'function';
 
     window.addEventListener('keydown', event => {
       if (this.capture) {
@@ -69,10 +72,13 @@ export class Input {
       else this.buttons.delete(event.button);
     }, options);
     document.addEventListener('pointercancel', () => this.clear(), options);
-    canvas.addEventListener('contextmenu', event => event.preventDefault(), options);
-    document.addEventListener('mousemove', event => {
+    document.addEventListener('contextmenu', event => {
+      if (document.pointerLockElement === canvas || event.target === canvas) event.preventDefault();
+    }, options);
+    document.addEventListener(this.pointerMotion ? 'pointermove' : 'mousemove', event => {
       if (!this.enabled || document.pointerLockElement !== canvas) return;
-      // Do not also accumulate pointermove deltas: those are the same physical motion.
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      // Exactly one motion stream: compatibility mouse events are never added twice.
       const sensitivity = .0018 * this.settings.sensitivity;
       this.mx += (event.movementX || 0) * sensitivity;
       this.my += (event.movementY || 0) * sensitivity;

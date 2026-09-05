@@ -1,3 +1,4 @@
+import {SupportView} from './support-view.js';
 import {qualityProfile} from './quality.js';
 import {appearanceFor} from './appearance.js';
 import {sampleClipFrame} from './animation-sampling.js';
@@ -52,7 +53,7 @@ export class GameView {
    const dx=Math.max(0,Math.abs(c.x-p.x)-e.x),dz=Math.max(0,Math.abs(c.z-p.z)-e.z);
    if(dx*dx+dz*dz<(r+8)*(r+8))list.push(mesh);
   }
-  for(const unit of [...this.units.values(),...this.tankModels.values()]){
+  for(const unit of [...this.units.values(),...this.tankModels.values(),...(this.support?.guns.values()||[])]){
    const q=unit.root.position;
    if((q.x-p.x)**2+(q.z-p.z)**2<(r+8)**2)for(const mesh of unit.meshes)if(mesh.isEnabled()&&mesh.getTotalVertices()>0)list.push(mesh);
   }
@@ -60,6 +61,7 @@ export class GameView {
   this.renderStats.shadowCasters=list.length;
  }
  async load(progress){await this.assets.load(progress);for(const n of this.world.npcs)this.addUnit(n);for(const t of this.world.tanks){const model=this.assets.instantiate('mark-iv',t.id);this.tankModels.set(t.id,model);for(const m of model.meshes){m.receiveShadows=true;if(this.shadow)this.shadow.addShadowCaster(m,false);}}
+  this.support=new SupportView(this.scene,this.assets,this.mats,this.world);
   this.fpRoot=new TransformNode('first-person',this.scene);this.fpRoot.parent=this.camera;
   for(const name of ['smle','gewehr','webley','lewis']){const model=this.assets.instantiate(name,`fp-${name}`);model.root.parent=this.fpRoot;model.root.setEnabled(false);for(const m of model.meshes){m.renderingGroupId=2;m.receiveShadows=false;m.alwaysSelectAsActiveMesh=true;}this.viewModels.set(name,model);}
   this.hands=this.assets.instantiate('hands','fp-hands');this.hands.root.parent=this.fpRoot;for(const m of this.hands.meshes){m.renderingGroupId=2;m.receiveShadows=false;m.alwaysSelectAsActiveMesh=true;}
@@ -76,7 +78,7 @@ export class GameView {
   this.smoothedEye=lerp(this.smoothedEye,EYE_HEIGHT[p.stance],1-Math.exp(-Math.max(dt,.016)*14));const motion=this.settings.motion??.5,bob=p.moving&&p.grounded?Math.sin(this.motionPhase)*.023*motion:0;
   this.camera.position.set(p.pos.x,p.pos.y+this.smoothedEye+bob,p.pos.z);this.camera.rotation.set(p.pitch-p.recoil*.6*motion+Math.sin(time*51)*(this.effects?.trauma||0)*.018*motion,p.yaw+Math.sin(time*39)*(this.effects?.trauma||0)*.012*motion,Math.sin(time*47)*(this.effects?.trauma||0)*.008*motion);this.camera.fov=lerp(this.camera.fov,((this.settings.fov||78)-(p.ads?22:0))*Math.PI/180,1-Math.exp(-Math.max(dt,.016)*14));
   if(this.fpRoot){const reload=p.weapon.reloadLeft>0?Math.sin(Math.min(1,p.weapon.reloadLeft/p.weapon.definition.reload)*Math.PI):0,melee=p.meleeLeft>0?Math.sin(p.meleeLeft/.85*Math.PI):0,throwing=p.grenadeLeft>0?Math.sin(p.grenadeLeft*Math.PI):0;
-   const aim=p.ads?1:0;this.fpRoot.position.set(lerp(.19,0,aim)+(p.moving?Math.sin(this.motionPhase*.5)*.011*motion:0),lerp(-.24,-.118,aim)-reload*.3-throwing*.25,lerp(.30,.22,aim)-p.recoil*1.8-melee*.1);this.fpRoot.rotation.set(reload*.42+melee*.75+throwing*.5+(p.weapon.cooldown>0&&['smle','gewehr'].includes(p.weapon.id)?Math.sin(p.weapon.cooldown/p.weapon.definition.cycle*Math.PI)*.07:0),p.recoil*.1,reload*-.28);this.fpRoot.scaling.setAll(1);
+   const aim=p.ads?1:0;this.fpRoot.position.set(lerp(.19,0,aim)+(p.moving?Math.sin(this.motionPhase*.5)*.011*motion:0),lerp(-.24-(w.director.phase===0?.10:0),-.118,aim)-reload*.3-throwing*.25,lerp(.30,.22,aim)-p.recoil*1.8-melee*.1);this.fpRoot.rotation.set(reload*.42+melee*.75+throwing*.5+(p.weapon.cooldown>0&&['smle','gewehr'].includes(p.weapon.id)?Math.sin(p.weapon.cooldown/p.weapon.definition.cycle*Math.PI)*.07:0),p.recoil*.1,reload*-.28);this.fpRoot.scaling.setAll(1);
    if(this.lastWeapon!==p.weapon.id){for(const [id,m] of this.viewModels)m.root.setEnabled(id===p.weapon.id);this.lastWeapon=p.weapon.id;}
   }
   for(const n of w.npcs){if(!this.units.has(n.id))this.addUnit(n);const model=this.units.get(n.id);model.root.position.set(n.pos.x,n.pos.y+(n.stance==='crouch'?-.36:n.stance==='prone'?.25:0),n.pos.z);model.root.rotation.y=n.yaw;model.root.rotation.x=n.hp>0&&n.stance==='prone'?Math.PI/2:0;
@@ -93,7 +95,7 @@ export class GameView {
   for(const t of w.tanks){const model=this.tankModels.get(t.id);model.root.position.set(t.pos.x,t.pos.y,t.pos.z);model.root.rotation.y=t.yaw;model.root.rotation.x=t.moving?Math.sin(t.trackPhase*2)*.006:0;}
   for(const i of w.items)this.items.get(i.id)?.setEnabled(!i.used);
   if(time>=(this.nextDetailUpdate??0)||Math.hypot(p.pos.x-(this.lastDetailX??Infinity),p.pos.z-(this.lastDetailZ??Infinity))>6){this.lastDetailX=p.pos.x;this.lastDetailZ=p.pos.z;this.nextDetailUpdate=time+.2;for(const mesh of this.staticMeshes){if(!mesh.metadata?.detail)continue;const bounds=mesh.getBoundingInfo().boundingBox,c=bounds.centerWorld,e=bounds.extendSizeWorld,dx=Math.max(0,Math.abs(c.x-p.pos.x)-e.x),dz=Math.max(0,Math.abs(c.z-p.pos.z)-e.z);mesh.setEnabled(mesh.metadata.detailRank<=this.profile.detailFraction&&dx*dx+dz*dz<this.profile.detailDistance**2);}}
-  this.effects?.update(w,dt);
+  this.support?.sync(w,dt,this.effects,this.profile);this.effects?.update(w,dt);
  }
  render(active=true){
   if(this.disposed)return;
@@ -112,6 +114,6 @@ export class GameView {
  event(e){this.effects?.event(e);}
  marker(){const o=this.world.director.objective;const point=new Vector3(o.x,this.world.terrain.height(o.x,o.z)+2,o.z);const projected=Vector3.Project(point,Matrix.Identity(),this.scene.getTransformMatrix(),this.camera.viewport.toGlobal(this.engine.getRenderWidth(),this.engine.getRenderHeight()));const dx=o.x-this.world.player.pos.x,dz=o.z-this.world.player.pos.z;return{x:projected.x/this.engine.getRenderWidth()*100,y:projected.y/this.engine.getRenderHeight()*100,visible:dx*Math.sin(this.world.player.yaw)+dz*Math.cos(this.world.player.yaw)>0&&projected.z>=0&&projected.z<=1,distance:Math.hypot(dx,dz)};}
  resize(){this.engine.resize();}
- dispose(){if(this.disposed)return;this.disposed=true;this.gpuTimer.dispose();this.effects?.dispose();this.assets.dispose();this.scene.dispose();this.engine.dispose();this.units.clear();this.items.clear();this.tankModels.clear();}
+ dispose(){if(this.disposed)return;this.disposed=true;this.gpuTimer.dispose();this.support?.dispose();this.effects?.dispose();this.assets.dispose();this.scene.dispose();this.engine.dispose();this.units.clear();this.items.clear();this.tankModels.clear();}
 }
 function powSafe(x){return Math.max(0,Math.min(1,x));}

@@ -1,3 +1,18 @@
+# Zmiany v0.4.0 — 5 września 2026
+
+- Zunifikowany strumień ruchu/przycisków Pointer Events, regresja trzymanego PPM.
+- 42-sekundowa odprawa z napisami, dowodzący i oddział w zamkniętym stanowisku.
+- Żywe posterunki, wczesny alarm, profil ognia NPC→NPC oraz siedem etapów misji.
+- Obsługiwane działo 7,7 cm, trasy Mark IV, MG/działa, uszkodzenia i dwa otwierane druty.
+- Skończone przeloty DH.5/DFW i dwie widoczne, ostrzegane bomby.
+- Limiter renderowania 0/1–360 FPS, prawdziwa liczba renderów, bez pozornego VSync OFF.
+- Jawnie niewchodzalne płoty, bez step-up w locie, zamknięte stosy worków.
+- Poprawione trasy wyjścia całej obsady odprawy; brak cofania do miniętego węzła przy replanie.
+- Nowy schemat misji (missionVersion=3), walidacja zapisów lotnictwa/artylerii/czołgów.
+- Nie dodano kampanii, Vite, pełnego AI pilotów ani niemieckich czołgów do daty 1917.
+
+## Historia wcześniejszych wydań
+
 # Ziemia Niczyja — historia wydań
 
 ## 0.3.0 — 5 września 2026

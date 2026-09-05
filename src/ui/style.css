@@ -46,3 +46,7 @@ html,body,#menu{max-width:100%;overscroll-behavior:none}
 .damage-direction{position:absolute;left:50%;top:50%;width:min(52vh,420px);height:min(52vh,420px);opacity:0;transform:translate(-50%,-50%);transform-origin:center}
 .damage-direction span{position:absolute;top:0;left:50%;width:55px;height:12px;transform:translateX(-50%);border-top:4px solid #d64b37;border-radius:50%;filter:drop-shadow(0 0 4px #3e0e09)}
 .critical-health{position:absolute;left:50%;bottom:23%;transform:translateX(-50%);font-size:.6rem;letter-spacing:.13em;color:#efb2a2;text-shadow:0 1px 4px #000;white-space:nowrap}
+
+/* v0.4: subtitle-only briefing, numeric FPS cap. */
+.subtitle-box{white-space:pre-line;line-height:1.55;max-width:min(760px,86vw);}
+.setting input[type=number]{width:126px;padding:10px 12px;background:#222b2b;color:#e4deca;border:1px solid #717364;font:inherit;}

@@ -27,3 +27,18 @@ export function updateGrenades(world,dt){for(const g of world.grenades){g.fuse-=
  if(g.fuse<=0){const owner=world.actors.find(a=>a.id===g.owner)||{id:g.owner,faction:g.faction};blast(world,g.pos,7,190,owner);g.dead=true;}}
  world.grenades=world.grenades.filter(g=>!g.dead);
 }
+
+/** A mounted weapon shares actor hits, friendly blockers and world geometry.
+ * No invented eye/muzzle on a tank; the physical mounting is supplied explicitly.
+ */
+export function fireMountedBullet(world,owner,origin,aim,{weapon='lewis',range=95,damage=34,spread=.075}={}){
+ const random=world.random,d=norm(add(aim,v3((random()-.5)*spread,(random()-.5)*spread,(random()-.5)*spread)));
+ const hit=world.collision.ray(origin,d,range,world.actors,null,{ignoreSolid:owner.id});
+ const end=hit?.point||add(origin,mul(d,range));
+ world.emit('shot',{from:origin,to:end,faction:owner.faction,weapon,owner:owner.id});
+ world.stats[owner.faction==='uk'?'britishShots':'germanShots']++;
+ if(hit?.actor)world.damage(hit.actor,damage*(hit.part==='head'?1.6:hit.part==='limb'?.57:1),owner);
+ else if(hit)world.emit('impact',{pos:end,kind:hit.kind});
+ for(const n of world.npcs)if(n.hp>0&&n.faction!==owner.faction&&flatDist(n.pos,end)<4)n.suppression=Math.min(1.7,n.suppression+.30);
+ return hit;
+}

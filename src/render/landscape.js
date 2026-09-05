@@ -1,10 +1,11 @@
+import {buildSandbags} from './sandbags.js';
 import {SpatialBatches} from './spatial-batches.js';
 import {terrainMeshes} from './terrain-mesh.js';
 import {makeSky} from './sky.js';
 import {Mesh,VertexData,StandardMaterial,Color3,Texture,Vector3} from './babylon.js';
 import {Geometry} from './geometry.js';
 import {assetURL} from './assets.js';
-import {northZ,roadX,MAP} from '../data/world-map.js';
+import {northZ,roadX,MAP,HQ} from '../data/world-map.js';
 import {rng,clamp} from '../core/math.js';
 export function materials(scene){const result={};
  for(const [name,file,color] of [['earth','earth',[1,.98,.94]],['wood','wood',[.98,.95,.88]],['bags','bags',[1,.98,.91]],['concrete','concrete',[.93,.96,.96]],['brick','brick',[.95,.92,.89]],['crate','wood',[1,.94,.79]],['rubble','concrete',[.78,.73,.66]]]){
@@ -20,15 +21,10 @@ export function makeLandscape(scene,world,mats){const terrain=world.terrain,rand
  makeSky(scene);
  const data=new VertexData(),positions=[],uvs=[],colors=[],indices=[];for(let z=0;z<terrain.nz;z++)for(let x=0;x<terrain.nx;x++){const px=x+terrain.minX,pz=z+terrain.minZ,y=terrain.heights[z*terrain.nx+x],trench=terrain.trenchDistance(px,pz),noise=.87+random()*.16;positions.push(px,y,pz);uvs.push(px/3.3,pz/3.3);const muddy=trench<3.6||terrain.base(px,pz)-y>.25||Math.abs(px-roadX(pz))<3.5;colors.push((muddy?.81:1)*noise,(muddy?.80:.98)*noise,(muddy?.74:.84)*noise,1);}
  for(let z=0;z<terrain.nz-1;z++)for(let x=0;x<terrain.nx-1;x++){const a=z*terrain.nx+x,b=a+1,c=a+terrain.nx,d=c+1;indices.push(a,b,c,b,d,c);}const normals=[];VertexData.ComputeNormals(positions,indices,normals);const ground=terrainMeshes(scene,terrain,mats.earth,positions,normals,uvs,colors);
- for(const b of world.layout){if(b.wire){const g=get('iron');for(let x=b.x-b.w/2;x<=b.x+b.w/2;x+=2.5){g.cylinder([x,b.y-.45,b.z],[x+.17,b.y+.8,b.z],.038,.025,5);}
+ for(const b of world.layout){if(b.breakable)continue;if(b.wire){const g=get('iron');for(let x=b.x-b.w/2;x<=b.x+b.w/2;x+=2.5){g.cylinder([x,b.y-.45,b.z],[x+.17,b.y+.8,b.z],.038,.025,5);}
   for(let layer=0;layer<3;layer++){for(let x=b.x-b.w/2;x<b.x+b.w/2;x+=.6){const y=b.y-.25+layer*.3;g.cylinder([x,y,b.z],[x+.6,y+.05,b.z+.12],.012,.012,4);g.cylinder([x,y-.08,b.z-.09],[x+.12,y+.11,b.z+.12],.012,.012,4);}}continue;}
   if(b.mat==='bags'){
-   const g=get('bags'),rows=Math.max(1,Math.round(b.h/.3)),cols=Math.max(1,Math.ceil(b.w/.85)),width=b.w/cols;
-   for(let row=0;row<rows;row++)for(let i=0;i<cols;i++){
-    const xx=b.min.x+width*(i+.5),yy=b.min.y+(row+.5)*b.h/rows;
-    g.ellipsoid(xx,yy,b.z,width*.53,b.h/rows*.54,b.d*.53,12,6,(row%2?.03:-.035),[.93+random()*.07,.94+random()*.06,.91,1]);
-    if(i%2===0)get('rope').cylinder([xx-width*.37,yy,b.z-b.d*.5],[xx+width*.37,yy,b.z-b.d*.5],.007,.007,5);
-   }
+   buildSandbags(get('bags'),b);
   }else if(b.kind==='stump'){
    get('darkwood').cylinder([b.x,b.min.y,b.z],[b.x+.11,b.max.y,b.z+.07],.31,.11,10);
    for(let j=0;j<3;j++){const h=b.min.y+b.h*(.45+j*.15),a=j*2.3;get('darkwood').cylinder([b.x,h,b.z],[b.x+Math.sin(a)*1.2,h+.65,b.z+Math.cos(a)*1.2],.10,.027,7);}
@@ -55,7 +51,7 @@ export function makeLandscape(scene,world,mats){const terrain=world.terrain,rand
  // Background trees are beyond the playable boundary. In-world trunks come from layout colliders.
  for(let i=0;i<44;i++){const x=i%2?99+random()*7:-99-random()*7,z=-12+random()*233,y=terrain.height(x,z),h=4+random()*4;get('darkwood').cylinder([x,y,z],[x+.2,y+h,z+.1],.24,.035,7);for(let j=0;j<2;j++){const by=y+h*(.5+j*.16),angle=random()*Math.PI*2;get('darkwood').cylinder([x,by,z],[x+Math.sin(angle)*1.6,by+1,z+Math.cos(angle)*1.6],.09,.018,6);}}
  // Four reproducible decorative layers; solid cover and NPCs NEVER disappear with a preset.
- for(let i=0;i<3700;i++){const x=(random()-.5)*181,z=-20+random()*228;if(terrain.trenchDistance(x,z)<3.7||Math.abs(x-13)<3||Math.abs(x+13)<3||Math.abs(x-roadX(z))<4)continue;const y=terrain.height(x,z),h=.20+random()*.47;if(terrain.base(x,z)-y>.35)continue;for(let j=0;j<2;j++){const yaw=random()*Math.PI;get(`grass${i%4}`).blade(x,y,z,.5,h,yaw,[.86+random()*.14,.87+random()*.13,.91,1]);}}
+ for(let i=0;i<3700;i++){const x=(random()-.5)*181,z=-20+random()*228;if((Math.abs(x-HQ.x)<HQ.w/2+.8&&Math.abs(z-HQ.z)<HQ.d/2+.8)||terrain.trenchDistance(x,z)<3.7||Math.abs(x-13)<3||Math.abs(x+13)<3||Math.abs(x-roadX(z))<4)continue;const y=terrain.height(x,z),h=.20+random()*.47;if(terrain.base(x,z)-y>.35)continue;for(let j=0;j<2;j++){const yaw=random()*Math.PI;get(`grass${i%4}`).blade(x,y,z,.5,h,yaw,[.86+random()*.14,.87+random()*.13,.91,1]);}}
  // Small terrain-conforming water patches, low-cost specular only (no fake screen-space reflections).
  for(const crater of terrain.craters.slice(0,35)){const x=crater.x,z=crater.z;if(!Number.isFinite(x)||terrain.trenchDistance(x,z)<5)continue;const r=.5+random()*.65,y=terrain.height(x,z)+.025,g=get('water');for(let j=0;j<18;j++){const a=j/18*Math.PI*2,b=(j+1)/18*Math.PI*2;g.cylinder([x+Math.cos(a)*r,y,z+Math.sin(a)*r],[x+Math.cos(b)*r,y,z+Math.sin(b)*r],.007,.007,4);}const geom=batches.get('water',x,z);for(let j=0;j<18;j++){const a=j/18*Math.PI*2,b=(j+1)/18*Math.PI*2;geom.face([[x,y,z],[x+Math.cos(a)*r,y,z+Math.sin(a)*r],[x+Math.cos(b)*r,y,z+Math.sin(b)*r]],[[0,1,0],[0,1,0],[0,1,0]],[[.5,.5],[.5+Math.cos(a)*.5,.5+Math.sin(a)*.5],[.5+Math.cos(b)*.5,.5+Math.sin(b)*.5]]);}}
  // Telephone, ordnance boxes, trench sign and the starting field document.
