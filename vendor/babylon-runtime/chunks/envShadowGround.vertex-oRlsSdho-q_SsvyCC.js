@@ -1,0 +1,2 @@
+import{S as r}from"./index-3iDVoJzw.js";import"./index-B5Zu_GVg.js";const t="envShadowGroundVertexShader",o=`attribute position: vec3f;attribute uv: vec2f;uniform viewProjection: mat4x4f;uniform worldViewProjection: mat4x4f;varying vUV: vec2f;@vertex
+fn main(input : VertexInputs)->FragmentInputs {vertexOutputs.position=uniforms.worldViewProjection*vec4f(input.position,1.0);vertexOutputs.vUV=input.uv;}`;r.ShadersStoreWGSL[t]||(r.ShadersStoreWGSL[t]=o);const L={name:t,shader:o};export{L as envShadowGroundVertexShaderWGSL};
