@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+const module=await import('../src/performance/frame-limiter.js').catch(()=>({}));
+test('render limiter supports fractional caps without overshooting or halving rate',()=>{assert.equal(typeof module.FrameLimiter,'function');for(const hz of [60,165,240])for(const cap of [0,30,60,90,120,144,165,240]){const l=new module.FrameLimiter(),draw=[];for(let i=0;i<hz*6;i++)if(l.due(i*1000/hz,cap))draw.push(i);assert.ok(Math.abs(draw.length/6-Math.min(cap||hz,hz))<1,{hz,cap,actual:draw.length/6});}});
+test('long pause and cap change do not produce catch-up bursts',()=>{assert.equal(typeof module.FrameLimiter,'function');const l=new module.FrameLimiter();assert.ok(l.due(0,30));assert.ok(!l.due(5,30));assert.ok(l.due(10000,30));assert.ok(!l.due(10001,30));assert.ok(l.due(10005,120));assert.ok(!l.due(10006,120));l.reset();assert.ok(l.due(10006,30));});
+
+test('FPS preference is numeric, bounded, persistent and has an uncapped default',async()=>{const{Store}=await import('../src/save/store.js');const prior=globalThis.localStorage;try{globalThis.localStorage={getItem:()=>'{"maxFps":999}'};assert.equal(new Store(()=>{}).settings().maxFps,360);globalThis.localStorage.getItem=()=>'{}';assert.equal(new Store(()=>{}).settings().maxFps,0);}finally{globalThis.localStorage=prior;}});

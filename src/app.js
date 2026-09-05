@@ -13,7 +13,7 @@ class Application {
   this.store.load().then(snapshot=>{this.checkpoint=snapshot;if(this.state==='main')this.ui.render('main');}).catch(error=>{this.ui.toast(`${error.message} Możesz bezpiecznie rozpocząć misję od nowa.`,9);});
   this.raf=requestAnimationFrame(now=>this.loop(now));
   // Read-only diagnostics are deliberately available for performance and lifecycle checks.
-  window.ZiemiaNiczyja={get state(){return app.state;},inspect:()=>this.inspect(),version:'0.4.0'};
+  window.ZiemiaNiczyja={get state(){return app.state;},inspect:()=>this.inspect(),version:'0.4.1'};
  }
  go(state){this.state=state;const active=state==='playing';this.input.setActive(active);this.clock.reset();this.performance?.reset();if(this.performance)this.metrics=this.performance.metrics;if(!active)this.view?.setDiagnosticsEnabled(false);this.lastFrame=performance.now();this.lastRender=this.lastFrame;this.frameLimiter?.reset();this.pendingCpu=this.pendingSimulation=0;if(!active){this.audio.pause();if(document.pointerLockElement===this.canvas)document.exitPointerLock();}this.ui.render(state);}
  pause(){if(this.state==='playing')this.go('paused');}

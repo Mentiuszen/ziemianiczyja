@@ -1,4 +1,13 @@
-# Zmiany v0.4.0 — 5 września 2026
+# Zmiany v0.4.1 — 5 września 2026
+
+- Źródła, narzędzia, testy i workflow Pages wersjonowane w głównym katalogu projektu.
+- Osobny, generowany `dist/`; GitHub Actions testuje projekt i publikuje wyłącznie release.
+- Sześć poprawionych modeli piechoty z Blendera, sześć różnych twarzy i cztery atlasy 2048 × 2048.
+- Zachowane szkielety, 13 klipów na model i trzy LOD-y; uzupełnione testy oraz pochodzenie zasobów.
+- Regeneracja zasobów proceduralnych zachowuje importowaną piechotę.
+- Checkpointy i ustawienia v0.4 pozostają zgodne.
+
+## Zmiany v0.4.0 — 5 września 2026
 
 - Zunifikowany strumień ruchu/przycisków Pointer Events, regresja trzymanego PPM.
 - 42-sekundowa odprawa z napisami, dowodzący i oddział w zamkniętym stanowisku.

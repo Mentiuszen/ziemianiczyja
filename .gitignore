@@ -1,1 +1,12 @@
-/.source
+node_modules/
+/dist/
+/.local/
+.DS_Store
+__pycache__/
+*.pyc
+
+# Generated captures and historical test output stay local.
+/docs/test-results/
+/docs/v0.2-tests/
+/docs/v0.3-tests/
+/docs/v0.4-tests/
