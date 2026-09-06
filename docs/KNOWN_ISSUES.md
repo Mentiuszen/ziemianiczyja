@@ -1,4 +1,47 @@
-# Znane ograniczenia v0.4.1
+# Znane ograniczenia 0.4.2 — 6 września 2026
+
+**Kandydat do lokalnego odbioru; nie opublikowano wydania.**
+
+## Aktualny zakres weryfikacji
+
+Naprawy rozgrywki, AI, kolizji, zapisu i cyklu życia mają testy automatyczne.
+Aktualne wyniki i lista uruchomionych plików są w `V0_4_2_IMPLEMENTATION.md`.
+Nie utożsamiać ich z całym zestawem historycznych 134 testów ani z odbiorem balansu.
+Pełny `npm test` w kompletnym checkoutcie pozostaje obowiązkowym krokiem lokalnym.
+
+Nie przeprowadzono w tym środowisku grywalnego testu WebGL2 ani Firefoksa/Edge,
+odsłuchu, pomiaru fizycznego GPU czy sesji ludzkich. Chromium blokuje lokalny adres
+przez `ERR_BLOCKED_BY_ADMINISTRATOR`; niezależna próba utworzenia WebGL2 zwraca brak
+kontekstu. `CAM-01` ma potwierdzony test rzeczywistej matematyki dołączonej kamery,
+lecz regresja na pełnym `GameView` czeka na lokalne uruchomienie
+`tools/browser_v042_camera.py`. Wynik BLOCKED nie jest PASS.
+
+## Rozgrywka i zgodność
+
+Nowe profile trudności są pierwszą iteracją: wymagają przejścia misji i prób
+różnych seedów. Bot nadal zna mapę i wrogów; jego ukończenie z czołgami i bez nich
+nie dowodzi właściwej trudności dla człowieka. Szczególnie sprawdzić ciasne przejścia,
+płoty, obrót leżącej postaci, ustępowanie oddziału i finał z pobliskim przeciwnikiem.
+
+Kolizja kadłuba używa teraz prostokąta obróconego zgodnie z yaw, z AABB tylko jako
+wstępnym filtrem. Nadal nie jest to fizyka gąsienic, ragdoll ani symulacja pancerza.
+Awaryjna korekta penetracji jest ograniczona i rejestrowana; nierozwiązywalny spawn
+lub checkpoint zostaje odrzucony zamiast przeniesienia przez ścianę. Lokalne korekty
+historycznych pozycji NPC mają osobny limit 1,25 m, a normalny odzysk 0,65 m.
+
+Format pozostaje `SAVE_VERSION=1`, `MISSION_VERSION=3`. Poprawny checkpoint 0.4.1
+ma jawne wartości domyślne dla nowych pól; niezgodna geometria starszych misji lub
+uszkodzony stan nie są akceptowane. Nie kasuje się ustawień przy odrzuceniu zapisu.
+Trudność checkpointu nie jest zastępowana wyborem nowej misji z menu. Zapis może być
+odroczony bez końca, jeśli wciąż trwa bezpośrednie zagrożenie; ostatni dobry punkt
+pozostaje zachowany. Trwały IndexedDB wymaga lokalnego odbioru na zwykłym originie.
+
+Modele, tekstury, dźwięki, definicje mapy i Babylon pozostają z 0.4.1. Ich poprawa
+jakościowa należy do 0.5. Poniższy tekst opisuje wcześniejsze próby, nie wyniki 0.4.2.
+
+---
+
+# Archiwum ograniczeń v0.4.1
 
 ## Przeglądarki i wydajność
 Poprawka PPM usuwa zależność od kompatybilnego mousemove anulowanego po pointerdown.

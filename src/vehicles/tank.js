@@ -1,12 +1,37 @@
 import {v3,sub,norm,flatDist,add,mul,angleDiff,approachAngle} from '../core/math.js';
+import {orientedBounds,footprintOverlap,footprintsIntersect} from '../world/shapes.js';
+import {BODY_HEIGHT,CONTACT_EPS} from '../world/collision.js';
 import {blast,fireMountedBullet} from '../combat/ballistics.js';
 
 export function createTank(data,terrain){return{...data,route:data.route.map(p=>({...p})),routeIndex:0,pos:v3(data.x,terrain.height(data.x,data.z),data.z),yaw:0,state:'waiting',weaponLeft:2,mgLeft:1,mgAmmo:450,mgBurst:0,ammunition:18,moving:false,gunWorking:true,trackPhase:0,integrity:100,tracks:100,blockedTime:0,lastFire:-100,lastHit:-100};}
-export function tankBounds(t){const c=Math.abs(Math.cos(t.yaw)),s=Math.abs(Math.sin(t.yaw)),x=1.8*c+3.7*s,z=1.8*s+3.7*c;return{id:t.id,min:v3(t.pos.x-x,t.pos.y+.05,t.pos.z-z),max:v3(t.pos.x+x,t.pos.y+2.65,t.pos.z+z)};}
+export function tankBounds(t){return orientedBounds(t.id,t.pos,t.yaw,1.8,3.7,t.pos.y+.05,t.pos.y+2.65);}
 export function tankMount(t,x,y,z){return v3(t.pos.x+x*Math.cos(t.yaw)+z*Math.sin(t.yaw),t.pos.y+y,t.pos.z-x*Math.sin(t.yaw)+z*Math.cos(t.yaw));}
 /** Keep these offsets aligned with the Mark IV asset muzzle tips (metres). */
 export function tankMuzzle(t,kind,side=1){return kind==='mg'?tankMount(t,0,1.36,3.23):tankMount(t,Math.sign(side)*2.93,1.40,1.34);}
 function local(t,p){const x=p.x-t.pos.x,z=p.z-t.pos.z;return{x:x*Math.cos(t.yaw)-z*Math.sin(t.yaw),z:x*Math.sin(t.yaw)+z*Math.cos(t.yaw)};}
+
+/** Conservative swept footprint shared with actor blocking; no two front-point shortcut. */
+export function tankMoveClear(w,t,pos,yaw){
+ const delta=angleDiff(yaw,t.yaw),angle=t.yaw+delta/2,c=Math.cos(angle),s=Math.sin(angle);
+ const dx=pos.x-t.pos.x,dz=pos.z-t.pos.z,rotationMargin=4.2*Math.abs(delta)/2;
+ const mid=v3((pos.x+t.pos.x)/2,(pos.y+t.pos.y)/2,(pos.z+t.pos.z)/2);
+ const sweep=orientedBounds(t.id,mid,angle,1.8+Math.abs(dx*c-dz*s)/2+rotationMargin,3.7+Math.abs(dx*s+dz*c)/2+rotationMargin,Math.min(pos.y,t.pos.y)+.05,Math.max(pos.y,t.pos.y)+2.65);
+ for(const a of w.actors){
+  if(a.hp<=0||a.pos.y+(BODY_HEIGHT[a.stance]||1.74)<=sweep.min.y+CONTACT_EPS||a.pos.y>=sweep.max.y-CONTACT_EPS)continue;
+  for(const offset of a.stance==='prone'?[0,-.55,.55]:[0]){
+   const x=a.pos.x+Math.sin(a.yaw||0)*offset,z=a.pos.z+Math.cos(a.yaw||0)*offset,r=.28;
+   if(footprintOverlap({x,z},r,sweep,CONTACT_EPS))return false;
+  }
+ }
+ const boxes=[...w.collision.index.bounds(sweep.min.x,sweep.min.z,sweep.max.x,sweep.max.z),...w.collision.dynamic];
+ for(const b of boxes){
+  if(b.id===t.id||b.owner===t.id||b.blocksMovement===false)continue;
+  // Retain the existing .60 m ground-clearance rule; do not shrink actor blockers.
+  if(b.max.y<=Math.min(t.pos.y,pos.y)+.60||b.min.y>=sweep.max.y-CONTACT_EPS)continue;
+  if(footprintsIntersect(sweep,b,CONTACT_EPS))return false;
+ }
+ return true;
+}
 
 /** Conventional small-arms fire cannot drain a tank's hull-health bar. */
 export function damageTank(w,t,amount,source,point){
@@ -29,15 +54,13 @@ export function updateTank(w,t,dt){
   else if(flatDist(t.pos,waypoint)<.38){
    if(!waypoint.gate||w.director.events.includes(waypoint.gate)){t.routeIndex++;t.state='moving';}else t.state='holding';
   }else{
-   const heading=Math.atan2(waypoint.x-t.pos.x,waypoint.z-t.pos.z);t.yaw=approachAngle(t.yaw,heading,dt*.32);
-   const speed=1.4*Math.max(.15,Math.cos(angleDiff(heading,t.yaw))),dx=Math.sin(t.yaw)*speed*dt,dz=Math.cos(t.yaw)*speed*dt;
+   const heading=Math.atan2(waypoint.x-t.pos.x,waypoint.z-t.pos.z);const yaw=approachAngle(t.yaw,heading,dt*.32);
+   const speed=1.4*Math.max(.15,Math.cos(angleDiff(heading,yaw))),dx=Math.sin(yaw)*speed*dt,dz=Math.cos(yaw)*speed*dt;
    const front=tankMount(t,0,1,4.05),next=v3(t.pos.x+dx,0,t.pos.z+dz);next.y=w.terrain.height(next.x,next.z);
    for(const b of w.layout)if(b.breakable&&!w.destroyedObstacles.includes(b.id)&&Math.abs(front.x-b.x)<b.w/2+1.5&&Math.abs(front.z-b.z)<b.d/2+.7)w.breakObstacle(b.id);
-   const ahead=w.actors.some(a=>{if(a.hp<=0||a.pos.y+1.7<t.pos.y+.2)return false;const q=local(t,a.pos);return Math.abs(q.x)<2.05&&q.z>2.8&&q.z<5.4;});
-   const corners=[tankMount(t,-1.5,.5,4.1),tankMount(t,1.5,.5,4.1)];
-   const solid=corners.some(p=>w.collision.index.point(p.x,p.z,.12).some(b=>b.blocksMovement!==false&&p.x+.12>b.min.x&&p.x-.12<b.max.x&&p.z+.12>b.min.z&&p.z-.12<b.max.z&&b.max.y>t.pos.y+.60&&b.min.y<t.pos.y+2.5));
+   const clear=tankMoveClear(w,t,next,yaw);
    const steep=Math.abs(next.y-t.pos.y)>Math.max(.06,Math.hypot(dx,dz)*.9);
-   if(!ahead&&!solid&&!steep){t.pos=next;t.state='moving';t.moving=true;t.trackPhase+=speed*dt;t.blockedTime=0;}
+   if(clear&&!steep){t.yaw=yaw;t.pos=next;t.state='moving';t.moving=true;t.trackPhase+=Math.hypot(dx,dz);t.blockedTime=0;}
    else{t.state='holding';t.blockedTime+=dt;}
   }
  }

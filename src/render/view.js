@@ -13,7 +13,9 @@ import {clamp,lerp} from '../core/math.js';
 export class GameView {
  constructor(canvas,world,settings){this.canvas=canvas;this.world=world;this.settings=settings;this.engine=new Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,antialias:true},true);if(this.engine.webGLVersion<2){this.engine.dispose();throw Error('Gra wymaga WebGL2. Włącz akcelerację sprzętową lub użyj zgodnej przeglądarki.');}
   this.gpuTimer=new GpuTimer(canvas.getContext('webgl2'));this.renderStats={};this.engine.setHardwareScalingLevel(1/(settings.renderScale||1));this.scene=new Scene(this.engine);this.scene.detachControl();this.scene.clearColor=new Color4(.48,.55,.57,1);this.scene.fogMode=Scene.FOGMODE_LINEAR;this.scene.fogStart=65;this.scene.fogEnd=240;this.scene.fogColor=new Color3(.60,.65,.65);this.scene.ambientColor=new Color3(.23,.24,.22);this.scene.skipPointerMovePicking=true;this.scene.autoClear=true;
-  this.camera=new TargetCamera('player-eye',new Vector3(0,0,0),this.scene);this.camera.minZ=.035;this.camera.maxZ=500;this.camera.fov=(settings.fov||78)*Math.PI/180;
+  this.camera=new TargetCamera('player-eye',new Vector3(0,0,0),this.scene);
+  // Recompute up from all three axes even after explosion roll returns to zero.
+  this.camera.updateUpVectorFromRotation=true;this.camera.minZ=.035;this.camera.maxZ=500;this.camera.fov=(settings.fov||78)*Math.PI/180;
   this.light=new HemisphericLight('overcast-sky',new Vector3(.25,1,.15),this.scene);this.light.intensity=.84;this.light.diffuse=new Color3(.82,.9,1);this.light.groundColor=new Color3(.31,.28,.20);
   this.sun=new DirectionalLight('november-sun',new Vector3(-.55,-.92,.48),this.scene);this.sun.position=new Vector3(42,75,-35);this.sun.intensity=1.13;this.sun.diffuse=new Color3(1,.94,.82);this.sun.shadowMinZ=1;this.sun.shadowMaxZ=190;
   this.assets=new Assets(this.scene);this.mats=materials(this.scene);this.staticMeshes=makeLandscape(this.scene,world,this.mats);this.units=new Map();this.tankModels=new Map();this.items=new Map();this.lastTime=world.time;this.smoothedEye=EYE_HEIGHT[world.player.stance];this.viewModels=new Map();this.lastSlot=null;this.lastWeapon=null;this.motionPhase=0;this.frameTimes=[];this.disposed=false;this.applySettings(settings);
@@ -60,7 +62,7 @@ export class GameView {
   this.shadow.getShadowMap().renderList=list;
   this.renderStats.shadowCasters=list.length;
  }
- async load(progress){await this.assets.load(progress);for(const n of this.world.npcs)this.addUnit(n);for(const t of this.world.tanks){const model=this.assets.instantiate('mark-iv',t.id);this.tankModels.set(t.id,model);for(const m of model.meshes){m.receiveShadows=true;if(this.shadow)this.shadow.addShadowCaster(m,false);}}
+ async load(progress){await this.assets.load(progress);if(this.disposed)throw new DOMException('Scena anulowana.','AbortError');for(const n of this.world.npcs)this.addUnit(n);for(const t of this.world.tanks){const model=this.assets.instantiate('mark-iv',t.id);this.tankModels.set(t.id,model);for(const m of model.meshes){m.receiveShadows=true;if(this.shadow)this.shadow.addShadowCaster(m,false);}}
   this.support=new SupportView(this.scene,this.assets,this.mats,this.world);
   this.fpRoot=new TransformNode('first-person',this.scene);this.fpRoot.parent=this.camera;
   for(const name of ['smle','gewehr','webley','lewis']){const model=this.assets.instantiate(name,`fp-${name}`);model.root.parent=this.fpRoot;model.root.setEnabled(false);for(const m of model.meshes){m.renderingGroupId=2;m.receiveShadows=false;m.alwaysSelectAsActiveMesh=true;}this.viewModels.set(name,model);}
@@ -71,7 +73,7 @@ export class GameView {
    root.position.set(i.pos.x,i.pos.y,i.pos.z);this.items.set(i.id,root);
   }
   // Freeze Babylon's wall-clock animation system; sampled clips follow simulation time.
-  this.scene.animationsEnabled=false;progress('Przygotowywanie pierwszej klatki',1);await this.scene.whenReadyAsync();this.sync(0);this.updateShadowList(true);this.render(false);
+  this.scene.animationsEnabled=false;progress('Przygotowywanie pierwszej klatki',1);await this.scene.whenReadyAsync();if(this.disposed)throw new DOMException('Scena anulowana.','AbortError');this.sync(0);this.updateShadowList(true);this.render(false);
  }
  addUnit(n){const model=this.assets.instantiate(appearanceFor(n).model,n.id);model.bones=new Map(model.root.getDescendants().map(node=>[node.name.split(':').pop(),node]));model.lastAnim=null;model.animation=null;model.animStart=0;model.nextSample=0;model.lod=-1;for(const m of model.meshes){m.receiveShadows=true;if(this.shadow)this.shadow.addShadowCaster(m,false);}this.units.set(n.id,model);}
  sync(dt){const w=this.world,p=w.player,time=w.time;this.motionPhase=p.distance*3;

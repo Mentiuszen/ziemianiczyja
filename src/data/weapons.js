@@ -6,8 +6,9 @@ export const WEAPONS=Object.freeze({
  lewis:{name:'Lewis Mk I',short:'LEWIS',capacity:47,cycle:.135,reload:4.5,damage:58,spread:.025,adsSpread:.008,recoil:.012,range:150,auto:true,model:'lewis',sound:'lewis'},
  mg08:{name:'MG 08',short:'MG 08',capacity:100,cycle:.14,reload:5.2,damage:57,spread:.018,adsSpread:.007,recoil:.005,range:150,auto:true,model:'mg08',sound:'mg'}
 });
+// Player protection is separate from NPC damage and from physical weapon timings.
 export const DIFFICULTIES=Object.freeze({
- recruit:{name:'Rekrut',incoming:.58,reaction:1.35,spread:1.6,pressure:.75},
- soldier:{name:'Żołnierz',incoming:.82,reaction:1,spread:1,pressure:1},
- veteran:{name:'Weteran',incoming:1.15,reaction:.72,spread:.7,pressure:1.25}
+ recruit:Object.freeze({name:'Rekrut',bulletIncoming:.25,explosionIncoming:.55,meleeIncoming:.58,regenDelay:3,regenRate:25,reactionMin:1,reactionMax:1.5,npcReactionScale:1.35,spread:1.6,burstMin:2,burstMax:4,burstPauseMin:1.2,burstPauseMax:1.8}),
+ soldier:Object.freeze({name:'Żołnierz',bulletIncoming:.35,explosionIncoming:.75,meleeIncoming:.82,regenDelay:4,regenRate:20,reactionMin:.7,reactionMax:1.2,npcReactionScale:1,spread:1,burstMin:3,burstMax:5,burstPauseMin:.8,burstPauseMax:1.4}),
+ veteran:Object.freeze({name:'Weteran',bulletIncoming:.65,explosionIncoming:1,meleeIncoming:1.15,regenDelay:5,regenRate:16,reactionMin:.45,reactionMax:.8,npcReactionScale:.72,spread:.7,burstMin:4,burstMax:6,burstPauseMin:.6,burstPauseMax:1.0})
 });

@@ -1,6 +1,8 @@
 import {LANDMARKS,HQ} from '../data/world-map.js';
 import {OBJECTIVES} from '../data/cambrai.js';
 import {PHASE,BRIEFING_DURATION,briefingLine} from '../data/briefing.js';
+import {isFieldGunNeutralized} from '../vehicles/field-gun.js';
+import {canReach} from '../core/interaction.js';
 import {flatDist} from '../core/math.js';
 
 /** Mission state, never a substitute for NPC perception or damage. All clocks are simulated. */
@@ -22,7 +24,7 @@ export class Director {
  startAssault(w){
   if(this.phase!==PHASE.BRIEFING)return;
   this.assaultTime=w.time;this.advance(w);
-  for(const n of w.npcs){n.think=0;n.path=[];n.pathTarget=null;}
+  for(const n of w.npcs){n.think=0;w.nav.cancel(n);}
   w.emit('whistle',{pos:{...w.player.pos}});
  }
  alert(w,text='Przeciwnik zaalarmowany! Oddział wychodzi ze stanowisk.'){
@@ -31,8 +33,8 @@ export class Director {
  }
  checkpoint(name){this.lastCheckpoint=name;this.checkpointPending=true;this.checkpointWait=0;}
  advance(w){
-  if(this.phase>=PHASE.COMPLETE)return;
-  this.phase++;w.emit('objective',{phase:this.phase});
+  if(w.player.hp<=0||this.phase>=PHASE.COMPLETE)return;
+  this.phase++;for(const n of w.npcs){w.nav.cancel(n);n.think=0;}w.emit('objective',{phase:this.phase});
   const texts={
    1:'Hughes: Ruszamy! H21 otworzy drut. Trzymaj odstęp i wykorzystuj zagłębienia!',
    2:'Ellis: Schron po prawej! Przycisnę obsługę. Reed, obejdź stanowisko!',
@@ -49,6 +51,7 @@ export class Director {
   if(this.phase===PHASE.COMPLETE){this.once('finished');w.emit('complete',{});}
  }
  update(w,dt){
+  if(w.player.hp<=0||this.phase===PHASE.COMPLETE)return;
   const p=w.player.pos;
   if(this.phase===PHASE.BRIEFING){
    this.briefingTime=Math.min(BRIEFING_DURATION,this.briefingTime+dt);
@@ -57,7 +60,7 @@ export class Director {
   }
   if(this.phase===PHASE.ADVANCE&&p.z>44)this.advance(w);
   if(this.phase===PHASE.MG){const gun=w.npcs.find(n=>n.id==='de-mg');if(!gun||gun.hp<=0||this.events.includes('mg-silenced')){this.once('mg-silenced');this.advance(w);}}
-  if(this.phase===PHASE.ARTILLERY&&w.fieldGuns.every(g=>!g.operational)){this.once('fieldgun-silenced');this.advance(w);}
+  if(this.phase===PHASE.ARTILLERY&&w.fieldGuns.every(g=>isFieldGunNeutralized(w,g))){this.once('fieldgun-silenced');this.advance(w);}
   if(this.phase===PHASE.HOLD){
    // Close enemies contest; a lost distant soldier never prevents victory.
    this.holdThreats=w.npcs.filter(n=>n.hp>0&&n.faction==='de'&&flatDist(n.pos,LANDMARKS.telephone)<15).length;
@@ -70,25 +73,35 @@ export class Director {
   }
   if(this.checkpointPending){
    this.checkpointWait+=dt;
-   if(!w.grenades.length&&!w.shells.length&&!(w.air?.bombs.length)&&w.player.hp>0&&w.player.health.delay<=0){
+   if(w.canCheckpoint()){
     this.checkpointPending=false;this.checkpointWait=0;w.emit('checkpoint',{name:this.lastCheckpoint});
    }
   }
  }
- interact(w){
-  const p=w.player.pos,o=this.objective;
-  if(this.phase===PHASE.BRIEFING)return this.skipBriefing(w);
-  if(o.kind==='gun'){
-   if(p.z>60.5&&flatDist(p,{x:23,z:62})<3){
-    const gun=w.npcs.find(n=>n.id==='de-mg');if(gun&&gun.hp>0){gun.fixed=false;gun.weapon.mag=0;gun.weapon.reserve=0;gun.weapon.cancelReload();gun.state='retreat';w.nav.request(gun,{x:31,y:0,z:127});}
-    this.once('mg-silenced');this.advance(w);return true;
-   }return false;
+ interaction(w){
+  const p=w.player.pos,o=this.objective;if(w.player.hp<=0||this.phase===PHASE.COMPLETE)return null;
+  if(this.phase===PHASE.BRIEFING)return{key:'interact',kind:'briefing',label:'Pomiń odprawę i rozpocznij natarcie'};
+  for(const gun of w.fieldGuns){
+   const point={x:gun.pos.x,y:gun.pos.y+1.05,z:gun.pos.z+.5};
+   if(!isFieldGunNeutralized(w,gun)&&p.z>gun.pos.z+.4&&canReach(w,point,3.3,gun.id))return{key:'interact',kind:'fieldgun',id:gun.id,label:'Unieszkodliw zamek działa 7,7 cm'};
   }
-  // Rear breech is available early too. No hidden requirement for the player's final hit.
-  const gun=w.fieldGuns.find(g=>g.operational&&p.z>g.pos.z+.4&&flatDist(p,g.pos)<3.3);
-  if(gun){gun.operational=false;gun.disabled=true;this.once('fieldgun-silenced');w.emit('message',{text:'Zamek wyłączony. To działo już nie wystrzeli.'});w.emit('gun-disabled',{id:gun.id,pos:{...gun.pos}});return true;}
-  if(o.kind==='interact'&&flatDist(p,{x:o.x,z:o.z})<o.radius){this.advance(w);return true;}
-  return false;
+  if(o.kind==='gun'&&p.z>60.5&&canReach(w,{x:23,y:w.terrain.height(23,62)+1,z:62},3))return{key:'interact',kind:'mg',label:'Przerwij podawanie amunicji MG 08'};
+  if(o.kind==='interact'&&canReach(w,{x:o.x,y:w.terrain.height(o.x,o.z)+1.35,z:o.z},o.radius))return{key:'interact',kind:'objective',label:this.phase===PHASE.RALLY?'Zabierz meldunek':'Uruchom telefon polowy'};
+  return null;
+ }
+ interact(w){
+  const action=this.interaction(w);if(!action)return false;
+  if(action.kind==='briefing')return this.skipBriefing(w);
+  if(action.kind==='mg'){
+   const gun=w.npcs.find(n=>n.id==='de-mg');
+   if(gun&&gun.hp>0){gun.fixed=false;gun.weapon.mag=0;gun.weapon.reserve=0;gun.weapon.cancelReload();gun.state='retreat';w.nav.request(gun,{x:31,y:0,z:127},'retreat');}
+   this.once('mg-silenced');this.advance(w);return true;
+  }
+  if(action.kind==='fieldgun'){
+   const gun=w.fieldGuns.find(g=>g.id===action.id);gun.operational=false;gun.disabled=true;gun.neutralized=true;
+   this.once('fieldgun-silenced');w.emit('message',{text:'Zamek wyłączony. To działo już nie wystrzeli.'});w.emit('gun-disabled',{id:gun.id,pos:{...gun.pos}});return true;
+  }
+  if(action.kind==='objective'){this.advance(w);return true;}return false;
  }
  snapshot(){return{phase:this.phase,events:[...this.events],hold:this.hold,chapter:this.chapter,lastCheckpoint:this.lastCheckpoint,checkpointPending:this.checkpointPending,checkpointWait:this.checkpointWait,briefingTime:this.briefingTime,assaultTime:this.assaultTime,contested:this.contested,holdThreats:this.holdThreats};}
  restore(s){Object.assign(this,s);this.events=[...s.events];}
