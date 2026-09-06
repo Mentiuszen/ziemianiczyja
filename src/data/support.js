@@ -1,6 +1,7 @@
+import {message} from '../i18n/message.js';
 /** Metres. Equipment whitelist for the fictional Cambrai sector, 20 XI 1917. */
 export const FIELD_GUNS=Object.freeze([
- {id:'fieldgun-1',name:'Niemieckie działo polowe 7,7 cm',x:36,z:110,yaw:Math.PI,
+ {id:'fieldgun-1',name:message('equipment.fieldgun'),x:36,z:110,yaw:Math.PI,
   faction:'de',crewIds:['de-gun-0','de-gun-1'],model:'field-gun-77'}
 ]);
 // One finite programme, relative to assault start. Models are simplified silhouettes.

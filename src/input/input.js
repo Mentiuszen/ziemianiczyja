@@ -1,3 +1,4 @@
+import {LocalizedError} from '../i18n/index.js';
 const EDGE_ACTIONS = ['crouch', 'prone', 'jump', 'interact', 'reload', 'grenade', 'melee', 'slot1', 'slot2'];
 
 /** A single input owner. Pointer Events are authoritative, mouse events are a fallback.
@@ -154,10 +155,10 @@ export function requestGamePointerLock(canvas, timeoutMs = 2500) {
       error ? reject(error) : resolve();
     };
     const changed = () => { if (document.pointerLockElement === canvas) finish(); };
-    const failed = () => finish(new Error('Przeglądarka odmówiła blokady kursora.'));
+    const failed = () => finish(new LocalizedError('error.lockDenied'));
     document.addEventListener('pointerlockchange', changed);
     document.addEventListener('pointerlockerror', failed);
-    timer = setTimeout(() => finish(new Error('Przekroczono czas oczekiwania na blokadę kursora.')), timeoutMs);
+    timer = setTimeout(() => finish(new LocalizedError('error.lockTimeout')), timeoutMs);
     try {
       const result = canvas.requestPointerLock();
       if (result?.catch) result.catch(finish);

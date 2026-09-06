@@ -1,3 +1,4 @@
+import {message} from '../i18n/message.js';
 import {v3,sub,norm,flatDist,angleDiff,approachAngle} from '../core/math.js';
 
 export function createFieldGun(data,terrain){return{...data,crewIds:[...data.crewIds],pos:v3(data.x,terrain.height(data.x,data.z),data.z),yaw:data.yaw,homeYaw:data.yaw,operational:true,disabled:false,neutralized:false,reloadLeft:5,ammo:18,recoil:0,lastFire:-100};}
@@ -38,7 +39,7 @@ export function updateFieldGun(w,g,dt){
   w.shells.push({id:`shell-${w.nextId++}`,owner:g.id,faction:g.faction,pos:from,vel:v3(d.x/flight,(d.y+3*flight*flight)/flight,d.z/flight),ttl:flight+1,power:180,radius:4.2,armorDamage:48,kind:'shell'});
   g.ammo--;g.reloadLeft=(crew.length>1?7.5:13)+w.random()*2;g.recoil=1;g.lastFire=w.time;w.stats.fieldGunShots++;
   w.emit('cannon',{pos:from,owner:g.id});
-  if(w.director.once('gun-revealed'))w.emit('message',{text:'Hughes: Działo na prawej flance! Widzisz błysk? Reed, podejdź od boku, zanim trafi czołgi!'});
+  if(w.director.once('gun-revealed'))w.emit('message',{text:message('message.fieldgun')});
   break;
  }
 }

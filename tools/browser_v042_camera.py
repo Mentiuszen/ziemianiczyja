@@ -89,6 +89,8 @@ def main() -> int:
                     code=2
                 else:
                     page.wait_for_function('!!globalThis.__ZN_TEST__?.app')
+                    if page.locator('#choose-pl').count():
+                        page.locator('#choose-pl').click()
                     page.evaluate('async()=>{await globalThis.__ZN_TEST__.app.start();}')
                     page.wait_for_function("globalThis.__ZN_TEST__.app.state==='ready'",timeout=60000)
                     for quality in ['low','medium','high','ultra']:

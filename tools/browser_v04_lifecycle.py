@@ -22,7 +22,7 @@ with sync_playwright() as p:
   else:report['missing'].append(r.request.url);r.fulfill(status=404,body='missing')
  page.route('http://local.test/**',route)
  html=(ROOT/'index.html').read_text().replace('<head>',f'<head><base href="{base}"><script>window.__ZN_TEST_MODE__=true</script>')
- page.set_content(html,wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja !== undefined')
+ page.set_content(html,wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja !== undefined');page.locator('#choose-pl').click() if page.locator('#choose-pl').count() else None
  report['menu']=page.evaluate('ZiemiaNiczyja.inspect()');report['menuRequests']=len(requests);assert report['menu']['missionScenes']==0 and report['menu']['npcs']==0;page.screenshot(path=str(OUT/'menu.png'))
  page.locator('[data-action="settings"]').click();page.locator('select[data-setting="quality"]').select_option('low');page.locator('[data-action="back"]').click()
  page.locator('[data-action="controls"]').click();page.locator('[data-action="bind"][data-key="crouch"]').click();page.keyboard.press('X');assert page.evaluate('__ZN_TEST__.app.settings.keys.crouch')=='KeyX';page.locator('[data-action="keys-reset"]').click();page.locator('[data-action="back"]').click();report['settingsAndRebind']=True

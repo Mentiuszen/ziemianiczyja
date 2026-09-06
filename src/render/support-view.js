@@ -5,7 +5,7 @@ import {HQ} from '../data/world-map.js';
 
 /** Render-only support layer. Ownership of trajectories and damage remains in Simulation. */
 export class SupportView {
- constructor(scene,assets,mats,world){
+ constructor(scene,assets,mats,world,language='pl'){
   this.scene=scene;this.assets=assets;this.mats=mats;this.guns=new Map();this.planes=new Map();this.wire=new Map();this.lastDust=-1;
   for(const g of world.fieldGuns){const m=assets.instantiate(g.model,g.id);for(const mesh of m.meshes)mesh.receiveShadows=true;this.guns.set(g.id,m);}
   for(const b of world.layout.filter(b=>b.breakable)){
@@ -15,7 +15,7 @@ export class SupportView {
    const mesh=g.mesh('breakable:'+b.id,scene,mats.iron);mesh.freezeWorldMatrix();mesh.metadata={breakable:b.id};mesh.setEnabled(!world.destroyedObstacles.includes(b.id));this.wire.set(b.id,mesh);
   }
   const y=world.terrain.height(HQ.x,HQ.z)+.20;
-  const mapMat=new StandardMaterial('operations-map',scene);mapMat.diffuseTexture=new Texture(assetURL('textures/briefing-map.jpg'),scene);mapMat.specularColor=Color3.Black();mapMat.diffuseColor=new Color3(.93,.92,.82);
+  const mapMat=new StandardMaterial('operations-map',scene);this.mapTextures={pl:new Texture(assetURL('textures/briefing-map.jpg'),scene),en:new Texture(assetURL('textures/briefing-map-en.png'),scene)};this.mapMaterial=mapMat;this.setLanguage(language);mapMat.specularColor=Color3.Black();mapMat.diffuseColor=new Color3(.93,.92,.82);
   const map=new Geometry();map.quad([[31.74,y+1.166,-6.43],[34.24,y+1.166,-6.43],[34.24,y+1.166,-5.31],[31.74,y+1.166,-5.31]],[0,1,0]);map.mesh('briefing-map',scene,mapMat).receiveShadows=true;
   const deco=new Geometry();
   // Lantern frame and chimney; lighting remains within the existing bounded light rig.
@@ -27,6 +27,7 @@ export class SupportView {
   const bulb=boxMesh('briefing-lantern-light',scene,glow,.073,.16,.07);bulb.position.set(34.03,y+1.36,-5.39);
   const papers=new Geometry();for(let i=0;i<4;i++)papers.box(31.82+i*.025,y+1.17+i*.006,-5.48,.30,.008,.30,-.15);papers.mesh('briefing-orders',scene,mats.paper);
  }
+ setLanguage(language){this.mapMaterial.diffuseTexture=this.mapTextures[language==='en'?'en':'pl'];}
  sync(w,dt,effects,profile){
   for(const [id,mesh] of this.wire)mesh.setEnabled(!w.destroyedObstacles.includes(id));
   for(const g of w.fieldGuns){const model=this.guns.get(g.id);model.root.position.set(g.pos.x-Math.sin(g.yaw)*g.recoil*.07,g.pos.y,g.pos.z-Math.cos(g.yaw)*g.recoil*.07);model.root.rotation.y=g.yaw;}

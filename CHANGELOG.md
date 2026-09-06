@@ -1,3 +1,74 @@
+# Zmiany v0.4.3 — 6 września 2026
+
+**Status: kod przygotowany do lokalnego odbioru; bez publikacji przez wykonawcę.**
+
+Wydanie językowe na bazie 0.4.2. Pełne polskie i angielskie teksty gry,
+jednorazowy ekran wyboru języka oraz zapamiętana preferencja niezależna od postępu.
+
+## Wybór języka przy uruchomieniu
+
+- Przed pierwszym menu pojawiają się dwa duże kafle: **English** i **Polski**.
+- Flaga English łączy USA w górnym lewym trójkącie i UK w dolnym prawym;
+  przekątna biegnie od lewego dolnego do prawego górnego narożnika. Polski ma flagę biało-czerwoną.
+- Kliknięcie, Enter lub Spacja na kaflu zapisuje wybór i otwiera menu główne w danym języku.
+  Nie ma wcześniejszego mignięcia menu, dodatkowego potwierdzenia ani automatycznego wyboru
+  według języka przeglądarki. Wybór nie ładuje mapy i nie przejmuje kursora.
+- Kolejne uruchomienia pomijają wybór. Starsze ustawienia bez języka oraz nieprawidłowe
+  wartości wyświetlają wybór, zachowując jakość grafiki, klawisze i zapis misji.
+- Dodano obsługę klawiatury, widoczny fokus, natywne nazwy języków i układ dla małych okien.
+  Flagi są lokalnymi SVG; nie wymagają CDN, pobierania fontów ani usług tłumaczenia.
+
+## Pełna warstwa tekstowa PL/EN
+
+- Zlokalizowano menu główne, wybór misji, odprawę przed startem, ustawienia, sterowanie,
+  informacje o projekcie, ładowanie, pauzę, ekran śmierci, ukończenia i błędów.
+- Tłumaczenia obejmują HUD, postawy, przeładowanie, ostrzeżenia o zdrowiu i granatach,
+  wszystkie cele i podpowiedzi, interakcje, wyposażenie, pickupy oraz checkpointy.
+- Przetłumaczono siedem wypowiedzi odprawy, stopnie i ogólne nazwy rozmówców, meldunki oddziału,
+  ostrzeżenia artylerii, czołgów i nalotów. Zachowano kolejność, czas i warunki zdarzeń.
+- W obu językach dostępne są komunikaty walidacji zapisów, odmowy pamięci, ładowania zasobów,
+  WebGL2, blokady kursora i audio oraz podpisy diagnostyki CPU/GPU/FPS i stanów AI.
+- Podpowiedzi korzystają z faktycznie przypisanych klawiszy. Liczby interfejsu mają format
+  właściwy dla języka. Tekst z parametrami jest wyświetlany bez interpretowania go jako HTML.
+- Ekran informacji otwiera angielskie odpowiedniki historii, znanych ograniczeń i pochodzenia
+  zasobów po wybraniu English. Oryginalne licencje zależności pozostają bez zmian.
+- Nazwa **Ziemia Niczyja**, nazwy własne bohaterów, miejsc i broni nie zostały arbitralnie
+  zmienione. Lokalizacja dotyczy tekstów, nie dubbingu ani nagrań.
+- Dodano angielski napis w teksturze mapy na stole odprawy. Zmiana języka przełącza
+  materiał bez przebudowy sceny. Oryginalna mapa pozostaje; wariant EN zmienia tylko obszar napisu.
+
+## Zmiana języka i zgodność
+
+- Opcja **Język / Language** zmienia teksty natychmiast, również w opcjach otwartych z pauzy.
+  Nie przeładowuje strony, nie tworzy nowej sceny, nie resetuje zdrowia, czasu ani postępu.
+- Aktywne powiadomienia, bieżący cel, podpis checkpointu i napisy odświeżają tłumaczenie
+  bez ponownego wywoływania zdarzenia, przedłużania timera czy odtwarzania dźwięku.
+- Wybór `pl` / `en` jest częścią `zn-settings-v1`, a nie snapshotu misji. Reset ustawień
+  pozostawia język; odrzucenie checkpointu także go nie kasuje.
+- Gdy przeglądarka nie pozwala zapisać ustawień, gra nadal działa w wybranym języku w sesji
+  i pokazuje przetłumaczone ostrzeżenie. Nie obiecuje zapamiętania wyboru po zamknięciu.
+- Zachowano `SAVE_VERSION=1` i `MISSION_VERSION=3`. Starsze nazwy checkpointów i ogólne
+  nazwy NPC są normalizowane przy odczycie; nie zamrażają polskiego tekstu w angielskiej grze.
+
+## Utrzymanie, wydanie i regresje
+
+- Dodano wspólny translator, katalogi `src/i18n/pl.js` i `en.js`, stabilne klucze i parametry.
+  Brakujące klucze i parametry są błędami, a nie cichym mieszaniem języków.
+- Ujednolicono wersję **0.4.3** w metadanych pakietu, lockfile, menu/HUD i API diagnostycznym.
+  Baza 0.4.2 miała jeszcze numer 0.4.1 w części metadanych.
+- Rozszerzono build o dokumenty EN oraz kontrole kompletności tłumaczeń, ścieżek i numerów wersji.
+- Dodano regresje wyboru języka, starszych ustawień, zapamiętania/odmowy zapisu,
+  przełączania w pauzie, zachowania snapshotów, parametrów, błędów i wszystkich ekranów.
+- Zachowano naprawy 0.4.2, istniejącą mapę, modele, oryginalne tekstury, audio i przypięty Babylon.
+  Dodatkowy wariant tekstury EN dotyczy wyłącznie podpisu na stole odprawy.
+  Nie zmieniono poziomu trudności, mechaniki walki, kolizji ani przebiegu misji.
+
+Szczegóły rzeczywiście wykonanej weryfikacji oraz lokalnych prób są w
+`docs/V0_4_3_IMPLEMENTATION.md`. Zielone testy tekstów nie oznaczają zakończonego
+odbioru pełnej gry, Firefoksa/Edge, fizycznego GPU ani publikacji.
+
+---
+
 # Zmiany v0.4.2 — 6 września 2026
 
 **Status: kandydat do lokalnego odbioru, bez publikacji.**

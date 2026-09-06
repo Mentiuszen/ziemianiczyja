@@ -1,3 +1,4 @@
+import {message} from '../i18n/message.js';
 /** Balance values are gameplay choices, not claims about real weapon performance. */
 export const WEAPONS=Object.freeze({
  smle:{name:'SMLE Mk III',short:'SMLE',capacity:10,cycle:1.1,reload:3.3,damage:94,spread:.013,adsSpread:.0018,recoil:.029,range:180,auto:false,model:'smle',sound:'rifle'},
@@ -8,7 +9,7 @@ export const WEAPONS=Object.freeze({
 });
 // Player protection is separate from NPC damage and from physical weapon timings.
 export const DIFFICULTIES=Object.freeze({
- recruit:Object.freeze({name:'Rekrut',bulletIncoming:.25,explosionIncoming:.55,meleeIncoming:.58,regenDelay:3,regenRate:25,reactionMin:1,reactionMax:1.5,npcReactionScale:1.35,spread:1.6,burstMin:2,burstMax:4,burstPauseMin:1.2,burstPauseMax:1.8}),
- soldier:Object.freeze({name:'Żołnierz',bulletIncoming:.35,explosionIncoming:.75,meleeIncoming:.82,regenDelay:4,regenRate:20,reactionMin:.7,reactionMax:1.2,npcReactionScale:1,spread:1,burstMin:3,burstMax:5,burstPauseMin:.8,burstPauseMax:1.4}),
- veteran:Object.freeze({name:'Weteran',bulletIncoming:.65,explosionIncoming:1,meleeIncoming:1.15,regenDelay:5,regenRate:16,reactionMin:.45,reactionMax:.8,npcReactionScale:.72,spread:.7,burstMin:4,burstMax:6,burstPauseMin:.6,burstPauseMax:1.0})
+ recruit:Object.freeze({name:message('difficulty.recruit'),bulletIncoming:.25,explosionIncoming:.55,meleeIncoming:.58,regenDelay:3,regenRate:25,reactionMin:1,reactionMax:1.5,npcReactionScale:1.35,spread:1.6,burstMin:2,burstMax:4,burstPauseMin:1.2,burstPauseMax:1.8}),
+ soldier:Object.freeze({name:message('difficulty.soldier'),bulletIncoming:.35,explosionIncoming:.75,meleeIncoming:.82,regenDelay:4,regenRate:20,reactionMin:.7,reactionMax:1.2,npcReactionScale:1,spread:1,burstMin:3,burstMax:5,burstPauseMin:.8,burstPauseMax:1.4}),
+ veteran:Object.freeze({name:message('difficulty.veteran'),bulletIncoming:.65,explosionIncoming:1,meleeIncoming:1.15,regenDelay:5,regenRate:16,reactionMin:.45,reactionMax:.8,npcReactionScale:.72,spread:.7,burstMin:4,burstMax:6,burstPauseMin:.6,burstPauseMax:1.0})
 });

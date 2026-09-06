@@ -2,10 +2,10 @@ import {cp,mkdir,rm,readFile,writeFile,stat,readdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';import {resolve,join,relative,sep} from 'node:path';import {gzipSync} from 'node:zlib';
 const root=fileURLToPath(new URL('../',import.meta.url)),dist=resolve(root,'dist');
 // Only deployable files belong in dist. Validate inputs before replacing the old build.
-const inputs=['index.html','src','public','vendor','ASSET_LICENSES.md','LICENSE','CHANGELOG.md','docs/HISTORY.md','docs/KNOWN_ISSUES.md'];
+const inputs=['index.html','src','public','vendor','ASSET_LICENSES.md','ASSET_LICENSES.en.md','LICENSE','CHANGELOG.md','docs/HISTORY.md','docs/HISTORY.en.md','docs/KNOWN_ISSUES.md','docs/KNOWN_ISSUES.en.md'];
 for(const name of inputs)await stat(join(root,name));
 await rm(dist,{recursive:true,force:true});await mkdir(dist,{recursive:true});
-// These two documents are linked from the game's Credits screen.
+// Polish and English documents are linked from the game's Credits screen.
 await mkdir(join(dist,'docs'),{recursive:true});
 for(const name of inputs)await cp(join(root,name),join(dist,name),{recursive:true});
 await writeFile(join(dist,'.nojekyll'),'');

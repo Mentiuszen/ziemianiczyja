@@ -1,3 +1,4 @@
+import {message} from '../i18n/message.js';
 import {AIR_SORTIES} from '../data/support.js';
 import {v3,add,sub,mul,norm,dist} from '../core/math.js';
 import {blast} from '../combat/ballistics.js';
@@ -15,7 +16,7 @@ export function updateAirSupport(w,dt){
   if(s.attack){
    const fall=Math.sqrt(2*s.altitude/12),dir=v3(Math.sin(s.heading),0,Math.cos(s.heading));
    velocity=mul(dir,s.speed);pos=v3(s.target.x-velocity.x*(fall+4),w.terrain.height(s.target.x,s.target.z)+s.altitude,s.target.z-velocity.z*(fall+4));life=fall+13;releaseAt=4;
-   w.emit('air-warning',{pos:{...pos},faction:s.faction,text:s.faction==='de'?'Niemiecki samolot obniża lot! Osłoń się za ziemnym nasypem lub w budynku.':'Brytyjski samolot nadlatuje z lewej — nie wychodź na stanowiska przeciwnika.'});
+   w.emit('air-warning',{pos:{...pos},faction:s.faction,text:s.faction==='de'?message('message.airDe'):message('message.airUk')});
   }else{pos={...s.start};velocity=mul(norm(sub(s.end,s.start)),s.speed);life=dist(s.start,s.end)/s.speed;}
   a.planes.push({id:s.id,model:s.model,faction:s.faction,pos,velocity,age:0,life,releaseAt,released:false,yaw:Math.atan2(velocity.x,velocity.z),bank:s.faction==='uk'?.05:-.04});
   w.emit('air-pass',{pos:{...pos},faction:s.faction});

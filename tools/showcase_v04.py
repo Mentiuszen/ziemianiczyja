@@ -10,7 +10,7 @@ with sync_playwright() as pw:
   if not f.is_file():missing.append(str(f))
   r.fulfill(status=200 if f.is_file() else 404,body=f.read_bytes() if f.is_file() else b'missing',headers={'Content-Type':mimetypes.guess_type(f)[0] or 'application/octet-stream','Access-Control-Allow-Origin':'*'})
  page.route('http://local.test/**',route)
- page.set_content((ROOT/'index.html').read_text().replace('<head>','<head><base href="http://local.test/"><script>window.__ZN_TEST_MODE__=true</script>'),wait_until='networkidle');page.wait_for_function('window.__ZN_TEST__');page.evaluate("__ZN_TEST__.app.settings.quality='high';__ZN_TEST__.app.start()")
+ page.set_content((ROOT/'index.html').read_text().replace('<head>','<head><base href="http://local.test/"><script>window.__ZN_TEST_MODE__=true</script>'),wait_until='networkidle');page.wait_for_function('window.__ZN_TEST__');page.locator('#choose-pl').click() if page.locator('#choose-pl').count() else None;page.evaluate("__ZN_TEST__.app.settings.quality='high';__ZN_TEST__.app.start()")
  page.wait_for_function("['ready','error'].includes(ZiemiaNiczyja.state)",timeout=65000);assert page.evaluate('ZiemiaNiczyja.state')=='ready'
  page.evaluate("() => {const a=__ZN_TEST__.app;a.ui.menu.hidden=true;a.ui.hud.hidden=true;document.querySelector('#toast').style.display='none';a.world.player.ads=false;a.settings.showFps=false;a.settings.showCpu=false;a.settings.showGpu=false;}")
  def shot(pos,target,name,hud=False):

@@ -1,3 +1,38 @@
+# Znane ograniczenia 0.4.3 — 6 września 2026
+
+**Kod do lokalnego odbioru. Ten dokument nie potwierdza publikacji ani pełnego przejścia gry w przeglądarce.**
+
+## Języki i bieżący odbiór
+
+Cała własna warstwa tekstowa gry korzysta z katalogów PL/EN: menu, opcje, HUD,
+cele, odprawa, komunikaty, interakcje, zapis, błędy i diagnostyka. Dokumenty otwierane
+z ekranu informacji mają wersje angielskie. Nazwa projektu, nazwy własne sprzętu,
+identyfikatory techniczne oraz oryginalne licencje zależności pozostają niezmienione.
+Nie dodano dubbingu. Tekst na mapie odprawy ma osobny wariant EN; reszta obrazu pozostaje taka sama. Flaga English jest znakiem wyboru języka USA/UK, a nie nową frakcją.
+
+Brak poprawnego `settings.language` uruchamia wybór języka, także po aktualizacji ze
+starszej wersji. Nie wybiera się języka automatycznie na podstawie przeglądarki.
+Zmiana w opcjach nie zmienia misji ani checkpointu. Przy odmowie pamięci lokalnej
+wybór obowiązuje tylko w bieżącej sesji; po ponownym otwarciu wybór może wrócić.
+Przywrócenie domyślnych opcji nie usuwa wybranego języka.
+
+Sprawdzenie kompletu kluczy/parametrów nie zastępuje korekty językowej w całym przebiegu
+misji. W szczególności lokalnie sprawdzić długie napisy i podpowiedzi przy małym oknie,
+zmianę języka podczas pauzy, trwały zapis ustawień po restarcie przeglądarki oraz Firefox/Edge.
+Wyniki wykonanych testów, zakres kontrolowanej próby DOM i ograniczenia WebGL/HTTP są
+w `V0_4_3_IMPLEMENTATION.md`. Próba DOM bez sieci nie potwierdza trwałego IndexedDB,
+pełnego renderu 3D, Pointer Lock ani działania na hostingu. Nie oznaczać ich jako PASS.
+
+0.4.3 nie zmienia balansu, kolizji, liczby jednostek ani jakości modeli z 0.4.2.
+`SAVE_VERSION=1` i `MISSION_VERSION=3` pozostają; poprawne zapisy 0.4.1/0.4.2 są obsługiwane.
+Historyczne etykiety checkpointów i ogólne nazwy postaci są mapowane na stabilne klucze.
+Nie przenosi się pozycji z niezgodnej starszej wersji mapy.
+
+Poniżej zachowano wcześniejsze notatki wraz z ich datami i ówczesnym statusem;
+nie są one raportem ponownego wykonania prób w 0.4.3.
+
+---
+
 # Znane ograniczenia 0.4.2 — 6 września 2026
 
 **Kandydat do lokalnego odbioru; nie opublikowano wydania.**

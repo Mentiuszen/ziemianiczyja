@@ -1,3 +1,5 @@
+import {LocalizedError} from '../i18n/index.js';
+import {message} from '../i18n/message.js';
 import {PHASE} from '../data/briefing.js';
 import {FIELD_GUNS} from '../data/support.js';
 import {createFieldGun,fieldGunBounds,updateFieldGun,restoreFieldGunState} from '../vehicles/field-gun.js';
@@ -43,7 +45,7 @@ export class Simulation {
    // v0.4.1 has four embedded authored spawn poses, including uk-8 at the tank rear.
    // The 1.25 m bound is for spawn/historical restore only; ordinary recovery stays .65 m.
    const limit=actor.id==='player'?.65:1.25;
-   if(!this.collision.recover(actor,limit))throw Error(`Niebezpieczna pozycja ${actor.id} w checkpointcie lub na starcie. Nie przeniesiono postaci przez przeszkodę.`);
+   if(!this.collision.recover(actor,limit))throw new LocalizedError('error.position',{id:actor.id});
    actor.grounded=this.collision.supported(actor);
    if(actor.grounded)actor.lastSafePosition={...actor.pos};
    if(spawn)actor.recoveryThisStep=false;
@@ -52,10 +54,10 @@ export class Simulation {
  spawnSoldier(data){
   if(this.npcs.some(n=>n.id===data.id))return;
   const actor=createSoldier(data,this.terrain,this.random);
-  if(!this.collision.recover(actor,1.25))throw Error(`Nie można bezpiecznie ustawić ${actor.id}.`);
+  if(!this.collision.recover(actor,1.25))throw new LocalizedError('error.spawn',{id:actor.id});
   this.npcs.push(actor);this.actors=[this.player,...this.npcs];this.collision.actors=this.actors;
  }
- tick(dt,input){if(this.player.hp<=0||this.director.phase===PHASE.COMPLETE)return;dt=Math.min(dt,.05);this.time+=dt;this.player.update(this,dt,input);if(this.player.collisionBlocked)throw Error('Nie można bezpiecznie ustawić postaci. Wczytaj poprzedni checkpoint lub rozpocznij misję ponownie.');this.refreshDynamic();this.collision.actors=this.actors;
+ tick(dt,input){if(this.player.hp<=0||this.director.phase===PHASE.COMPLETE)return;dt=Math.min(dt,.05);this.time+=dt;this.player.update(this,dt,input);if(this.player.collisionBlocked)throw new LocalizedError('error.playerPosition');this.refreshDynamic();this.collision.actors=this.actors;
   this.navBudget+=dt;if(this.navBudget>=.12){this.navBudget=0;this.nav.process(2);}
   for(const n of this.npcs)updateSoldier(this,n,dt);for(const t of this.tanks){updateTank(this,t,dt);this.refreshDynamic();}this.refreshDynamic();for(const g of this.fieldGuns)updateFieldGun(this,g,dt);updateGrenades(this,dt);updateShells(this,dt);updateAirSupport(this,dt);if(this.player.hp>0)this.director.update(this,dt);
   for(const noise of this.noises)noise.ttl-=dt;this.noises=this.noises.filter(n=>n.ttl>0);
@@ -89,13 +91,13 @@ export class Simulation {
  }
  nearbyItem(){return this.items.filter(i=>!i.used&&canReach(this,{...i.pos,y:i.pos.y+.3},2.1)).sort((a,b)=>flatDist(a.pos,this.player.pos)-flatDist(b.pos,this.player.pos))[0];}
  interact(){if(this.director.interact(this))return;const item=this.nearbyItem();if(!item)return;
-  if(item.type==='medkit'){if(!this.player.health.medkit()){this.emit('toast',{text:'Zdrowie pełne — apteczka zostaje na miejscu.'});return;}item.used=true;this.emit('pickup',{text:'+50 zdrowia'});}
-  if(item.type==='ammo'){let changed=false;for(const w of this.player.weapons){const max=w.id==='lewis'?188:w.id==='webley'?36:80;if(w.reserve<max){w.reserve=max;changed=true;}}if(this.player.grenades<3){this.player.grenades=3;changed=true;}if(changed){item.used=true;this.emit('pickup',{text:'Uzupełniono amunicję i granaty.'});}else this.emit('toast',{text:'Masz pełny zapas amunicji.'});}
-  if(item.type==='lewis'){this.player.weapon.cancelReload();this.player.weapons[1]=new Weapon('lewis',47,94);this.player.slot=1;item.used=true;this.emit('pickup',{text:'Lewis zajmuje drugi slot broni.'});}
+  if(item.type==='medkit'){if(!this.player.health.medkit()){this.emit('toast',{text:message('pickup.fullHealth')});return;}item.used=true;this.emit('pickup',{text:message('pickup.health')});}
+  if(item.type==='ammo'){let changed=false;for(const w of this.player.weapons){const max=w.id==='lewis'?188:w.id==='webley'?36:80;if(w.reserve<max){w.reserve=max;changed=true;}}if(this.player.grenades<3){this.player.grenades=3;changed=true;}if(changed){item.used=true;this.emit('pickup',{text:message('pickup.ammo')});}else this.emit('toast',{text:message('pickup.fullAmmo')});}
+  if(item.type==='lewis'){this.player.weapon.cancelReload();this.player.weapons[1]=new Weapon('lewis',47,94);this.player.slot=1;item.used=true;this.emit('pickup',{text:message('pickup.lewis')});}
  }
  interaction(){
   const action=this.director.interaction(this);if(action)return action;
-  const item=this.nearbyItem();return item?{key:'interact',label:item.type==='medkit'?'Apteczka · +50 zdrowia':item.type==='ammo'?'Uzupełnij amunicję i granaty':'Podnieś Lewisa · slot 2'}:null;
+  const item=this.nearbyItem();return item?{key:'interact',label:item.type==='medkit'?message('interaction.medkit'):item.type==='ammo'?message('interaction.ammo'):message('interaction.lewis')}:null;
  }
  canCheckpoint(){
   const p=this.player;
@@ -118,7 +120,7 @@ export class Simulation {
   }
   return true;
  }
- snapshot(){if(this.grenades.length||this.shells.length||this.air.bombs.length)throw Error('Zapis odłożony do zakończenia lotu pocisków.');return{version:SAVE_VERSION,mission:'cambrai',missionVersion:MISSION_VERSION,time:this.time,difficulty:this.difficultyId,nextId:this.nextId,random:this.random.state(),player:this.player.snapshot(),npcs:this.npcs.map(soldierSnapshot),tanks:deepCopy(this.tanks),fieldGuns:deepCopy(this.fieldGuns),air:deepCopy(this.air),destroyedObstacles:[...this.destroyedObstacles],items:deepCopy(this.items),director:this.director.snapshot(),stats:{...this.stats},grenades:[]};}
+ snapshot(){if(this.grenades.length||this.shells.length||this.air.bombs.length)throw new LocalizedError('error.projectiles');return{version:SAVE_VERSION,mission:'cambrai',missionVersion:MISSION_VERSION,time:this.time,difficulty:this.difficultyId,nextId:this.nextId,random:this.random.state(),player:this.player.snapshot(),npcs:this.npcs.map(soldierSnapshot),tanks:deepCopy(this.tanks),fieldGuns:deepCopy(this.fieldGuns),air:deepCopy(this.air),destroyedObstacles:[...this.destroyedObstacles],items:deepCopy(this.items),director:this.director.snapshot(),stats:{...this.stats},grenades:[]};}
  restore(snapshot){
   const s=deepCopy(validateSnapshot(snapshot));
   this.time=s.time;this.nextId=s.nextId;this.random.restore(s.random);this.difficultyId=s.difficulty;this.difficulty=DIFFICULTIES[s.difficulty];
@@ -129,7 +131,7 @@ export class Simulation {
   this.grenades=[];this.shells=[];this.events=[];this.noises=[];this.navBudget=0;this.collision.actors=this.actors;this.refreshDynamic();
   this.nav.requests.length=0;this.nav.coverOwners.clear();for(const c of this.nav.cover)c.owner=null;
   for(const n of this.npcs){
-   if(n.coverId&&n.hp>0){const cover=this.nav.cover.find(c=>c.id===n.coverId);if(!cover)throw Error('Nieprawidłowa osłona w checkpointcie.');this.nav.reserveCover(n,cover);}
+   if(n.coverId&&n.hp>0){const cover=this.nav.cover.find(c=>c.id===n.coverId);if(!cover)throw new LocalizedError('error.cover');this.nav.reserveCover(n,cover);}
    else n.coverId=null;
    if(n.hp>0&&n.moveGoal&&n.pathIndex>=n.path.length)this.nav.request(n,n.moveGoal,n.moveReason||n.state);
   }

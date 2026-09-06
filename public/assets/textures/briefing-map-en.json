@@ -1,0 +1,13 @@
+{
+  "source": "briefing-map.jpg",
+  "sourceSha256": "f6d3a82ec647de40a984aaa03c23b3457e80db4ba83f2ee82c5f9b9a42c9da5e",
+  "catalogueKey": "world.mapLegend",
+  "text": "FICTIONAL SECTOR - SQUAD PLAN",
+  "sha256": "73cce20e8eb50c21592c01564aeef8ba6afe124e6e29c1a32b06377cd61b82e3",
+  "labelRectangle": [
+    24,
+    696,
+    264,
+    728
+  ]
+}

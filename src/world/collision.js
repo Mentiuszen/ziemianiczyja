@@ -1,3 +1,4 @@
+import {LocalizedError} from '../i18n/index.js';
 import {footprintOverlap,shapeCorrections,rayShape} from './shapes.js';
 import {SpatialIndex} from './spatial-index.js';
 import {MAP} from '../data/world-map.js';
@@ -165,7 +166,7 @@ export class CollisionWorld {
  canWalk(a,b,r=.29){const length=Math.hypot(b.x-a.x,b.z-a.z),steps=Math.max(1,Math.ceil(length/.25)),stride=length/steps;let old=this.ground(a.x,a.z,a.y,r),oldNatural=this.terrain.height(a.x,a.z);for(let i=1;i<=steps;i++){const t=i/steps,x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t,y=this.ground(x,z,old,r),natural=this.terrain.height(x,z);const slope=Math.hypot(this.terrain.height(x+.08,z)-this.terrain.height(x-.08,z),this.terrain.height(x,z+.08)-this.terrain.height(x,z-.08))/.16;if((Math.abs(natural-oldNatural)>.012&&slope>1.02)||Math.abs(y-old)>.46||Math.abs(natural-oldNatural)>Math.max(.06,stride*1.02)||this.overlaps(v3(x,y+.03,z),1.65,r,false))return false;old=y;oldNatural=natural;}return true;}
 
  move(actor,dx,dz,dt){
-  if(!finitePoint(actor.pos)||![dx,dz,dt,actor.vy??0].every(Number.isFinite)||dt<0)throw Error('Nieprawidłowy krok ruchu.');
+  if(!finitePoint(actor.pos)||![dx,dz,dt,actor.vy??0].every(Number.isFinite)||dt<0)throw new LocalizedError('error.movement');
   actor.recoveryThisStep=false;
   if(!this.recover(actor))return false;
   const before={...actor.pos};

@@ -1,9 +1,9 @@
 {
   "name": "ziemia-niczyja",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "private": true,
   "type": "module",
-  "description": "Ziemia Niczyja — WWI FPS v0.4.1: source/release separation and refined infantry models",
+  "description": "Ziemia Niczyja — WWI FPS v0.4.3: Polish/English localization and first-run language selection",
   "engines": {
     "node": ">=20"
   },
@@ -12,7 +12,7 @@
     "build": "node tools/build.mjs",
     "preview": "node tools/serve.mjs --dist",
     "test": "node --test tests/*.test.mjs",
-    "check": "node tools/check.mjs"
+    "check": "node tools/check.mjs && node tools/check-localization.mjs"
   },
   "dependencies": {}
 }

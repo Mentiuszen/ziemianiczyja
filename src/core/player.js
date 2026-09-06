@@ -1,3 +1,4 @@
+import {message} from '../i18n/message.js';
 import {HQ} from '../data/world-map.js';
 import {Health} from '../combat/health.js';
 import {Weapon} from '../combat/weapon.js';
@@ -24,7 +25,7 @@ export class Player {
   this.moveIntent=mag>0;this.moveDirection={x:dx,z:dz};const before={...this.pos};world.collision.move(this,dx,dz,dt);this.moving=flatDist(before,this.pos)>dt*.15;this.distance+=flatDist(before,this.pos);
   if(this.moving&&this.grounded){this.stepTime-=dt;if(this.stepTime<=0){this.stepTime=sprint?.3:this.stance==='prone'?.85:.49;world.emit('step',{pos:{...this.pos},surface:world.terrain.trenchDistance(this.pos.x,this.pos.z)<1.6?'wood':'earth'});}}
   if(input.reload&&this.weapon.reload())world.emit('reload',{owner:this.id,actionId:this.weapon.reloadSerial,weapon:this.weapon.id,pos:eye(this)});
-  if(input.fire&&!sprint&&this.meleeLeft<=.45&&this.grenadeLeft<=.4){if(this.weapon.fire()){const w=this.weapon;fireBullet(world,this,w,direction(this.yaw,this.pitch),this.ads?w.definition.adsSpread:w.definition.spread+(this.moving?.01:0));this.recoil=w.definition.recoil;this.pitch=clamp(this.pitch-w.definition.recoil*.6,-1.4,1.4);world.stats.playerShots++;if(world.director.phase===0&&this.pos.z>8)world.director.alert(world,'Zwiad został ostrzelany — ruszamy wcześniej!');}else if(this.weapon.mag===0&&this.weapon.reloadLeft===0&&this.weapon.reload())world.emit('reload',{owner:this.id,actionId:this.weapon.reloadSerial,weapon:this.weapon.id,pos:eye(this)});}
+  if(input.fire&&!sprint&&this.meleeLeft<=.45&&this.grenadeLeft<=.4){if(this.weapon.fire()){const w=this.weapon;fireBullet(world,this,w,direction(this.yaw,this.pitch),this.ads?w.definition.adsSpread:w.definition.spread+(this.moving?.01:0));this.recoil=w.definition.recoil;this.pitch=clamp(this.pitch-w.definition.recoil*.6,-1.4,1.4);world.stats.playerShots++;if(world.director.phase===0&&this.pos.z>8)world.director.alert(world,message('message.underFire'));}else if(this.weapon.mag===0&&this.weapon.reloadLeft===0&&this.weapon.reload())world.emit('reload',{owner:this.id,actionId:this.weapon.reloadSerial,weapon:this.weapon.id,pos:eye(this)});}
   if(input.grenade&&this.grenades>0&&this.grenadeLeft<=0){
    const from=eye(this),d=direction(this.yaw,this.pitch-.15),pos=add(from,mul(d,.5));
    if(!world.collision.sweepSphere(from,pos,.09,world.actors,this.id)){

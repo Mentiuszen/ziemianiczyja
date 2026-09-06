@@ -1,3 +1,4 @@
+import {soldierName} from '../i18n/legacy.js';
 import {PHASE} from '../data/briefing.js';
 import {LANDMARKS} from '../data/world-map.js';
 import {Weapon} from '../combat/weapon.js';
@@ -217,4 +218,4 @@ export function updateSoldier(w,n,dt){
  }
 }
 export function soldierSnapshot(n){const copy={...n,weapon:n.weapon.snapshot(),path:n.path.map(p=>({...p})),pos:{...n.pos}};delete copy.pathPending;delete copy.lastSafePosition;delete copy.collisionBlocked;delete copy.moveDirection;return copy;}
-export function restoreSoldier(data){return{...data,path:data.path.map(p=>({...p})),pos:{...data.pos},weapon:Weapon.restore(data.weapon),pathPending:false,pathIndex:data.pathIndex??0,pathGeneration:0,grounded:false,lastSafePosition:null,collisionBlocked:false,perceptionCursor:data.perceptionCursor??0,repathLeft:data.repathLeft??0,avoidWaypoint:data.avoidWaypoint??null,avoidLeft:data.avoidLeft??0,moveGoal:data.moveGoal??data.pathTarget??null,moveReason:data.moveReason??data.state,coverRetryLeft:data.coverRetryLeft??0,failedCoverId:data.failedCoverId??null,pathFailures:data.pathFailures??0};}
+export function restoreSoldier(data){return{...data,name:soldierName(data),path:data.path.map(p=>({...p})),pos:{...data.pos},weapon:Weapon.restore(data.weapon),pathPending:false,pathIndex:data.pathIndex??0,pathGeneration:0,grounded:false,lastSafePosition:null,collisionBlocked:false,perceptionCursor:data.perceptionCursor??0,repathLeft:data.repathLeft??0,avoidWaypoint:data.avoidWaypoint??null,avoidLeft:data.avoidLeft??0,moveGoal:data.moveGoal??data.pathTarget??null,moveReason:data.moveReason??data.state,coverRetryLeft:data.coverRetryLeft??0,failedCoverId:data.failedCoverId??null,pathFailures:data.pathFailures??0};}

@@ -1,8 +1,9 @@
+import {LocalizedError} from '../i18n/index.js';
 import {clamp,flatDist,rng} from '../core/math.js';
 /** Original procedural Foley and battlefield sound. No network audio or speech synthesis. */
 export class BattlefieldAudio {
  constructor(settings){this.settings=settings;this.ctx=null;this.sources=new Set();this.sourceRecords=new Map();this.currentAction=null;this.resumeGeneration=0;this.resumeWanted=false;this.disposed=false;this.ambientNodes=[];this.nextAmbient=6;this.enabled=false;this.listener={x:0,y:0,z:0,yaw:0};}
- async resume(isCurrent=()=>true){if(this.disposed)throw Error('Kontekst audio został zamknięty.');const generation=++this.resumeGeneration;this.resumeWanted=true;if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)throw Error('Web Audio jest niedostępne.');this.ctx=new C();this.master=this.ctx.createGain();this.master.connect(this.ctx.destination);this.noise=this.ctx.createBuffer(1,this.ctx.sampleRate*3,this.ctx.sampleRate);const data=this.noise.getChannelData(0),random=rng(407);for(let i=0;i<data.length;i++)data[i]=(random()-.5)*2;this.startAmbience();}const ctx=this.ctx;await ctx.resume();
+ async resume(isCurrent=()=>true){if(this.disposed)throw new LocalizedError('error.audioClosed');const generation=++this.resumeGeneration;this.resumeWanted=true;if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)throw new LocalizedError('error.audioUnsupported');this.ctx=new C();this.master=this.ctx.createGain();this.master.connect(this.ctx.destination);this.noise=this.ctx.createBuffer(1,this.ctx.sampleRate*3,this.ctx.sampleRate);const data=this.noise.getChannelData(0),random=rng(407);for(let i=0;i<data.length;i++)data[i]=(random()-.5)*2;this.startAmbience();}const ctx=this.ctx;await ctx.resume();
   if(generation!==this.resumeGeneration||ctx!==this.ctx||!isCurrent()){
    if(generation===this.resumeGeneration)this.resumeWanted=false;
    if(ctx===this.ctx&&!this.resumeWanted){this.enabled=false;this.master.gain.value=0;if(ctx.state==='running')await ctx.suspend();}

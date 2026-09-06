@@ -18,7 +18,7 @@ with sync_playwright() as p:
   if not f.is_file():report['missing'].append(path)
   r.fulfill(status=200 if f.is_file() else 404,body=f.read_bytes() if f.is_file() else b'missing',headers={'Content-Type':mimetypes.guess_type(f)[0] or 'application/octet-stream','Access-Control-Allow-Origin':'*'})
  page.route('http://local.test/**',route)
- page.set_content((ROOT/'index.html').read_text().replace('<head>',f'<head><base href="{base}"><script>window.__ZN_TEST_MODE__=true</script>'),wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja')
+ page.set_content((ROOT/'index.html').read_text().replace('<head>',f'<head><base href="{base}"><script>window.__ZN_TEST_MODE__=true</script>'),wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja');page.locator('#choose-pl').click() if page.locator('#choose-pl').count() else None
  for width,height in [(320,568),(390,844),(800,400),(1024,600),(1280,720),(1366,768),(1920,1080),(2560,1440)]:
   page.set_viewport_size({'width':width,'height':height});page.evaluate("__ZN_TEST__.app.go('main')");page.wait_for_timeout(40)
   result=page.evaluate("""() => { const s=document.querySelector('.screen');return {viewport:[innerWidth,innerHeight],screen:[s.clientWidth,s.clientHeight,s.scrollWidth,s.scrollHeight],buttons:[...document.querySelectorAll('.menu-actions button')].map(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {action:e.dataset.action,rect:[r.x,r.y,r.right,r.bottom],reachable:e===hit||e.contains(hit)};})}; }""")

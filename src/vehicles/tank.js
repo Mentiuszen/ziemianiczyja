@@ -1,3 +1,4 @@
+import {message} from '../i18n/message.js';
 import {v3,sub,norm,flatDist,add,mul,angleDiff,approachAngle} from '../core/math.js';
 import {orientedBounds,footprintOverlap,footprintsIntersect} from '../world/shapes.js';
 import {BODY_HEIGHT,CONTACT_EPS} from '../world/collision.js';
@@ -42,7 +43,7 @@ export function damageTank(w,t,amount,source,point){
  if(t.tracks<=0)t.state='immobilized';
  if(t.integrity<=0){t.state='destroyed';t.gunWorking=false;w.emit('explosion',{pos:{...t.pos,y:t.pos.y+1.2},radius:4});}
  t.lastHit=w.time;w.stats.tankHits++;w.emit('tank-hit',{id:t.id,pos:{...point},destroyed:t.state==='destroyed'});
- if(w.director.once(t.id+'-damaged'))w.emit('message',{text:`${t.name}: trafienie! Piechota musi uciszyć działo. Boczne podejście pozostaje otwarte.`});
+ if(w.director.once(t.id+'-damaged'))w.emit('message',{text:message('message.tankHit',{name:t.name})});
  return true;
 }
 export function updateTank(w,t,dt){

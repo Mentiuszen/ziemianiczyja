@@ -1,3 +1,25 @@
+# Raport testów — Ziemia Niczyja v0.4.3
+
+6 września 2026. Baza `d4f0b6a2ed59b7e3e53d7adb113a3fc639c6bb9d` (0.4.2).
+**Implementacja do lokalnego odbioru; bez publikacji.**
+
+| Sprawdzenie | Wynik 0.4.3 |
+|---|---|
+| Pełny `npm test` | **274/274 PASS**, bez pominiętych przypadków; 40 nowych |
+| `npm run check` | PASS; 65 JS/MJS, importy, 15 GLB; 387/387 kluczy PL/EN |
+| Oba scenariusze `autoplay` | PASS; misja ukończona, po 2 checkpointy |
+| Build | PASS; 461 plików manifestu, 49,29 MiB; zgodne dwa buildy |
+| HTTP `/` oraz `/ZiemiaNiczyja/` | PASS; 24 odpowiedzi, poprawne MIME; kontrola klientem Python, nie przeglądarką |
+| Teksty/UI Chromium | PASS w izolowanym DOM: picker, klawiatura, 36 ekranów, 21 próbek napisów, 3 rozmiary okna; pamięciowy fixture zamiast trwałego storage, bez GPU |
+| Pełny HTTP/WebGL `GameView` | **BLOCKED**: `ERR_BLOCKED_BY_ADMINISTRATOR` przy nawigacji Chromium; nie utożsamiać z testem DOM |
+| Firefox/Edge, trwałość zapisu po restarcie, GPU/FPS | **NIE WYKONANO**; do lokalnego odbioru |
+
+Szczegóły, wersje środowiska i instrukcje: [V0_4_3_IMPLEMENTATION.md](V0_4_3_IMPLEMENTATION.md).
+Maszynowe zestawienie: [V0_4_3_VALIDATION.json](V0_4_3_VALIDATION.json).
+Poniższa historia zachowuje wcześniejsze wyniki z ich datami; nie stanowi nowego testu 0.4.3.
+
+---
+
 # Raport testów — Ziemia Niczyja v0.4.1
 
 Weryfikacja z 5 września 2026 po migracji źródeł i imporcie poprawionej piechoty:

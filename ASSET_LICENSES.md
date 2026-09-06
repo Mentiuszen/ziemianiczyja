@@ -1,4 +1,4 @@
-# Pochodzenie zasobów — Ziemia Niczyja v0.4.1
+# Pochodzenie zasobów — Ziemia Niczyja v0.4.3
 
 Nie pobrano assetów z komercyjnych gier ani marketplace. Nie dołączono zdjęć muzealnych,
 zewnętrznych fontów, cudzych nagrań ani usług uruchamianych podczas gry. Interfejs używa
@@ -21,6 +21,8 @@ fontów systemowych. Nowe modele, materiały i efekty są przygotowane lokalnie 
 | Zamknięte worki, drut, wnętrze odprawy | render/sandbags.js, support-view.js, layout.js | MIT; własne buforowane siatki i układ |
 | Polskie dialogi odprawy | data/briefing.js | Fikcyjne wypowiedzi dla projektu, nie cytaty historycznych postaci |
 | Audio | src/audio/audio.js | MIT; lokalne oscylatory i szum Web Audio, bez próbek zewnętrznych |
+| Teksty PL/EN i flagi wyboru języka (v0.4.3) | src/i18n/, public/assets/ui/flag-en.svg, flag-pl.svg | Własne tłumaczenia i kod SVG projektu na zasadach jego licencji w mającym zastosowanie zakresie; bez pobranych fotografii flag i nowych plików fontów |
+| Angielski podpis mapy odprawy (v0.4.3) | tools/generate_localized_map.py, briefing-map.jpg, src/i18n/en.js | Pochodna własnej mapy projektu; bez zmiany geometrii i pikseli poza obszarem podpisu |
 
 Licencja projektu nie gwarantuje ochrony prawnoautorskiej materiałom wygenerowanym z pomocą AI.
 Nie zmienia praw ani pochodzenia dokumentu użytkownika `docs/MASTER_PROMPT.md`.

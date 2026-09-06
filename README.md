@@ -1,16 +1,24 @@
-# Ziemia Niczyja — v0.4.1
+# Ziemia Niczyja — v0.4.3
 
 Jednoosobowy FPS przeglądarkowy z I wojny światowej. Grywalna pozostaje **jedna misja:
 nr 04, „Pęknięta linia” — Cambrai, 20 XI 1917**. v0.4 przebudowuje tę misję, nie dodaje
 czterech brakujących części kampanii. Kod, lokalny runtime i zasoby są w paczce.
 
-v0.4.1 porządkuje źródła i publikację oraz aktualizuje sześć modeli żołnierzy i ich atlasy.
-Checkpointy v0.4 pozostają zgodne; aktualizacja nie zmienia formatu zapisu ani przebiegu misji.
+v0.4.3 dodaje pełną polską i angielską warstwę tekstową na bazie poprawek 0.4.2.
+Przy pierwszym uruchomieniu wybierz **English** (łączona flaga USA/UK) albo **Polski**.
+Dopiero potem otwiera się menu. Kolejne starty pamiętają wybór; opcja Język / Language
+zmienia go natychmiast, także podczas pauzy, bez restartu misji. Brak dostępu do pamięci
+ogranicza zapamiętanie do bieżącej sesji. Reset opcji nie usuwa języka.
 
-## Najważniejsze zmiany
+Wersja nie przebudowuje modeli, mapy ani dźwięków. Poprawne checkpointy 0.4.1/0.4.2
+pozostają zgodne (`SAVE_VERSION=1`, `MISSION_VERSION=3`).
+Opis wdrożenia i faktycznej weryfikacji: [0.4.3](docs/V0_4_3_IMPLEMENTATION.md).
+Zasady katalogów tłumaczeń: [LOCALIZATION.md](docs/LOCALIZATION.md).
+
+## Podstawa rozgrywki 0.4–0.4.2
 
 Odprawa zaczyna się w zadaszonym stanowisku dowodzenia, przy mapie, z oficerem i trzema
-żołnierzami. Siedem krótkich wypowiedzi po polsku trwa łącznie 42 sekundy. Można się
+żołnierzami. Siedem krótkich wypowiedzi w wybranym języku trwa łącznie 42 sekundy. Można się
 rozglądać i poruszać; **E pomija pozostałą odprawę i rozpoczyna natarcie**. Nie ma dubbingu
 ani syntezy mowy. Bez pominięcia atak rozpoczyna się po ostatniej wypowiedzi.
 
@@ -42,7 +50,7 @@ mają spłaszczony kształt, mijankę rzędów i zamknięte wypełnienie, bez pr
 Nowe modele artylerii i samolotów, mapa odprawy, detale wnętrza i efekty pracy/uszkodzenia
 pojazdów są autorską, proceduralną oprawą retro.
 
-## Firefox: celowanie i obrót kamery
+## Firefox: celowanie i obrót kamery — informacje z wcześniejszych wersji
 
 Przy dostępnych Pointer Events ruch kamery, LPM i PPM korzystają teraz z jednego strumienia.
 Poprzedni kod anulował `pointerdown`, ale czekał na kompatybilny `mousemove`; taki strumień
@@ -52,13 +60,18 @@ gdy Pointer Events nie ma. Nie sumujemy obu strumieni, żeby nie podwajać czuł
 Regresje sprawdzają ruch przy PPM, przy obu przyciskach i po pauzie/checkpoincie. **Firefox
 nie został uruchomiony w środowisku autora**: próby pobrania nie powiodły się. Test
 symulujący brak kompatybilnych zdarzeń nie zastępuje testu realnego Firefoksa.
-Rzeczywiste zdarzenia myszy sprawdzano w Chromium; pełny zakres w raporcie.
+Rzeczywiste zdarzenia myszy sprawdzano w Chromium; pełny zakres w historycznym raporcie.
+Bieżący zakres sprawdzenia 0.4.3 i ograniczenia środowiska opisuje osobny raport 0.4.3.
 
-## Aktualizacja — rozpocznij nową misję
+## Aktualizacja do 0.4.3
 
-Rozpakuj release v0.4.1 do **nowego folderu**, zatrzymaj serwer poprzedniej wersji i uruchom nowy.
-Nie kopiuj samego JavaScriptu. Nowe GLB, CSS i tekstury należą do tego samego wydania.
-Gdy strona nadal pokazuje 0.3, odśwież ją bez cache.
+Nałóż pliki 0.4.3 na repozytorium z 0.4.2, scalając katalogi i zastępując tylko dołączone
+pliki. Nakładka nie jest kompletnym projektem: nie usuwaj pozostałej zawartości `src/`,
+`tests/` i `tools/`. Po lokalnych testach odtwórz `dist/` przez `npm run build`.
+Używaj tej samej wersji JS, CSS i flag SVG. Nie musisz kasować checkpointu ani danych strony. Angielski wariant napisu na mapie odprawy
+nie zmienia układu terenu ani oryginalnych modeli.
+Starsze ustawienia po raz pierwszy pokażą wybór języka. Pełne instrukcje i baza SHA są
+w raporcie 0.4.3. Ta paczka nie publikuje automatycznie żadnych zmian.
 
 **Checkpointy v0.3 i wcześniejsze nie są zgodne z nowym przebiegiem misji.** Walidator
 odmawia ich wczytania z komunikatem; nie teleportuje obiektów z dawnych zapisów. Rozpocznij
@@ -81,8 +94,9 @@ uruchamiaj z tego katalogu.
 | `.local/` | Lokalne kopie i wyniki pracy; ignorowane przez Git |
 
 Archiwalne zrzuty i logi `docs/*-tests/` oraz `docs/test-results/` pozostają lokalne.
-`dist/` zawiera grę, zasoby, licencje, changelog, manifest plików oraz dwie notatki
-dostępne z menu gry: `HISTORY.md` i `KNOWN_ISSUES.md`.
+`dist/` zawiera grę, zasoby, licencje, changelog, manifest plików oraz notatki
+dostępne z menu gry: `HISTORY.md`, `KNOWN_ISSUES.md` i ich angielskie odpowiedniki.
+Także `ASSET_LICENSES.md` ma wariant `.en.md`; język linku wynika z ustawień gry.
 Edytuj źródła, a release odtwarzaj przez `npm run build`.
 
 Node.js 20 lub nowszy do pracy deweloperskiej. Lokalny Babylon.js 8.46.2 i statyczny build
@@ -96,7 +110,8 @@ npm run dev
 W PowerShell z zablokowanym `npm.ps1` użyj `npm.cmd` zamiast `npm`; nie trzeba zmieniać
 polityki wykonywania skryptów.
 
-Otwórz adres wypisany w terminalu, zwykle `http://localhost:5173/`. Wybierz misję, wczytaj
+Otwórz adres wypisany w terminalu, zwykle `http://localhost:5173/`. Przy pierwszym starcie
+wybierz język, następnie misję, wczytaj
 zasoby i kliknij wejście do gry. Ten świadomy klik uruchamia Pointer Lock i audio.
 Wymagane są WebGL2, mysz i klawiatura. Nie otwieraj `index.html` przez dwuklik / `file://`.
 
@@ -159,6 +174,7 @@ fokusu pauzują grę; powrót wymaga kliknięcia wznowienia.
 ```bash
 npm test
 npm run check
+node tools/check-localization.mjs
 python tools/test_asset_geometry.py
 node tools/autoplay.mjs
 node tools/autoplay.mjs --destroyed-tanks
@@ -196,6 +212,19 @@ historycznych `generate_characters.py` albo `generate_assets.py` bez `--keep-inf
 nadpisuje piechotę starszą geometrią; nie służy do aktualizacji obecnego zestawu.
 Aktualizacja sześciu GLB i czterech atlasów: [CHARACTER_ART.md](docs/CHARACTER_ART.md).
 Atlasy obok GLB są wymagane. Pochodzenie: [ASSET_LICENSES.md](ASSET_LICENSES.md).
+
+## Odbiór języków
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python tools/browser_v043_language.py --url http://127.0.0.1:5173/ --headed --game
+```
+
+Bez `--game` skrypt sprawdza start i menu bez ładowania WebGL. Z `--game` sprawdza również
+zmianę języka z istniejącym `GameView`. Używa osobnych kontekstów, nie danych gracza.
+Brak przeglądarki lub WebGL jest ograniczeniem odbioru, nie wynikiem PASS. Dalsze scenariusze,
+podkatalog hostingu i Firefox/Edge opisano w raporcie 0.4.3.
 
 ## Ograniczenia
 

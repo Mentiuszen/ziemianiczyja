@@ -1,0 +1,67 @@
+# Known limitations 0.4.3 — September 6, 2026
+
+**Code for local acceptance testing. This document does not confirm publication or a complete browser playthrough.**
+
+## Languages and current acceptance testing
+
+All project-authored game text uses the PL/EN catalogues: menus, settings, HUD, objectives, briefing, messages, interactions, saves, errors and diagnostics. Documents opened from the information screen have English versions. The project name, equipment proper names, technical identifiers and original dependency licenses remain unchanged. No dubbing was added. The briefing-map label has an English variant; the rest of the image is unchanged. The English USA/UK flag is a language-choice symbol, not a new faction.
+
+Without a valid `settings.language`, the language picker opens, including after an upgrade from an older version. The browser's language is not automatically selected. Changing the option does not change the mission or checkpoint. If local storage is denied, the choice lasts only for the current session and the picker may return on reopening the page. Restoring default options does not clear the selected language.
+
+Checking all keys and parameters is not a substitute for language review throughout a mission. In particular, test long subtitles and prompts in small windows, switching during pause, persistent preferences after a browser restart, and Firefox/Edge locally. The results, the controlled DOM test's scope and WebGL/HTTP limitations are in `V0_4_3_IMPLEMENTATION.md` (developer report in Polish). A network-free DOM test does not confirm persistent IndexedDB, full 3D rendering, Pointer Lock or hosted operation. Do not mark these as PASS on that basis.
+
+0.4.3 does not change 0.4.2 balance, collisions, unit counts or model quality. `SAVE_VERSION=1` and `MISSION_VERSION=3` remain; valid 0.4.1/0.4.2 saves are supported. Historical checkpoint labels and generic character names are mapped to stable keys. Positions from incompatible older map versions are not migrated.
+
+Earlier notes are retained below with their dates and status at the time. They are not a report of those tests being repeated in 0.4.3.
+
+---
+
+# Known limitations 0.4.2 — September 6, 2026
+
+**Candidate for local acceptance; the release had not been published by its implementer.**
+
+## Verification scope at that time
+
+Gameplay, AI, collision, save and lifecycle fixes have automated tests. Results and the list of executed files are in `V0_4_2_IMPLEMENTATION.md`. Do not equate them with the full historical set of 134 tests or with balance acceptance. A full `npm test` in the complete checkout remains a required local step.
+
+No playable WebGL2 test, Firefox/Edge test, listening session, physical GPU measurement or human playtest was performed in that environment. Chromium blocks local addresses with `ERR_BLOCKED_BY_ADMINISTRATOR`; a separate WebGL2 creation attempt returned no context. `CAM-01` has a confirmed test of the bundled camera's actual mathematics, but the full `GameView` regression awaits a local run of `tools/browser_v042_camera.py`. BLOCKED is not PASS.
+
+## Gameplay and compatibility
+
+The new difficulty profiles are an initial iteration requiring a mission playthrough and tests with different seeds. The bot still knows the map and enemies; completing the mission with and without tanks does not prove suitable difficulty for a person. Pay particular attention to narrow passages, fences, prone turns, squad yielding and the finale with a nearby enemy.
+
+Hull collision now uses a yaw-rotated rectangle, with an AABB only as a broad-phase filter. It is still not track physics, ragdoll or armor simulation. Emergency penetration recovery is bounded and recorded; an unsolvable spawn or checkpoint is rejected instead of moving a character through a wall. Local corrections of historical NPC positions have a separate 1.25 m limit; normal recovery is limited to 0.65 m.
+
+The format remains `SAVE_VERSION=1`, `MISSION_VERSION=3`. A valid 0.4.1 checkpoint has explicit defaults for new fields; incompatible older mission geometry or corrupted state is not accepted. Rejecting a save does not clear settings. A checkpoint's difficulty is not replaced by the new-mission selection in the menu. Saving can be deferred indefinitely while direct danger persists; the last good checkpoint remains. Persistent IndexedDB requires local acceptance on a normal origin.
+
+Models, textures, sounds, map definitions and Babylon remain from 0.4.1. Their qualitative improvement belongs to 0.5. The text below describes earlier tests, not 0.4.2 results.
+
+---
+
+# Archived v0.4.1 limitations
+
+## Browsers and performance
+
+The RMB fix removes reliance on compatibility `mousemove` events suppressed after `pointerdown`. A stream without `mousemove` and real input in Chromium were tested. **Real Firefox was not run**: it was not installed and installation/download attempts failed because of environment restrictions. This remains an important user test. Do not write “Firefox PASS” in the report. Edge/Safari were not run separately either.
+
+There was no physical GPU. SwiftShader renders in software; overload is subject to an intentional limit on accumulated simulation steps. Timings from such tests do not predict FPS on the user's computer. The frame cap is an application limit, not a way to disable browser VSync. Mouse and keyboard are required; a small window does not imply a touch version.
+
+## Presentation and vehicles
+
+Aircraft are simplified procedural silhouettes of historical families. There are five authored flyovers with two bomb drops; no autonomous dogfights, pilot accuracy simulation, airframe damage or player shoot-downs. This is not a complete later aviation system. The 7.7 cm gun is a visual approximation, not a claim to represent a specific factory variant.
+
+The tanks had simple dynamic AABBs and limited weapon sectors, not simulation of tracks contacting every terrain irregularity, armor ballistics or animated crews. Sponson barrels do not have complete articulation reproducing every aiming correction. Movement along authored corridors may temporarily stop for infantry. Only two specified wire sections are destructible. No promise is made that any vehicle can destroy every fence.
+
+Characters have six refined models and faces in v0.4.1 with the existing clips retained; conversation animation uses standing/turning, without facial animation or new motion-capture recordings. All sound is synthetic. There is no dubbing. Sandbags have closed, compressed filling rather than simulation of physically independent bags. Environment and character collisions are simplified; diagonal tests do not prove every possible location on the map. Collisions were not globally disabled to bypass issues.
+
+## Mission and campaign
+
+Still only Cambrai. The other four missions are not complete; there are no human tests confirming a 12–20 minute playtime or final balance. The bot knows enemy positions and the graph; its completion time only tests traversability. Eight reserve units already exist on the map rather than appearing in front of the player; before the defense they remain in position. They can die earlier too.
+
+The lack of German tanks in this mission follows from the selected date, not a broken toggle. Portable anti-tank weapons from 1918 were not added to Cambrai 1917. The player silences the German gun through its crew or breech instead of fighting a fictional A7V. Historical material separated from the fictional local engagement plan is in `HISTORY.en.md`.
+
+## Saves and tools
+
+A new checkpoint from the v0.4 mission is required; old positions and phases are not migrated. Settings persist on the same origin. Graphics tests routed with an opaque origin test the memory fallback, not persistent IndexedDB after closing a browser on ordinary hosting.
+
+The build is still a static Node tool, without Vite. No remote Pages workflow or publication was performed during those historical tests. v02/v03 test scripts were retained for reference; current commands are in the README. Introducing a generator alone does not mean all inherited models were re-exported: new GLBs were generated, while existing v0.3 assets were retained.
