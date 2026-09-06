@@ -1,0 +1,75 @@
+{
+  "version": "0.4.4",
+  "uiRevision": 3,
+  "scopeStatus": "PARTIAL — request 1 not delivered",
+  "base": {
+    "archive": "ZiemiaNiczyja_0.4.4_R2_pelne_zrodla.zip",
+    "sha256": "41aea3f88943957c77afb2627ae56f81e555f3f323e2edf03225f2b81b11a53f"
+  },
+  "requirements": {
+    "1_high_resolution_backgrounds": "NOT_DELIVERED: existing R2 background bytes preserved",
+    "2_localized_title_and_logo": "IMPLEMENTED",
+    "3_campaign_only_difficulty": "IMPLEMENTED",
+    "4_smooth_front_transition": "IMPLEMENTED"
+  },
+  "checks": {
+    "baselineTests": {
+      "passed": 343,
+      "failed": 0
+    },
+    "nodeTests": {
+      "passed": 355,
+      "failed": 0,
+      "skipped": 0
+    },
+    "localization": {
+      "pl": 491,
+      "en": 491
+    },
+    "npmCheck": "PASS",
+    "npmBuild": "PASS; two identical build manifests",
+    "autoplay": "PASS; mission complete, 2 checkpoints",
+    "autoplayDestroyedTanks": "PASS; mission complete, 2 checkpoints",
+    "protectedFiles": {
+      "count": 433,
+      "changed": [],
+      "backgrounds": "unchanged R2"
+    },
+    "isolatedDOM": {
+      "scope": "UI-only about:blank, production modules with rewritten import URLs, memory preferences; no GameView/native IndexedDB",
+      "checks": [
+        "English document title",
+        "English accessible logotype",
+        "No difficulty in gameplay",
+        "No difficulty in controls",
+        "No difficulty in audio",
+        "No difficulty in graphics",
+        "New campaign difficulty set in campaign",
+        "Front really morphs at intermediate time",
+        "Intermediate geometry labeled as transition",
+        "Front DOM node retained",
+        "Rapid selection settles on last chosen date",
+        "Continuation changes actual checkpoint pair",
+        "Continuation preserves every non-difficulty snapshot field",
+        "No world created; denied durable write remains session-only",
+        "Polish title restored",
+        "Language switch keeps continuation difficulty",
+        "No JavaScript page errors"
+      ],
+      "status": "PASS",
+      "version": "144.0.7559.96"
+    },
+    "nativeBrowser": {
+      "status": "BLOCKED",
+      "error": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:5173/\nCall log:\n  - navigating to \"http://127.0.0.1:5173/\", waiting until \"domcontentloaded\"\n",
+      "version": "144.0.7559.96"
+    }
+  },
+  "notClaimed": [
+    "Regenerated high-resolution background assets",
+    "Full GameView acceptance",
+    "Native IndexedDB acceptance",
+    "Firefox/Edge acceptance",
+    "User hardware performance"
+  ]
+}

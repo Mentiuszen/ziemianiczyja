@@ -1,12 +1,26 @@
-# Lokalizacja PL/EN — Ziemia Niczyja 0.4.3
+# Lokalizacja PL/EN — 0.4.4, rewizja 3
+
+## 0.4.4 rewizja 3
+
+Tytuł to `app.title`: **Ziemia Niczyja** w PL i **No Man’s Land** w EN.
+Wektorowe logotypy `logo.svg` / `logo-en.svg` oraz `page.title`, opis strony
+ i opis projektu są zgodne z wyborem. Katalogi mają po 491 kluczy.
+Techniczne ID, `window.ZiemiaNiczyja`, nazwę repozytorium i magazynu zachowano,
+żeby zmiana języka nie powodowała utraty danych ani zgodności narzędzi.
+Dodano komunikaty trudności kampanii i przejścia frontu; nie wypalono ich w mapie.
+
+## 0.4.4 rewizja 2 — zakres historyczny
+
+Dodano PL/EN dla strzałek wyboru, przełączników, datowanego frontu, podsumowań pięciu rozdziałów i oszczędnego HUD-u. Katalogi mają po 482 klucze. Zmiana języka zachowuje wybraną misję, jej datę i widok; małe etykiety oraz błędy pozostają tekstem DOM. Obrazy nie zawierają tłumaczeń; wyjątkiem jest nazwa własna w logotypie.
+
 
 ## Zakres i granica odpowiedzialności
 
 Gra ma dwa języki tekstowe: `pl` i `en`. Obejmuje to menu, opcje, sterowanie, HUD,
 cele, wszystkie siedem wypowiedzi odprawy, napisy zdarzeń, interakcje, komunikaty
 zapisu i ładowania, własne komunikaty błędów, diagnostykę oraz dokumenty dostępne
-z ekranu autorów. Oryginalna nazwa **Ziemia Niczyja**, nazwiska, nazwy własne broni,
-jednostki i techniczne identyfikatory nie są tłumaczone na siłę. Nie dodano dubbingu.
+z ekranu autorów. Nazwa gry przełącza się zgodnie z R3. Nazwiska, nazwy własne broni,
+jednostki i techniczne identyfikatory pozostają niezmienne. Nie dodano dubbingu.
 Dokumentacja dla programistów, komentarze i oryginalne teksty licencji nie są częścią
 przełączanej warstwy interfejsu.
 
@@ -163,3 +177,22 @@ Skrypt wymaga opcjonalnego Playwright i zainstalowanej przeglądarki. Obsługuje
 ustawienia/pamięć; z `--game` także rzeczywisty `GameView`, HUD i misję. Błąd lub brak
 możliwości uruchomienia nie jest raportowany jako PASS. Wyniki oraz ograniczenia
 sprawdzenia dostarczonej paczki są w `V0_4_3_IMPLEMENTATION.md`.
+
+
+## Rozszerzenie 0.4.4
+
+Oba katalogi mają po 463 klucze (76 nowych względem 0.4.3). Obejmują nawigację kampanii,
+wszystkie zakładki i potwierdzenia, stany metadanych, mapę i narrację Ypres/Cambrai,
+minimapę, nazwy dostępności ikon oraz komunikaty błędów. Nazwy własne gry/broni nie
+są duplikowane według języka. Wycofane teksty starych ekranów zachowano dla zgodności
+historycznych narzędzi; runtime nie montuje dawnych widoków missions/brief/controls.
+
+Nowe ekrany są w `src/ui/screens/`, HUD w `src/ui/hud/`; nadal używają `message`,
+`t/text`, interpolacji i escaping po interpolacji. Zmiana języka nie resetuje mapy,
+kontaktu strzelca, timera napisów, stanu symulacji ani zasobów. Capture kończy się,
+ale zakładka, przewinięcie i sensowny fokus pozostają. Legendy SVG to tekst DOM,
+nie wypalone litery w obrazie. Flagi językowe nie są flagami frakcji.
+
+Sprawdzenie: `npm run check`, `tests/v043-*.test.mjs`, `tests/v044-*.test.mjs`,
+`tools/browser_v043_language.py` (zaktualizowane wejścia) oraz `browser_v044_ui.py`.
+Nie uznawać kontroli identyczności zbiorów kluczy za pełny wizualny odbiór każdej linii.

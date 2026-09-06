@@ -1,0 +1,38 @@
+{
+  "base": "ZiemiaNiczyja_0.4.4_R3_pelne_zrodla.zip",
+  "version": "0.4.4",
+  "uiRevision": 3,
+  "package": "campaign-and-loading-art integration",
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "size": 33395,
+      "sha256": "9b40f8059bbc2de817842d884dbf94c5137099ce7dddd11d9ed9bfba0b2e4cbb"
+    },
+    {
+      "path": "src/ui/screens/status.js",
+      "size": 3311,
+      "sha256": "d975d68515976ad89e165ce05ddce9563fcd7824b5f82e1a066b2deca0a30561"
+    },
+    {
+      "path": "src/ui/styles/menus.css",
+      "size": 9891,
+      "sha256": "547195edd4f7d5d0264f298a78eb939ed5ba76fdad4637ff8d846e720afc3e70"
+    },
+    {
+      "path": "src/ui/styles/campaign.css",
+      "size": 9082,
+      "sha256": "b7450ad6ca796a5cf95764fa8ef652ea8d1ae8f66c4833298a9c850b590b37bc"
+    },
+    {
+      "path": "public/assets/ui/campaign-art.webp",
+      "size": 451516,
+      "sha256": "26b92bb762ecef3be3f42ab10523220144a052a73ce83404990aaed2b17c74ed"
+    },
+    {
+      "path": "public/assets/ui/loading-art.webp",
+      "size": 274388,
+      "sha256": "6a981b99ec1d17a07ad0875a5c98dec87d50fa8344159d18a3a015a34f5791e6"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""0.4.3 language acceptance on a normal HTTP(S) origin, in isolated browser contexts.
+"""0.4.3 language regressions adapted to 0.4.4 acceptance on a normal HTTP(S) origin, in isolated browser contexts.
 
 Start npm run dev or preview, then run with --url and optionally --game.
 No production language flag is forced; selection uses the real tiles and settings.
@@ -34,7 +34,7 @@ PRESENTATION_CASES = r'''async () => {
   check(a.ui.checkpointUntil===checkpointDeadline,'checkpoint notification restarted');
   check(a.ui.toastNode.textContent===t('pickup.ammo'),'active toast is stale');
   check(a.ui.el.checkpoint.textContent===t('checkpoint.flash',{name:message('checkpoint.bennett')}),'checkpoint is stale');
-  for(const state of ['main','missions','brief','settings','controls','credits','loading','ready','paused','dead','complete','error']){
+  for(const state of ['main','campaign','settings','credits','loading','ready','paused','dead','complete','error']){
    a.errorMessage=message('error.assetMissing',{name:'test.glb'});a.ui.render(state);
    const content=a.ui.menu.textContent;
    check(!/\[object Object\]|undefined|\{[A-Za-z][A-Za-z0-9_]*\}/.test(content),`${language}/${state}: unresolved content`);
@@ -73,7 +73,7 @@ def main() -> int:
     parser.add_argument('--executable', help='Installed browser executable, e.g. Edge')
     parser.add_argument('--headed', action='store_true')
     parser.add_argument('--game', action='store_true', help='Also load the real GameView')
-    parser.add_argument('--output', default='.local/v0.4.3-tests/browser/result.json')
+    parser.add_argument('--output', default='.local/v0.4.4-tests/language-regression/result.json')
     args = parser.parse_args()
     if urlsplit(args.url).scheme not in ('http', 'https'):
         parser.error('--url must be HTTP(S), not file://')
@@ -95,20 +95,20 @@ def main() -> int:
                 page.on('request',lambda request:requests.append(request.url))
                 page.goto(args.url,wait_until='networkidle');page.wait_for_function("!!globalThis.__ZN_TEST__?.app")
                 ensure(page.evaluate("ZiemiaNiczyja.state==='language-select' && !__ZN_TEST__.app.world && !__ZN_TEST__.app.view"),'fresh start did not show only the picker')
-                ensure(page.locator('[data-action="brief"]').count()==0,'main menu is exposed before choosing')
+                ensure(page.locator('[data-action="campaign-new"]').count()==0,'main menu is exposed before choosing')
                 ensure(not any('/src/render/view.js' in x or '/vendor/' in x for x in requests),'runtime loaded before choosing')
                 page.keyboard.press('Escape');ensure(page.evaluate("ZiemiaNiczyja.state==='language-select'"),'Escape skipped the choice')
                 report['checks'].append('fresh picker, no menu/runtime, Escape gated')
                 page.locator('#choose-en').click();page.wait_for_function("ZiemiaNiczyja.state==='main'")
                 ensure(page.evaluate("document.documentElement.lang==='en' && JSON.parse(localStorage.getItem('zn-settings-v1')).language==='en'"),'English selection was not persisted')
-                ensure('Start demo mission' in page.locator('#menu').text_content(),'main menu not English')
+                ensure('New Campaign' in page.locator('#menu').text_content(),'main menu not English')
                 page.reload(wait_until='networkidle');page.wait_for_function("ZiemiaNiczyja.state==='main'")
                 ensure(page.locator('#choose-en').count()==0,'picker returned after saved choice')
                 report['checks'].append('English click, localStorage persistence, reload skips picker')
                 page.locator('[data-action="settings"]').click();page.select_option('#language','pl')
                 ensure(page.evaluate("document.documentElement.lang==='pl' && ZiemiaNiczyja.state==='settings'"),'settings did not change immediately')
-                ensure('Ustawienia' in page.locator('#menu').text_content(),'Polish settings absent')
-                page.locator('[data-action="settings-reset"]').click();ensure(page.locator('#language').input_value()=='pl','defaults cleared language')
+                ensure('Opcje' in page.locator('#menu').text_content(),'Polish settings absent')
+                page.locator('[data-action="category-reset"]').click();page.locator('[data-action="confirm-modal"]').click();ensure(page.locator('#language').input_value()=='pl','defaults cleared language')
                 page.select_option('#language','en');page.locator('[data-action="back"]').click()
                 report['checks'].append('settings live switch and language survives reset')
                 page.locator('[data-action="credits"]').click()
@@ -125,7 +125,7 @@ def main() -> int:
                         ensure(page.evaluate("ZiemiaNiczyja.state==='ready'"),f'mission did not load: {page.locator("#menu").inner_text()}')
                         report['presentation']=page.evaluate(PRESENTATION_CASES)
                         ensure(page.evaluate("__ZN_TEST__.app.view.support.mapMaterial.diffuseTexture===__ZN_TEST__.app.view.support.mapTextures.en"),'world map did not switch to English')
-                        report['checks'].append('real GameView: paused switching, world label, HUD, 36 screens, 21 subtitle samples')
+                        report['checks'].append('real GameView: paused switching, world label, HUD, 30 screens, 21 subtitle samples')
                 ensure(not errors,f'page errors: {errors}')
                 ctx.close()
                 for settings in [{'language':'pl'},{'language':'invalid','quality':'high','keys':{'interact':'KeyF'}}]:

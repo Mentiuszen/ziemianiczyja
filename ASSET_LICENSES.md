@@ -1,5 +1,18 @@
 # Pochodzenie zasobów — Ziemia Niczyja v0.4.3
 
+Rewizja 3 dodaje angielski logotyp `logo-en.svg`: ten sam motyw i kontury DejaVu co wersja PL, z zachowaną notą DejaVu. Nowych teł wysokiej rozdzielczości nie dostarczono.
+
+## Interfejs 0.4.4 — rewizja 2
+
+- Nowe tła `main-art.webp`, `language-art.webp`, `options-art.webp`: adaptacja wskazanej przez użytkownika grafiki koncepcyjnej z tej rozmowy. Źródło i przygotowane kadry: `authoring/ui/`. Usunięto nadrukowane elementy UI; nie przypisuje się tej ilustracji automatycznie licencji MIT ani statusu fotografii archiwalnej.
+- Nowy logotyp: ścieżki liter DejaVu Sans Condensed Bold z własnym układem, zużyciem i sylwetką. Zachowano `public/assets/ui/licenses/DejaVu-LICENSE.txt`; nie dołączono plików fontów.
+- Podkład geograficzny: wycinek GSHHG 2.3.6, rozdzielczość intermediate, dostarczony przez basemap-data 2.0.0. Dane wybrzeża, jezior i rzek oraz ich pochodne są objęte LGPL-3.0-or-later, oddzielnie od licencji kodu gry. W paczce i release są teksty GPL/LGPL oraz edytowalny wycinek `public/assets/ui/maps/western-front-geography.json`; jego SVG można niezależnie podmienić. Nie kopiowano współczesnych granic państw.
+- Rzeźba podkładu: regionalny kadr `shadedrelief.jpg` z basemap-data, dostarczony pod MIT; zachowano `Basemap-data-MIT.txt` i źródłowy kadr.
+- Datowane linie frontu, strzałki, oznaczenia i logika ich wyboru: własna generalizacja, nie kopia mapy ani aktywów Call of Duty. Opis źródeł historycznych i ograniczeń: `docs/UI_ART.md`.
+
+Starsze noty poniżej dotyczą poprzednich dostaw; pierwsza grafika main 426×352 nie jest już bieżącym tłem.
+
+
 Nie pobrano assetów z komercyjnych gier ani marketplace. Nie dołączono zdjęć muzealnych,
 zewnętrznych fontów, cudzych nagrań ani usług uruchamianych podczas gry. Interfejs używa
 fontów systemowych. Nowe modele, materiały i efekty są przygotowane lokalnie dla projektu.
@@ -54,3 +67,18 @@ Autorzy: The Lit Project Contributors; Google LLC. Licencja BSD-3-Clause. Źród
 ## Źródła historyczne
 
 Linki w `docs/HISTORY.md` i `docs/CHARACTER_ART.md` służą wyłącznie weryfikacji tekstu i nie oznaczają licencji na muzealne multimedia. Żadne zdjęcie ze wskazanych stron nie zostało dołączone.
+
+
+## Aktywa UI 0.4.4
+
+Wektory podkładu kampanii, flagi UK i sylwetek broni przygotowano lokalnie dla projektu.
+Logo ma wyeksportowane kontury DejaVu Sans Condensed Bold; dołączono notę
+`public/assets/ui/licenses/DejaVu-LICENSE.txt`, bez plików fontu.
+
+`main-art.webp` pochodzi z załączonego kadru 426×352 odzyskanego z poprzedniej pracy.
+Nie ma osobnego zachowanego mastera/rejestru pierwotnej generacji; źródło przed
+załącznikiem i prawa do ilustracji nie zostały niezależnie potwierdzone. Nie nadajemy
+mu przez tę notę licencji MIT. Przed publikacją potwierdzić pochodzenie lub zastąpić
+zatwierdzonym własnym obrazem. Edytowalne źródła: `authoring/ui/`; szczegóły w
+`docs/UI_ART.md` (dokument developerski, poza dist). Mapa jest autorskim schematem,
+nie odrysowaniem arkusza muzealnego ani zasobem Call of Duty.

@@ -1,3 +1,48 @@
+# Ograniczenia 0.4.4 — 6 września 2026
+
+## Rewizja 3 — aktualny status
+
+- Punkty 2–4 zamówienia R3 są wdrożone. Punkt 1, nowe tła wysokiej rozdzielczości, pozostaje niewykonany; nadal obowiązuje ograniczenie rozmycia z R2.
+- English używa tytułu No Man’s Land i osobnego logo. Dawne uwagi o wyłącznie polskim tytule nie dotyczą bieżącego UI.
+- Trudność kontynuowanej misji można zmienić wyłącznie na mapie kampanii. Rozpoczęte timery zachowują wartości, HP i amunicja nie są uzupełniane.
+- Natywny zapis, pełny GameView i Firefox/Edge nadal wymagają lokalnego odbioru.
+
+Poniższe sekcje zachowano jako historię; R3 zastępuje ich opis zachowania trudności i tytułu.
+
+## 0.4.4, rewizja 2 — aktualne ograniczenia
+
+- Trzy tła są zaadaptowane z wybranego konceptu (panele źródłowe 764×352 / 764×374), nie nowo wygenerowane grafiki 4K. Na dużym ekranie mogą być miękkie. Logo i kontrolki są niezależnymi ostrymi elementami.
+- Podkład kampanii ma rzeczywistą geografię; pięć wojskowych linii jest uogólnieniem dla dat rozdziałów, a nie zweryfikowanym przebiegiem każdego okopu. Ypres jest datowane miesięcznie.
+- Pełne WebGL2, natywny zapis i wygląd przy faktycznej rozgrywce wymagają lokalnego odbioru. Test DOM bez sceny nie jest zastępstwem takiego przejścia.
+- Dotykowa responsywność menu nie oznacza nowej obsługi gry bez myszy i klawiatury.
+
+Pozostałe wcześniejsze ograniczenia zachowują ważność, o ile ta rewizja nie opisuje konkretnej zmiany.
+
+
+**Kandydat do lokalnego odbioru, nie deklaracja zakończonej walidacji na komputerze gracza.**
+
+- Tylko Cambrai jest grywalne. Inne punkty mapy są informacyjne; Ypres nie otrzymuje
+  fikcyjnego ukończenia przez obejrzenie wprowadzenia.
+- Mapa frontu jest własnym schematem, bez digitalizacji wszystkich historycznych
+  pozycji z 20.11.1917. Podkład kampanii nie jest minimapą geometrycznej przestrzeni gry.
+- Grafika main korzysta z zachowanego kadru 426×352 poprzedniej pracy; może być miękka
+  na dużych ekranach. Nie jest eksportem wysokiej rozdzielczości ani zdjęciem archiwalnym.
+- Flagi aktualizują zasłonięcie w ograniczonym budżecie do 4 LOS/klatkę; cache wynosi
+  do 0,15 s czasu świata. Nie należy oczekiwać bezkosztowego dokładnego raycasta każdego
+  znacznika w każdej klatce. Minimapę odrysowuje się do 30 razy/s.
+- Testy wykonane na DOM z fixture widoku/pamięci nie potwierdzają pełnego GameView,
+  trwałości IndexedDB, Firefoksa, Edge ani wydajności fizycznego GPU. Te odbiory trzeba
+  wykonać lokalnie; nie są zastępowane liczbą zielonych testów Node.
+- Podgląd nowej kampanii nie nadpisuje danych. Zatwierdzona transakcja nowego startu
+  jest granicą zastąpienia zapisu; po jej zakończeniu nie obiecujemy cofnięcia.
+- Odmowa pamięci pozwala grać sesyjnie, ale po zamknięciu przeglądarki może powrócić
+  starszy trwały zapis zamiast nowej sesji. Ostrzeżenie nie oznacza trwałego zapisu.
+
+Poniżej pozostawiono wcześniejsze notatki z ich oryginalnym kontekstem wersji.
+Nie należy traktować historycznego opisu układu menu jako aktualnego wyglądu 0.4.4.
+
+---
+
 # Znane ograniczenia 0.4.3 — 6 września 2026
 
 **Kod do lokalnego odbioru. Ten dokument nie potwierdza publikacji ani pełnego przejścia gry w przeglądarce.**

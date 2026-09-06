@@ -1,3 +1,4 @@
+from browser_v044_ui import open_new
 """v0.4 real-Chromium regressions. Run: xvfb-run -a python tools/browser_v04_regression.py
 Uses routed local files because the authoring environment blocks URL navigation.
 Opaque origin is deliberate: storage persistence is NOT claimed by this test.
@@ -31,8 +32,8 @@ with sync_playwright() as p:
  print('LAYOUT PASS',len(report['layout']),flush=True)
  page.set_viewport_size({'width':1280,'height':720});page.screenshot(path=str(OUT/'menu-v04.png'))
  # Keep interaction tests affordable in a software renderer; this is not the benchmark.
- page.set_viewport_size({'width':960,'height':600});page.locator('[data-action="settings"]').click();page.locator('[data-setting="quality"]').select_option('low');page.locator('[data-setting="showCpu"]').check();page.locator('[data-setting="showGpu"]').check();page.locator('[data-action="back"]').click()
- page.locator('[data-action="brief"]').click();page.locator('[data-action="start"]').click();page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=65000);assert page.evaluate('ZiemiaNiczyja.state')=='ready',page.evaluate('__ZN_TEST__.app.errorMessage')
+ page.set_viewport_size({'width':960,'height':600});page.locator('[data-action="settings"]').click();page.locator('#tab-graphics').click();page.locator('[data-setting="quality"]').select_option('low');page.locator('[data-setting="showCpu"]').check();page.locator('[data-setting="showGpu"]').check();page.locator('[data-action="back"]').click()
+ open_new(page);page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=65000);assert page.evaluate('ZiemiaNiczyja.state')=='ready',page.evaluate('__ZN_TEST__.app.errorMessage')
  page.locator('[data-action="enter"]').click();page.wait_for_function("ZiemiaNiczyja.state==='playing'");assert page.evaluate("document.pointerLockElement===__ZN_TEST__.app.canvas")
  page.mouse.down(button='right');page.wait_for_function('__ZN_TEST__.app.world.player.ads');before=page.evaluate('__ZN_TEST__.app.world.player.yaw');page.mouse.move(500,270);page.mouse.move(645,300,steps=6);page.wait_for_timeout(240);after=page.evaluate('__ZN_TEST__.app.world.player.yaw');assert abs(after-before)>.10,(before,after);report['checks']['rightHeldLookRealPointer']=True;page.mouse.down(button='left');page.wait_for_function('__ZN_TEST__.app.world.player.weapon.mag===9');page.mouse.up(button='left');assert page.evaluate('__ZN_TEST__.app.world.player.ads');page.mouse.up(button='right');page.wait_for_function('!__ZN_TEST__.app.world.player.ads');report['checks']['rightThenLeftRealMouse']=True
  page.wait_for_function('__ZN_TEST__.app.world.player.weapon.cooldown<=0',timeout=20000)
@@ -83,6 +84,7 @@ with sync_playwright() as p:
  pools=page.evaluate("Object.fromEntries(Object.entries(__ZN_TEST__.app.view.effects.pools).map(([k,p])=>[k,{allocated:p.objects.size,capacity:p.capacity,available:p.available}]))");assert all(v['allocated']<=v['capacity'] for v in pools.values());report['pools']=pools
  page.evaluate("() => {const a=__ZN_TEST__.app;a.ui.menu.hidden=false;a.go('paused');}")
  page.locator('[data-action="settings"]').click();
+ page.locator('#tab-graphics').click()
  for key in ['showFps','showCpu','showGpu']:page.locator(f'[data-setting="{key}"]').uncheck()
  page.locator('[data-action="back"]').click();page.locator('[data-action="enter"]').click();page.wait_for_function("ZiemiaNiczyja.state==='playing'");page.wait_for_function("document.querySelector('.performance-overlay').hidden");assert not page.locator('.performance-overlay').is_visible();assert not page.evaluate('__ZN_TEST__.app.view.gpuTimer.enabled');report['checks']['independentOverlaySettingsOff']=True
  page.keyboard.press('Escape');page.wait_for_function("ZiemiaNiczyja.state==='paused'");page.locator('[data-action="exit"]').click();assert page.evaluate('ZiemiaNiczyja.inspect().missionScenes')==0;assert not report['errors'],report['errors'];assert not report['missing'],report['missing'];report['passed']=True

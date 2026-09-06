@@ -52,6 +52,7 @@ export class LocalizedError extends Error {
 export function updateDocumentLanguage(doc=globalThis.document){
  if(!doc)return;
  doc.documentElement.lang=language;
+ doc.title=t('page.title');
  doc.querySelector('meta[name="description"]')?.setAttribute('content',t('page.description'));
  doc.querySelector('#game')?.setAttribute('aria-label',t('page.canvas'));
 }

@@ -1,0 +1,13 @@
+{
+  "base": "ZiemiaNiczyja_0.4.4_R3A_art_kampania_ladowanie.zip",
+  "version": "0.4.4",
+  "uiRevision": 3,
+  "package": "loading art viewport hotfix",
+  "files": [
+    {
+      "path": "src/ui/styles/menus.css",
+      "size": 10050,
+      "sha256": "adf713a4f215ceddc03d1c22b79e8c2c1750cfd9fe4966858a21078752ed0cff"
+    }
+  ]
+}

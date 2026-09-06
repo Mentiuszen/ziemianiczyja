@@ -1,3 +1,26 @@
+# Raport testów — Ziemia Niczyja v0.4.4
+
+6 września 2026. Baza `a3398c211292e1cd677478ad6c4d456b6d210193` (0.4.3).
+**Implementacja do lokalnego odbioru; bez publikacji przez wykonawcę.**
+
+| Sprawdzenie | Faktyczny wynik 0.4.4 |
+|---|---|
+| Pełny npm test | **331/331 PASS**, 0 fail/skip/cancel; baza 274 |
+| npm run check | PASS; 85 JS/MJS, względne importy, 15 GLB, 463/463 klucze PL/EN, 11 hashy UI |
+| Autoplay / destroyed-tanks | Oba PASS, faza 7, po 2 checkpointy |
+| Statyczny build | PASS; dwa identyczne manifesty |
+| HTTP source/dist/podkatalog | PASS; 96 odpowiedzi 200 oraz oczekiwane 404; klient Python |
+| Chromium DOM | PASS w about:blank z fixture pamięci i widoku; menu, opcje, kampania, Canvas/HUD, języki, układ |
+| Matematyka kamery | PASS na rzeczywistych macierzach przypiętego Babylon, bez GPU |
+| Cała gra HTTP/GameView | **BLOCKED: ERR_BLOCKED_BY_ADMINISTRATOR** przed kontrolami |
+| Firefox/Edge, natywny trwały storage, fizyczny GPU/p95/p99, 10 pełnych cykli | NIE WYKONANO; lokalny odbiór |
+
+[Raport 0.4.4](V0_4_4_IMPLEMENTATION.md) · [wyniki maszynowe](V0_4_4_VALIDATION.json).
+Poniżej zachowano wcześniejsze wyniki w ich oryginalnym kontekście. Nie są ponowną
+walidacją starych przeglądarek, assetów ani jakości na potrzeby 0.4.4.
+
+---
+
 # Raport testów — Ziemia Niczyja v0.4.3
 
 6 września 2026. Baza `d4f0b6a2ed59b7e3e53d7adb113a3fc639c6bb9d` (0.4.2).

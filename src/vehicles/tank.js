@@ -85,7 +85,7 @@ export function updateTank(w,t,dt){
   d.x+=(w.random()-.5)*1.7;d.z+=(w.random()-.5)*1.7;
   const flight=Math.max(.35,length/35);
   w.shells.push({id:`shell-${w.nextId++}`,owner:t.id,faction:t.faction,pos:from,vel:v3(d.x/flight,(d.y+3*flight*flight)/flight,d.z/flight),ttl:flight+1,power:145,radius:3.8,kind:'shell'});
-  t.weaponLeft=9+w.random()*4;t.ammunition--;t.lastFire=w.time;w.stats.tankCannonShots++;w.emit('cannon',{pos:from,owner:t.id});break;
+  t.weaponLeft=9+w.random()*4;t.ammunition--;t.lastFire=w.time;w.stats.tankCannonShots++;w.emit('cannon',{pos:from,owner:t.id,faction:t.faction});break;
  }
 }
 export function updateShells(w,dt){

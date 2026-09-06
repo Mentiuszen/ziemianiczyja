@@ -1,3 +1,241 @@
+# Zmiany v0.4.4 — rewizja 3A (grafiki kampanii i ładowania)
+
+**Wersja: 0.4.4, UI_REVISION: 3. Bez publikacji.**
+**Zakres tej poprawki: podpięcie nowych, samodzielnych teł `campaign-art.webp` i `loading-art.webp` oraz poprawa czytelności tekstu na tych ekranach.**
+
+## Ekran kampanii
+
+- Ekran kampanii korzysta teraz z osobnej grafiki `public/assets/ui/campaign-art.webp`,
+  zamiast poprzedniego neutralnego tła. Grafika jest używana jako pełnoekranowe tło
+  pod właściwym układem mapy, listy misji i panelu rozdziału.
+- Dodano warstwę przyciemnienia i delikatne winietowanie, aby nagłówki, opis misji,
+  karty rozdziałów oraz kontrolki mapy pozostały czytelne niezależnie od monitora.
+- Dla szerokich proporcji, w tym 21:9, ustawiono osobne pozycjonowanie tła, tak aby
+  stół i centralne materiały były nadal widoczne bez przypadkowego ucięcia kluczowych
+  elementów kompozycji.
+
+## Ekran ładowania
+
+- Ekran ładowania korzysta teraz z osobnej grafiki `public/assets/ui/loading-art.webp`.
+- Zmieniono układ na ciemny, półprzezroczysty panel nad tłem; zawiera on tytuł, status
+  ładowania, pasek postępu, wskazówkę i przycisk anulowania.
+- Warstwy przyciemnienia, rozmycie panelu i mocniejsze kontrasty zapewniają czytelność
+  komunikatów niezależnie od jasności tła.
+
+## Zakres techniczny
+
+- Zmieniono tylko warstwę interfejsu i assety tła; logika kampanii, ładowania, zapisu,
+  trudności i minimapy pozostaje bez zmian względem rewizji 3.
+- Numer wydania pozostaje `0.4.4`, a `ZiemiaNiczyja.uiRevision` nadal zwraca `3`.
+
+---
+
+# Zmiany v0.4.4 — rewizja 3 (częściowy zakres)
+
+**Wersja: 0.4.4, UI_REVISION: 3. Bez publikacji.**
+**Zrealizowano punkty 2–4 zamówienia R3. Punkt 1 — regeneracja samodzielnych teł
+w wysokiej rozdzielczości — nie został dostarczony. Nadal używane są tła R2.**
+
+## Tytuł i logo PL/EN
+
+- English używa nazwy **No Man’s Land** i osobnego wektorowego `logo-en.svg`.
+  Polski zachowuje **Ziemia Niczyja** oraz dotychczasowy logotyp.
+- Nazwa przełącza się także w tytule karty przeglądarki, metadanych strony,
+  opisie projektu i tekstowym zastępstwie logo. Nie zmieniono technicznych nazw
+  repozytorium, IndexedDB, kluczy ustawień ani API `ZiemiaNiczyja`.
+- Oba logotypy są niezależne od tła. Angielski eksport zawiera kontury znaków,
+  nie odwołania do zewnętrznego fontu; nota pochodzenia jest zachowana.
+
+## Trudność wyłącznie na ekranie kampanii
+
+- Usunięto kontrolkę trudności ze wszystkich kategorii Opcji. Reset Rozgrywki
+  nie zmienia poziomu trudności ani preferencji następnej kampanii.
+- W Nowej kampanii wybór określa profil nowego startu i nie zmienia starego checkpointu.
+- W Kontynuacji kampanii można zmienić trudność grywalnej, nieukończonej misji.
+  Zmieniany jest checkpoint i jego powiązane metadane w tej samej transakcji Store.
+  Zmiana nie uruchamia świata, nie rozpoczyna misji od nowa i nie uzupełnia HP/amunicji.
+- Pozostałe pola zapisu, w tym czas, RNG, pozycje, timery rozpoczętych akcji,
+  ekwipunek, osiągnięte cele oraz identyfikator przebiegu, pozostają zachowane.
+  Nowy profil działa po wznowieniu; trwające akcje zachowują swoje zapisane timery.
+- Podczas zapisywania nie można wystartować ani uruchomić drugiej zmiany trudności.
+  Wyjście z ekranu anuluje niezatwierdzony zapis. Zatwierdzona transakcja stanowi
+  granicę przyjęcia zmiany i nie jest cofana przez późniejsze wyjście.
+- Gdy trwały zapis jest niedostępny, aplikacja zachowuje spójną parę w tej sesji
+  i pokazuje ostrzeżenie. Stary trwały zapis pozostaje na dysku.
+
+## Płynna aktualizacja mapy frontu
+
+- Linia frontu zmienia kształt przez około 0,9 sekundy, zamiast natychmiastowej
+  podmiany całej warstwy SVG. Kamera przechodzi w tym samym czasie.
+- Strzałki obu dat płynnie wygasają/pojawiają się. Szybki kolejny wybór startuje
+  z obecnie wyświetlanego kształtu i krycia, nie z poprzedniego punktu końcowego.
+- Pośredni obraz jest podpisany jako przejście; nie udaje kolejnej historycznej daty.
+  Po zakończeniu wraca dokładna, niezmieniona polilinia wybranej misji z R2.
+- Pomiń oraz ograniczenie animacji kończą przejście od razu. Opcje, ukryta karta
+  i przełączenie języka nie resetują animacji ani nie zużywają czasu symulacji.
+
+## Niezamknięty punkt: tła
+
+Próby generowania nie dostarczyły właściwych pojedynczych teł o większej
+rozdzielczości. Plansze z nadrukowanym UI nie są włączone do gry. Nie powiększono
+małych wycinków do 4K pod nazwą nowych masterów. Rozmycie teł R2 pozostaje ograniczeniem.
+Ta paczka **nie spełnia jeszcze całego zamówienia R3**.
+
+Wyniki testów i granice odbioru: `docs/V0_4_4_R3_IMPLEMENTATION.md`.
+
+---
+
+# Zmiany v0.4.4 — rewizja 2
+
+**Status: poprawiona implementacja do lokalnego odbioru. Numer wydania pozostaje 0.4.4; rewizja UI = 2.**
+**Baza tej rewizji: aktualny ZIP użytkownika `ZiemiaNiczyja.zip`, nie ponownie pobrany main 0.4.3.**
+
+## Wygląd zgodny z wybranym kierunkiem
+
+- Wybór języka, main i opcje mają trzy oddzielne tła zaadaptowane z wybranego przez użytkownika konceptu. Z teł usunięto nadrukowane kontrolki i teksty; właściwe elementy są renderowane w HTML/CSS. Grafiki nie udają zrzutów działającej gry ani nowych natywnych assetów 4K.
+- Nowy wektorowy logotyp: mocne, przetarte litery, sylwetka piechura pomiędzy słowami oraz motyw drutu. Eksport zawiera krzywe, nie plik fontu.
+- Main otrzymał pełne tło sceny z żołnierzem po prawej oraz ciemną strefę pod menu, cieńsze separatory i oszczędne podświetlenie. Nadal ma dokładnie cztery działania i samo `v0.4.4` w rogu.
+- Picker zachowuje flagi PL i USA/UK, brak ramek, klawiaturę, zapamiętanie wyboru i obowiązkowy pierwszy wybór. Zmieniono skalę oraz typografię podpisów i kompozycję tła.
+- Opcje: przygaszone tło stanowiska dowodzenia, proste zakładki i równe wiersze. Doszły strzałki poprzedniej/następnej wartości obok dostępnych list oraz przełączniki z widocznym On/Off. Pod nimi nadal pracują natywne, podpisane selecty i checkboxy. Nie dodano fikcyjnych opcji z tekstu mockupu (dronów, automatycznego celowania, obsługi gamepada).
+
+## Kampania: mapa nad rozdziałami i datowane pozycje
+
+- Mapa zajmuje górną część ekranu. Pięć kart rozdziałów znajduje się poniżej, w kolejności 01–05; na wąskim ekranie przewijają się poziomo. Opis i rozpoczęcie/wznowienie są pod kartami, zamiast w bocznej kolumnie.
+- Podkład ma rzeczywiste współrzędne geograficzne, wybrzeże, rzeki i rzeźbę w skali strategicznej. Geografia pochodzi z regionalnego wycinka GSHHG 2.3.6/basemap-data 2.0.0; źródła danych, licencje i edytowalny wycinek są dołączone. Nie używamy współczesnych granic politycznych jako granic z 1917 roku.
+- Każdy wybór rozdziału zmienia linię frontu, kierunki natarcia, datę i zbliżenie: Somma (1.07.1916), Flers (15.09.1916), Ypres (październik 1917), Cambrai (20.11.1917), Amiens (8.08.1918).
+- Linie wojskowe są własnymi, datowanymi uogólnieniami. Nie są pomiarem każdego okopu ani zweryfikowaną digitalizacją dziennych arkuszy. Dla Ypres nie wymyślono dnia: źródłowy rozdział ma datę miesięczną.
+- Zmiana rozdziału przerywa nieaktualne intro, a zmiana języka i powrót z opcji zachowują wybór. Ograniczenie ruchu wyłącza przejazd kamery. Obserwator rozmiaru jest zwalniany przy opuszczeniu mapy.
+- Tylko Cambrai pozostaje grywalne. Oglądanie wcześniejszego/późniejszego frontu nie odblokowuje misji, nie zapisuje jej ukończenia i nie zmienia checkpointu.
+
+## Czystszy HUD
+
+- Okrągła minimapa zamiast kwadratu: delikatny obrys, kierunki świata, jasny gracz, niebiescy sojusznicy i czerwone kontakty. Lokacja i data są pod tarczą, a cel bezpośrednio poniżej.
+- Zasięg ujawniania dostosowano do okrągłego pola: promień 60 m, nie narożniki dawnego kwadratu ±60 m. Timery 3/2/1 s, kopia miejsca wystrzału, pauza oraz brak śledzenia cichych wrogów pozostają.
+- Zdrowie: jasny symbol krzyża, liczba i krótki pasek w jednym wierszu. Broń, amunicja i liczba granatów również tworzą jeden zwarty wiersz. Nazwy dostępności pozostają, ale zbędne widoczne etykiety usunięto.
+- Nie dodano przycisku Wstecz do rozgrywki. Stan świata, HP, amunicja, AI, kolizje, modele, języki i zapis misji zachowują działanie z bazowego ZIP-a.
+
+## Utrzymanie
+
+- Dodano 12 regresji rewizji, lokalny scenariusz `browser_v044_r2.py`, edytowalne źródła i odtwarzanie eksportów UI.
+- `VERSION` nadal wynosi `0.4.4`; `UI_REVISION` i `ZiemiaNiczyja.uiRevision` identyfikują rewizję 2. Nie zmieniono formatu zapisu ani wersji mapy.
+- Dokładne wyniki i ograniczenia odbioru: `docs/V0_4_4_R2_IMPLEMENTATION.md`. Nie wykonano pusha ani publikacji.
+
+---
+
+# Historia pierwszej rewizji 0.4.4
+
+Poniższy opis jest historyczny; wygląd i stałe, które rewizja 2 zmienia powyżej, nie opisują już bieżącego interfejsu.
+
+# Zmiany v0.4.4 — 6 września 2026
+
+**Status: implementacja przygotowana do lokalnego odbioru; bez publikacji przez wykonawcę.**
+
+Przebudowa menu, ekranu kampanii i HUD-u na bazie 0.4.3. Nadal dostępna jest jedna
+grywalna misja: Cambrai. Aktualizacja nie przebudowuje terenu, modeli, AI, obrażeń ani audio.
+
+## Menu główne i wybór języka
+
+- Nowe menu: logo w lewym górnym rogu, ilustracja frontu po prawej, przyciski po lewej
+  oraz wyłącznie `v0.4.4` w lewym dolnym rogu.
+- Usunięto górny i dolny pasek, dossier bieżącej misji, opisy prototypu i osobny wybór misji.
+- Cztery pozycje: **Kontynuuj kampanię, Nowa kampania, Opcje, O projekcie i zasobach**.
+  Dwa wejścia do kampanii zastępują trzy poprzednie przyciski misji.
+- Wybór języka nie ma obramowań flag ani całych kafli. Hover unosi/rozjaśnia flagę
+  i podkreśla nazwę; fokus klawiatury ma dodatkowy wskaźnik bez prostokątnego obrysu.
+- Zachowano flagi English USA/UK i Polski, zapis preferencji i blokadę wejścia do menu
+  przed pierwszym wyborem. Żaden ekran menu nie uruchamia świata ani kamery WebGL.
+- Odświeżono także informacje o projekcie, ładowanie, wejście do gry, pauzę, śmierć,
+  ukończenie i błędy. Oryginalne linki oraz atrybucje pozostają dostępne w PL/EN.
+
+## Osobna mapa kampanii
+
+- Pełnoekranowy ekran kampanii ma własny schemat frontu zachodniego, strony frontu,
+  datę 20 listopada 1917, punkty pięciu rozdziałów, zoom i podgląd lokalnego sektora.
+- Nowa kampania pokazuje około 7-sekundowe wprowadzenie: Ypres, narracyjne przejście
+  do Cambrai, zbliżenie oraz kierunek natarcia. Pomiń działa od początku i prowadzi
+  do tego samego końcowego stanu; sekwencja nie zapętla się.
+- Poprzedni rozdział „Morze błota” jest kontekstem, nie fikcyjnym ukończeniem.
+  Somma, Flers, Ypres i Amiens nie mają aktywnego przycisku rozpoczęcia.
+- Kontynuacja otwiera mapę z rzeczywistym checkpointem i jego trudnością. Dopiero
+  „Wznów misję” wczytuje zapis; brak zapisu nigdy nie oznacza ukrytego nowego startu.
+- Powrót z opcji i zmiana języka zachowują wybór rozdziału oraz oś czasu mapy.
+  Ustawienie animacji menu i preferencja ograniczonego ruchu wyłączają zbędny ruch.
+- Mapa jest autorskim schematem, nie digitalizacją dokładnej historycznej linii frontu.
+  Trasa Ypres–Cambrai nie udaje udokumentowanego marszu jednostki gracza.
+
+## Opcje i sterowanie
+
+- Jeden ekran opcji, cztery zakładki: **Rozgrywka, Sterowanie, Dźwięk, Grafika**
+  / **Gameplay, Controls, Audio, Graphics**. Widoczna jest tylko aktywna kategoria.
+- Usunięto długie techniczne opisy; zachowano etykiety, wartości, krótką pomoc i błędy.
+  Nie dodano ustawień, których gra nie realizuje.
+- Wszystkie przypisania klawiszy i czułość przeniesiono do Sterowania. Osobny przycisk
+  Sterowanie znika z main i pauzy. Konflikty klawiszy nadal rozwiązują się przez zamianę.
+- Dodano przełączniki minimapy, flag sojuszników i animacji menu, domyślnie włączone.
+- Zakresy ustawień pochodzą ze wspólnego schematu. Skala renderowania 50–150% odpowiada
+  walidacji zapisu; starsze 130–150% nie są obcinane do dawnego limitu kontrolki.
+- Reset dotyczy wyłącznie aktywnej kategorii, wymaga potwierdzenia i zachowuje język.
+  Reset Sterowania obejmuje klawisze i czułość; nigdy checkpoint.
+- Strzałki/Home/End obsługują zakładki. Escape najpierw anuluje capture, potem modal,
+  następnie wraca do właściwego rodzica. Opcje z pauzy nie wznawiają gry automatycznie.
+- Zmiany grafiki są scalane do najwyżej jednej aktualizacji na klatkę; zmiana tekstów,
+  zakładki lub głośności nie odbudowuje świata.
+
+## HUD, minimapa, sojusznicy i broń
+
+- Minimapę umieszczono w prawym górnym rogu; lokacja i data są częścią jej modułu,
+  a cel, podpowiedź i postęp obrony znajdują się bezpośrednio pod nią.
+- Canvas 2D korzysta z faktycznych danych terenu, okopów, ramp, dróg i colliderów.
+  Tło jest buforowane i aktualizowane po przełamaniu przeszkody. Nie dodano kamery 3D.
+- Północ pozostaje na górze, gracz w środku, widoczny zakres wynosi ±60 m X/Z.
+  Mapa odrysowuje się najwyżej 30 razy/s; DPR do 2 jest niezależny od renderScale gry.
+- Widoczne są żywe sojusznicze jednostki, niezniszczone czołgi, aktywne samoloty i cel.
+  Nie ma znaczników przyszłych wylotów, trupów ani wszechwiedzącego podglądu wrogów.
+- Wrogie rzeczywiste wystrzały broni i działa tworzą jeden kontakt na strzelca:
+  **Rekrut 3 s, Żołnierz 2 s, Weteran 1 s** od ostatniego wystrzału w czasie symulacji.
+  Kontakt wskazuje skopiowane miejsce strzału, nie śledzi późniejszego ruchu NPC.
+- Zasięg kontaktu sprawdzany jest w chwili strzału. Pauza nie zużywa czasu; język
+  i wyłączenie/włączenie minimapy go nie odnawiają. Nowy świat usuwa stare kontakty.
+- Dodano półprzezroczyste flagi UK nad głowami żywych sojuszników. Kotwice uwzględniają
+  postawę i faktyczną macierz kamery. Flagi nie przejmują wejścia ani nie oznaczają wrogów.
+- Widoczność flag ma ograniczony budżet geometrii: do 4 LOS na klatkę, cache do 0,15 s.
+  Nieznany/przeterminowany wynik ukrywa znacznik. Nakładające się flagi są wyciszane,
+  nie przesuwane nad inną postać; obszary celu, napisów i celownika są chronione.
+- Nazwę broni w amunicji zastąpiono osobnymi sylwetkami SMLE, Gewehr, Webley, Lewis
+  i MG 08. Nazwa pozostaje dostępna dla czytnika; liczby amunicji i zdrowie bez zmian.
+- FPS/CPU/GPU przeniesiono na lewą górę, komunikaty checkpointu na środek pod kompasem.
+  Usunięto drobny stały napis HUD z Esc/F3/wersją. Ostrzeżenia i napisy mają wspólną
+  strefę układu, a niskie okno zmniejsza mapę zamiast zakrywać cel lub amunicję.
+
+## Zapis i kompatybilność
+
+- Dodano metadane bieżącej kampanii do tej samej bazy IndexedDB co checkpoint.
+  Odczyt i zapis pary odbywają się w jednej transakcji, przez jedną kolejkę operacji.
+- Sam podgląd Nowej kampanii nie usuwa zapisu. Potwierdzenie zastąpienia następuje
+  dopiero przy rozpoczęciu. Anulowanie/błąd ładowania przed zatwierdzeniem zachowują
+  poprzednią parę; odmowa trwałego magazynu daje spójny zapis sesyjny z ostrzeżeniem.
+- Spóźniony wynik zastąpionego autosave nie przywraca starszego checkpointu w aplikacji.
+  Błąd drugiego zapisu w transakcji anuluje także pierwszy, zamiast pozostawić pół pary.
+- Ukończenie zapisuje stan bieżącego przebiegu, nie tylko historyczną flagę.
+  Powrót z ukończenia prowadzi do rzeczywistej mapy kampanii.
+- Poprawne checkpointy 0.4.1/0.4.2/0.4.3 są obsługiwane przez migrację metadanych.
+  `SAVE_VERSION=1`, `MISSION_VERSION=3` i klucz ustawień pozostają bez zmian.
+- Zachowano pełne PL/EN; katalogi zawierają po 463 klucze. Nie zmieniono naprawy
+  przechyłu kamery ani parametrów walki, AI, geometrii, modeli i audio.
+
+## Weryfikacja i przygotowanie wydania
+
+Dodano testy menu, nawigacji, zakładek, kampanii i transakcji, kontaktów, minimapy,
+projekcji rzeczywistej kamery, flag oraz ikon. Poprzednie regresje dostosowano do nowych
+wejść i zakładek, zamiast usuwać ich sprawdzenia. Nowe narzędzie `browser_v044_ui.py`
+obsługuje lokalny HTTP i opcjonalnie prawdziwy GameView przez `--game`.
+
+Dokładne wyniki i ograniczenia: `docs/V0_4_4_IMPLEMENTATION.md` oraz `docs/TEST_REPORT.md`.
+Test DOM i matematyki kamery nie jest odbiorem pełnej gry, trwałego IndexedDB ani
+wydajności fizycznego GPU. Odbiór lokalny i publikacja pozostają odrębnym krokiem.
+
+---
+
 # Zmiany v0.4.3 — 6 września 2026
 
 **Status: kod przygotowany do lokalnego odbioru; bez publikacji przez wykonawcę.**

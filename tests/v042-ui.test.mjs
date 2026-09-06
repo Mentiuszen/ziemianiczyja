@@ -12,8 +12,8 @@ function screen(state,chosen='soldier',loaded=null){
  ui.render(state);return ui.menu.innerHTML;
 }
 for(const [id,seconds,rate] of [['recruit',3,25],['soldier',4,20],['veteran',5,16]]){
- test(`briefing describes the selected ${id} regeneration`,()=>{
-  const html=screen('brief',id);assert.ok(html.includes(`po ${seconds} s`));assert.ok(html.includes(`${rate} HP/s`));
+ test(`death advice describes the selected ${id} regeneration`,()=>{
+  const html=screen('dead',id);assert.ok(html.includes(`po ${seconds} s`));assert.ok(html.includes(`${rate} HP/s`));
  });
 }
 test('ready screen reports checkpoint difficulty rather than next-mission selection',()=>{
@@ -22,6 +22,6 @@ test('ready screen reports checkpoint difficulty rather than next-mission select
 test('death advice uses the loaded mission profile',()=>{
  const html=screen('dead','recruit','veteran');assert.ok(html.includes('po 5 s'));assert.ok(html.includes('16 HP/s'));
 });
-test('settings distinguish the current mission from the next-mission selection',()=>{
- const html=screen('settings','recruit','veteran');assert.ok(html.includes('Trudność tej misji: Weteran'));assert.ok(html.includes('value="recruit" selected'));
+test('options no longer expose difficulty while pause retains the loaded mission profile',()=>{
+ const html=screen('settings','recruit','veteran');assert.doesNotMatch(html,/data-setting="difficulty"|Trudność nowej kampanii/);assert.ok(screen('paused','recruit','veteran').includes('Trudność tej misji: Weteran'));
 });

@@ -1,0 +1,9 @@
+Map source: GSHHG 2.3.6 (intermediate), extracted by Basemap 2.0.0.
+Coastline, lake and river data: LGPL-3.0-or-later.
+Editable regional coordinates accompany this export in western-front-geography.json.
+Source: https://www.soest.hawaii.edu/pwessel/gshhg/
+Distribution: https://github.com/matplotlib/basemap/tree/v2.0.0/data
+License text: ../licenses/GSHHG-LGPL-3.txt and GSHHG-GPL-3.txt.
+The derived map SVG can be replaced independently of the game.
+Relief crop: basemap-data shadedrelief.jpg, distributed under MIT; see ../licenses/Basemap-data-MIT.txt.
+Modern international boundaries are NOT rendered. Fronts/arrows are original dated generalizations, not survey data.

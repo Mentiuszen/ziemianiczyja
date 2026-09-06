@@ -1,3 +1,4 @@
+from browser_v044_ui import open_new
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import json,mimetypes,urllib.parse,shutil
@@ -8,7 +9,7 @@ with sync_playwright() as pw:
   f=ROOT/urllib.parse.urlparse(r.request.url).path.lstrip('/');r.fulfill(status=200 if f.is_file() else 404,body=f.read_bytes() if f.is_file() else b'missing',headers={'Content-Type':mimetypes.guess_type(f)[0] or 'application/octet-stream','Access-Control-Allow-Origin':'*'})
  page.route('http://local.test/**',route)
  page.set_content((ROOT/'index.html').read_text().replace('<head>','<head><base href="http://local.test/"><script>window.__ZN_TEST_MODE__=true</script>'),wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja');page.locator('#choose-pl').click() if page.locator('#choose-pl').count() else None;page.evaluate("__ZN_TEST__.app.settings.quality='low'")
- page.locator('[data-action="brief"]').click();page.locator('[data-action="start"]').click();page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=65000);print('state',page.evaluate('ZiemiaNiczyja.state'),'errors',errors,flush=True)
+ open_new(page);page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=65000);print('state',page.evaluate('ZiemiaNiczyja.state'),'errors',errors,flush=True)
  if page.evaluate('ZiemiaNiczyja.state')!='ready':print(page.evaluate('__ZN_TEST__.app.errorMessage'));b.close();raise SystemExit(1)
  page.locator('[data-action="enter"]').click();page.wait_for_function("ZiemiaNiczyja.state==='playing'")
  page.mouse.down(button='right');page.wait_for_function('__ZN_TEST__.app.world.player.ads');before=page.evaluate('__ZN_TEST__.app.world.player.yaw');page.mouse.move(620,330);page.mouse.move(780,355,steps=8);page.wait_for_timeout(300);after=page.evaluate('__ZN_TEST__.app.world.player.yaw');print('aim look delta',after-before,flush=True);page.mouse.up(button='right')

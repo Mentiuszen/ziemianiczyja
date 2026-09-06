@@ -30,7 +30,8 @@ export class Input {
         return;
       }
       if (event.code === 'Escape') {
-        if (this.enabled) this.callbacks.pause();
+        event.preventDefault();
+        if (this.enabled) this.callbacks.pause();else this.callbacks.escape?.();
         return;
       }
       if (!this.enabled) return;

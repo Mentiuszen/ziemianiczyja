@@ -1,3 +1,48 @@
+# 0.4.4 limitations — 6 September 2026
+
+## Revision 3 — current status
+
+- Requests 2–4 are implemented. Request 1, new high-resolution backdrops, is not delivered; R2 image softness still applies.
+- English uses No Man’s Land and its own logo. Earlier notes about a Polish-only title no longer describe the live UI.
+- A continuing mission's difficulty can be changed only on the Campaign screen. Started timers retain their values; health and ammunition are not replenished.
+- Native persistence, real GameView and Firefox/Edge still require local acceptance.
+
+Sections below are preserved as history. R3 supersedes their difficulty and title behavior.
+
+## 0.4.4 revision 2 — current limitations
+
+- The three backdrops are adapted from the selected concept (native panels 764×352 / 764×374), not new native 4K paintings. They may look soft at large sizes. The vector logo and live controls remain independent and sharp.
+- Campaign geography is based on real geographic data. The five military fronts are date-specific generalizations, not a verified trench-by-trench survey. Ypres has month-level dating.
+- Actual WebGL2 gameplay, native persistence and gameplay readability require local acceptance. An isolated DOM test without the 3D scene does not replace it.
+- Responsive menus do not add touchscreen-only gameplay.
+
+Other earlier limitations still apply unless a specific revision-2 change supersedes them.
+
+
+**Local-acceptance candidate, not a claim of full validation on the player's computer.**
+
+- Cambrai is the only playable chapter. Other map points are informational; watching
+  the introduction does not mark Ypres as completed.
+- The front map is an original schematic, not a digitization of all historical
+  positions on 20 November 1917. Campaign drawing units are separate from gameplay metres.
+- Main-menu artwork uses a recovered 426×352 crop from the earlier work; it may look
+  soft on large displays. It is not a high-resolution export or an archival photograph.
+- Friendly flags use up to 4 geometry visibility checks per frame and a cache up to
+  0.15 simulation seconds. The minimap redraws at up to 30 Hz, not every 165 Hz frame.
+- Isolated DOM tests with view/storage fixtures do not establish real GameView,
+  persistent IndexedDB, Firefox/Edge support or physical-GPU performance. Those remain
+  local acceptance requirements; passing Node tests is not a substitute.
+- New-campaign preview does not overwrite saves. A completed transaction is the
+  replacement boundary; cancellation after that boundary cannot undo the accepted save.
+- Denied storage permits session-only progress. Closing the browser can restore the
+  older durable save instead of the newer session state; the warning is not a promise
+  of persistence.
+
+Earlier version-specific notices are preserved below as history. Their description
+of old menus is not the current 0.4.4 interface.
+
+---
+
 # Known limitations 0.4.3 — September 6, 2026
 
 **Code for local acceptance testing. This document does not confirm publication or a complete browser playthrough.**

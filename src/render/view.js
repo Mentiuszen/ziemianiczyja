@@ -1,3 +1,4 @@
+import {projectToHud} from '../ui/hud/projection.js';
 import {LocalizedError} from '../i18n/index.js';
 import {message} from '../i18n/message.js';
 import {SupportView} from './support-view.js';
@@ -118,6 +119,9 @@ export class GameView {
  }
  event(e){this.effects?.event(e);}
  marker(){const o=this.world.director.objective;const point=new Vector3(o.x,this.world.terrain.height(o.x,o.z)+2,o.z);const projected=Vector3.Project(point,Matrix.Identity(),this.scene.getTransformMatrix(),this.camera.viewport.toGlobal(this.engine.getRenderWidth(),this.engine.getRenderHeight()));const dx=o.x-this.world.player.pos.x,dz=o.z-this.world.player.pos.z;return{x:projected.x/this.engine.getRenderWidth()*100,y:projected.y/this.engine.getRenderHeight()*100,visible:dx*Math.sin(this.world.player.yaw)+dz*Math.cos(this.world.player.yaw)>0&&projected.z>=0&&projected.z<=1,distance:Math.hypot(dx,dz)};}
+ cameraPosition(){const p=this.camera.globalPosition||this.camera.position;return{x:p.x,y:p.y,z:p.z};}
+ viewport(){const r=this.canvas.getBoundingClientRect(),v=this.camera.viewport;return{left:r.left+v.x*r.width,top:r.top+(1-v.y-v.height)*r.height,width:r.width*v.width,height:r.height*v.height};}
+ projectPoint(point){return projectToHud(point,{getTransformationMatrix:()=>this.scene.getTransformMatrix(),isNDCHalfZRange:this.engine.isNDCHalfZRange},this.viewport());}
  resize(){this.engine.resize();}
  dispose(){if(this.disposed)return;this.disposed=true;this.gpuTimer.dispose();this.support?.dispose();this.effects?.dispose();this.assets.dispose();this.scene.dispose();this.engine.dispose();this.units.clear();this.items.clear();this.tankModels.clear();}
 }

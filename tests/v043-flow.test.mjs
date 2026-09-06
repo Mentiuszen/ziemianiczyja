@@ -10,8 +10,8 @@ function fixture(t){
  const old=globalThis.document;globalThis.document={documentElement:{lang:'en'},querySelector:()=>null};t.after(()=>{if(old===undefined)delete globalThis.document;else globalThis.document=old;setLanguage('pl');});
  const calls={saved:[],states:[],rendered:[],toasts:[],loads:0,refreshes:0};
  const a=Object.assign(Object.create(Application.prototype),{state:'language-select',alive:true,loadGeneration:0,actionSequence:0,checkpointLoadStarted:false,settings:{...DEFAULT_SETTINGS,keys:{...DEFAULT_SETTINGS.keys}},world:null,view:null,storageWarning:'',checkpoint:null,
-  ui:{render(s){calls.rendered.push(s);},refreshLanguage(){calls.refreshes++;},toast(v){calls.toasts.push(v);}},input:{},audio:{setSettings(){}},go(s){this.state=s;calls.states.push(s);},
-  store:{saveSettings(s){calls.saved.push(structuredClone(s));return true;},async load(){calls.loads++;return null;}}
+  ui:{optionsTab:'graphics',showModal(m){this.modal=m;},closeModal(){this.modal=null;},render(s){calls.rendered.push(s);},refreshLanguage(){calls.refreshes++;},toast(v){calls.toasts.push(v);}},input:{},audio:{setSettings(){}},go(s){this.state=s;calls.states.push(s);},
+  store:{saveSettings(s){calls.saved.push(structuredClone(s));return true;},async loadCampaign(){calls.loads++;return{checkpoint:null,progress:null,checkpointState:'none'};}}
  });return{a,calls};
 }
 test('first selection persists once and opens only the selected main menu, without runtime loading',async t=>{
@@ -28,12 +28,12 @@ test('blocked persistence still enters main and retains the choice for the sessi
  assert.equal(a.selectLanguage('en'),true);await flush();assert.equal(a.state,'main');assert.equal(a.settings.language,'en');assert.equal(calls.loads,1);assert.match(text(calls.toasts[0]),/settings/i);
 });
 test('a delayed checkpoint result does not replace an options screen or start a mission',async t=>{
- const {a,calls}=fixture(t),pending=defer();a.store.load=()=>pending.promise;a.selectLanguage('pl');a.state='settings';
- pending.resolve({director:{lastCheckpoint:'checkpoint.bennett'}});await flush();assert.equal(a.state,'settings');assert.equal(calls.rendered.length,0);assert.equal(a.world,null);assert.ok(a.checkpoint);
+ const {a,calls}=fixture(t),pending=defer();a.store.loadCampaign=()=>pending.promise;a.selectLanguage('pl');a.state='settings';
+ pending.resolve({checkpoint:{director:{lastCheckpoint:'checkpoint.bennett'}},checkpointState:'ready'});await flush();assert.equal(a.state,'settings');assert.equal(calls.rendered.length,0);assert.equal(a.world,null);assert.ok(a.checkpoint);
 });
 test('a delayed boot checkpoint cannot overwrite a newer mission checkpoint',async t=>{
- const {a}=fixture(t),pending=defer();a.store.load=()=>pending.promise;a.selectLanguage('en');a.loadGeneration++;a.checkpoint={current:true};
- pending.resolve({stale:true});await flush();assert.deepEqual(a.checkpoint,{current:true});
+ const {a}=fixture(t),pending=defer();a.store.loadCampaign=()=>pending.promise;a.selectLanguage('en');a.loadGeneration++;a.checkpoint={current:true};
+ pending.resolve({checkpoint:{stale:true},checkpointState:'ready'});await flush();assert.deepEqual(a.checkpoint,{current:true});
 });
 test('paused language changes preserve the exact world, checkpoint, input and audio objects',t=>{
  const {a,calls}=fixture(t);a.state='settings';a.returnState='paused';a.settings.language='pl';a.world=new Simulation();a.checkpoint=structuredClone(a.world.snapshot());a.view={};const {world,view,input,audio,checkpoint}=a,before=world.snapshot();
@@ -42,9 +42,9 @@ test('paused language changes preserve the exact world, checkpoint, input and au
 });
 test('restore default settings keeps the selected language and key bindings',async t=>{
  const {a,calls}=fixture(t);a.state='settings';a.settings.language='en';a.settings.fov=99;a.settings.keys.interact='KeyF';setLanguage('en');
- await a.action('settings-reset');assert.equal(a.settings.language,'en');assert.equal(getLanguage(),'en');assert.equal(a.settings.keys.interact,'KeyF');assert.equal(a.settings.fov,DEFAULT_SETTINGS.fov);assert.equal(calls.saved.at(-1).language,'en');
+ await a.action('category-reset');await a.action('confirm-modal');assert.equal(a.settings.language,'en');assert.equal(getLanguage(),'en');assert.equal(a.settings.keys.interact,'KeyF');assert.equal(a.settings.fov,DEFAULT_SETTINGS.fov);assert.equal(calls.saved.at(-1).language,'en');
 });
 test('queued load errors retain descriptors and resolve in the later selected language',async t=>{
- const {a,calls}=fixture(t);a.store.load=async()=>{throw Error('foreign message');};a.selectLanguage('pl');await flush();
+ const {a,calls}=fixture(t);a.store.loadCampaign=async()=>{throw Error('foreign message');};a.selectLanguage('pl');await flush();
  assert.equal(calls.toasts[0].key,'error.bootSave');a.state='settings';a.selectLanguage('en');assert.match(text(calls.toasts[0]),/You can safely start a new mission/);assert.doesNotMatch(text(calls.toasts[0]),/foreign message/);
 });

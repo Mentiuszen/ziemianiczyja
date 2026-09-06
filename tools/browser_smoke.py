@@ -1,3 +1,4 @@
+from browser_v044_ui import open_new
 """Offline Playwright + Chromium integration tests (optional developer tooling).
 Real files are routed under a base URL because creation-environment admin policy
 blocks navigation. Opaque origin means this does NOT verify persistent IndexedDB.
@@ -24,11 +25,11 @@ with sync_playwright() as p:
  html=(ROOT/'index.html').read_text().replace('<head>',f'<head><base href="{base}"><script>window.__ZN_TEST_MODE__=true</script>')
  page.set_content(html,wait_until='networkidle');page.wait_for_function('window.ZiemiaNiczyja !== undefined')
  report['menu']=page.evaluate('ZiemiaNiczyja.inspect()');report['menuRequests']=len(requests);assert report['menu']['missionScenes']==0 and report['menu']['npcs']==0;page.screenshot(path=str(OUT/'menu.png'))
- page.locator('[data-action="settings"]').click();page.locator('select[data-setting="quality"]').select_option('low');page.locator('[data-action="back"]').click()
- page.locator('[data-action="controls"]').click();page.locator('[data-action="bind"][data-key="crouch"]').click();page.keyboard.press('X');assert page.evaluate('__ZN_TEST__.app.settings.keys.crouch')=='KeyX';page.locator('[data-action="keys-reset"]').click();page.locator('[data-action="back"]').click();report['settingsAndRebind']=True
+ page.locator('[data-action="settings"]').click();page.locator('#tab-graphics').click();page.locator('select[data-setting="quality"]').select_option('low');page.locator('[data-action="back"]').click()
+ page.locator('[data-action="settings"]').click();page.locator('#tab-controls').click();page.locator('[data-action="bind"][data-key="crouch"]').click();page.keyboard.press('X');assert page.evaluate('__ZN_TEST__.app.settings.keys.crouch')=='KeyX';page.locator('[data-action="category-reset"]').click();page.locator('[data-action="confirm-modal"]').click();page.locator('[data-action="back"]').click();report['settingsAndRebind']=True
  cdp=page.context.new_cdp_session(page)
  for i in range(args.cycles):
-  page.locator('[data-action="brief"]').click();page.locator('[data-action="start"]').click();page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=60000)
+  open_new(page);page.wait_for_function("ZiemiaNiczyja.state==='ready'||ZiemiaNiczyja.state==='error'",timeout=60000)
   assert page.evaluate('ZiemiaNiczyja.state')=='ready',page.evaluate('__ZN_TEST__.app.errorMessage')
   loaded=page.evaluate('ZiemiaNiczyja.inspect()');assert loaded['npcs']==28 and loaded['missionScenes']==1
   page.locator('[data-action="enter"]').click();page.wait_for_function("ZiemiaNiczyja.state==='playing'",timeout=10000)
@@ -42,6 +43,6 @@ with sync_playwright() as p:
   actual=page.evaluate(f"async()=>{{const {{Engine}}=await import('{base}src/render/babylon.js');return {{engines:Engine.Instances.length,scenes:Engine.Instances.reduce((a,e)=>a+e.scenes.length,0)}}}}")
   assert unloaded['missionScenes']==0 and unloaded['activeAudio']==0 and actual['engines']==0
   heap=cdp.send('Runtime.getHeapUsage');report['cycles'].append({'cycle':i+1,'loadedMeshes':loaded['meshes'],'enginesAfterExit':actual['engines'],'scenesAfterExit':actual['scenes'],'audioAfterExit':unloaded['activeAudio'],'heapUsedBytes':heap['usedSize']});print('cycle',i+1,report['cycles'][-1],flush=True)
- fail_asset=True;page.locator('[data-action="brief"]').click();page.locator('[data-action="start"]').click();page.wait_for_function("ZiemiaNiczyja.state==='error'",timeout=30000);report['assetErrorVisible']=page.evaluate('__ZN_TEST__.app.errorMessage');assert report['assetErrorVisible'];page.locator('[data-action="exit"]').click();fail_asset=False
+ fail_asset=True;open_new(page);page.wait_for_function("ZiemiaNiczyja.state==='error'",timeout=30000);report['assetErrorVisible']=page.evaluate('__ZN_TEST__.app.errorMessage');assert report['assetErrorVisible'];page.locator('[data-action="exit"]').click();fail_asset=False
  report['requests']=len(requests);report['externalRequests']=[url for url in requests if not url.startswith(base)];assert not report['missing'];assert not report['errors'];assert not report['externalRequests'];report['storageFallbackWarning']=page.evaluate('ZiemiaNiczyja.inspect().storageWarning');report['passed']=True
  filename=('dist-'+(args.prefix or 'root') if args.dist else 'source')+'.json';(OUT/filename).write_text(json.dumps(report,ensure_ascii=False,indent=2));print('PASS',filename,flush=True);browser.close()

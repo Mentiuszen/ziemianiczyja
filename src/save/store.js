@@ -1,26 +1,22 @@
 import {LocalizedError} from '../i18n/index.js';
-import {message,normalizeLanguage} from '../i18n/message.js';
+import {message} from '../i18n/message.js';
 import {validateSnapshot} from './schema.js';
-export const DEFAULT_KEYS={forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD',sprint:'ShiftLeft',crouch:'KeyC',prone:'KeyZ',jump:'Space',interact:'KeyE',reload:'KeyR',grenade:'KeyG',melee:'KeyV',slot1:'Digit1',slot2:'Digit2'};
-export const DEFAULT_SETTINGS={language:null,quality:'medium',maxFps:0,renderScale:1,fov:78,sensitivity:1,motion:.45,damageEffects:1,master:.7,effects:.85,ambient:.35,subtitles:true,showFps:true,showCpu:false,showGpu:false,difficulty:'soldier',keys:DEFAULT_KEYS};
+import {DEFAULT_KEYS,DEFAULT_SETTINGS,normalizeSettings} from './settings-schema.js';
+import {CAMPAIGN_KEY,validateProgress,reconcileCampaign,progressForCheckpoint,completeProgress} from './campaign.js';
+export {DEFAULT_KEYS,DEFAULT_SETTINGS};
 export class Store {
- constructor(warn){this.warn=warn;this.memory=null;this.dbPromise=null;this.warned=false;this.writeRevision=0;this.writeQueue=Promise.resolve();this.pendingTransaction=null;}
- warning(message){if(!this.warned){this.warned=true;this.warn(message);}}
- settings(){let raw={};try{raw=JSON.parse(localStorage.getItem('zn-settings-v1')||'{}');}catch(e){this.warning(message('storage.blocked'));}
-  const s={...DEFAULT_SETTINGS,keys:{...DEFAULT_KEYS}};s.language=normalizeLanguage(raw?.language);for(const key of ['maxFps','renderScale','fov','sensitivity','motion','damageEffects','master','effects','ambient'])if(typeof raw?.[key]==='number'&&Number.isFinite(raw[key]))s[key]=raw[key];s.maxFps=Math.max(0,Math.min(360,Math.round(s.maxFps)));s.renderScale=Math.max(.5,Math.min(1.5,s.renderScale));s.fov=Math.max(60,Math.min(105,s.fov));s.sensitivity=Math.max(.2,Math.min(3,s.sensitivity));for(const k of ['motion','damageEffects','master','effects','ambient'])s[k]=Math.max(0,Math.min(1,s[k]));if(['low','medium','high','ultra'].includes(raw?.quality))s.quality=raw.quality;if(['recruit','soldier','veteran'].includes(raw?.difficulty))s.difficulty=raw.difficulty;for(const key of ['subtitles','showFps','showCpu','showGpu'])if(typeof raw?.[key]==='boolean')s[key]=raw[key];for(const key of Object.keys(DEFAULT_KEYS))if(typeof raw?.keys?.[key]==='string'&&/^(Key[A-Z]|Digit[0-9]|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|Space|Arrow(Up|Down|Left|Right))$/.test(raw.keys[key]))s.keys[key]=raw.keys[key];return s;
- }
- saveSettings(settings){try{localStorage.setItem('zn-settings-v1',JSON.stringify(settings));return true;}catch(e){this.warning(message('storage.settingsFailed'));return false;}}
+ constructor(warn=()=>{}){this.warn=warn;this.memory=null;this.progress=null;this.sessionOnly=false;this.dbPromise=null;this.warned=false;this.writeRevision=0;this.writeQueue=Promise.resolve();this.pendingTransaction=null;}
+ warning(value){if(!this.warned){this.warned=true;this.warn(value);}}
+ settings(){let raw={};try{raw=JSON.parse(localStorage.getItem('zn-settings-v1')||'{}');}catch{this.warning(message('storage.blocked'));}return normalizeSettings(raw);}
+ saveSettings(settings){try{localStorage.setItem('zn-settings-v1',JSON.stringify(settings));return true;}catch{this.warning(message('storage.settingsFailed'));return false;}}
  db(){if(this.dbPromise)return this.dbPromise;this.dbPromise=new Promise((resolve,reject)=>{let request;try{request=indexedDB.open('ziemia-niczyja',1);}catch(e){reject(e);return;}request.onupgradeneeded=()=>request.result.createObjectStore('saves');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);request.onblocked=()=>reject(new LocalizedError('storage.busy'));});return this.dbPromise;}
- invalidatePending(){
-  this.writeRevision++;
-  if(this.pendingTransaction){try{this.pendingTransaction.abort();}catch{/* It may have already committed. */}this.pendingTransaction=null;}
- }
- async save(snapshot,{isCurrent=()=>true}={}){
-  // Validate first: rejecting a corrupt candidate must not discard a good pending write.
-  validateSnapshot(snapshot);const candidate=structuredClone(snapshot);
+ invalidatePending(){this.writeRevision++;if(this.pendingTransaction){try{this.pendingTransaction.abort();}catch{/* Already completed. */}this.pendingTransaction=null;}}
+ async saveCampaign(snapshot,progress,{isCurrent=()=>true}={}){
+  validateSnapshot(snapshot);validateProgress(progress,snapshot);
+  const candidate=structuredClone(snapshot),metadata=structuredClone(progress);
   if(!isCurrent())return false;
-  const revision=++this.writeRevision;this.memory=candidate;
-  const current=()=>revision===this.writeRevision&&isCurrent();
+  const revision=++this.writeRevision,current=()=>revision===this.writeRevision&&isCurrent();
+  const accept=sessionOnly=>{this.memory=candidate;this.progress=metadata;this.sessionOnly=sessionOnly;};
   const write=async()=>{
    if(!current())return false;
    try{
@@ -28,30 +24,43 @@ export class Store {
     await new Promise((resolve,reject)=>{
      const tx=db.transaction('saves','readwrite');this.pendingTransaction=tx;
      const clean=()=>{if(this.pendingTransaction===tx)this.pendingTransaction=null;};
-     tx.oncomplete=()=>{clean();resolve();};
-     tx.onerror=()=>{clean();reject(tx.error);};
-     tx.onabort=()=>{clean();reject(tx.error||new LocalizedError('storage.cancelled'));};
-     tx.objectStore('saves').put(candidate,'checkpoint');
+     tx.oncomplete=()=>{clean();accept(false);resolve();};tx.onerror=()=>{clean();reject(tx.error);};tx.onabort=()=>{clean();reject(tx.error||new LocalizedError('storage.cancelled'));};
+     // These two records commit or abort together.
+     try{tx.objectStore('saves').put(candidate,'checkpoint');tx.objectStore('saves').put(metadata,CAMPAIGN_KEY);}catch(error){try{tx.abort();}catch{}reject(error);}
     });
-    return current();
-   }catch(e){
-    if(current())this.warning(message('storage.session',{type:e?.name||'Error'}));
-    return false;
+    return true;
+   }catch(error){
+    if(current()){accept(true);this.warning(message('storage.session',{type:error?.name||'Error'}));}return false;
    }
   };
-  // IndexedDB transactions never complete out of our accepted candidate order.
   this.writeQueue=this.writeQueue.catch(()=>false).then(write);return this.writeQueue;
  }
- async load(){
-  if(this.memory)return structuredClone(this.memory);
-  const revision=this.writeRevision;let value;
+ async save(snapshot,options={}){return this.saveCampaign(snapshot,progressForCheckpoint(snapshot,this.progress),options);}
+ async loadCampaign(){
+  const legacyCompleted=(()=>{try{return localStorage.getItem('zn-cambrai-complete')==='1';}catch{return false;}})();
+  const inMemory=()=>({...reconcileCampaign(this.memory,this.progress,legacyCompleted),sessionOnly:this.sessionOnly});
+  if(this.memory)return inMemory();
+  const revision=this.writeRevision;let pair;
   try{
    const db=await this.db();
-   if(revision!==this.writeRevision)return this.memory?structuredClone(this.memory):null;
-   value=await new Promise((resolve,reject)=>{const q=db.transaction('saves').objectStore('saves').get('checkpoint');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});
-  }catch(e){this.warning(message('storage.unavailable'));return this.memory?structuredClone(this.memory):null;}
-  if(revision!==this.writeRevision)return this.memory?structuredClone(this.memory):null;
-  if(!value)return null;return validateSnapshot(value);
+   if(revision!==this.writeRevision){await this.writeQueue;return inMemory();}
+   pair=await new Promise((resolve,reject)=>{
+    const tx=db.transaction('saves','readonly'),values={checkpoint:null,progress:null};
+    tx.oncomplete=()=>resolve(values);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new LocalizedError('storage.cancelled'));
+    const store=tx.objectStore('saves'),a=store.get('checkpoint'),b=store.get(CAMPAIGN_KEY);
+    a.onsuccess=()=>{values.checkpoint=a.result;};b.onsuccess=()=>{values.progress=b.result;};
+   });
+  }catch{this.warning(message('storage.unavailable'));return inMemory();}
+  if(revision!==this.writeRevision){await this.writeQueue;return inMemory();}
+  const result=reconcileCampaign(pair.checkpoint,pair.progress,legacyCompleted);
+  this.memory=result.checkpoint;this.progress=result.progress;
+  if(result.metadataRepaired)this.warn(message('campaign.metadataRepaired'));
+  return{...result,sessionOnly:false};
  }
- async completed(){try{localStorage.setItem('zn-cambrai-complete','1');}catch(e){this.warning(message('storage.completeFailed'));}}
+ async load(){return(await this.loadCampaign()).checkpoint;}
+ async completed({isCurrent=()=>true}={}){
+  if(this.memory){const p=completeProgress(this.progress,this.memory);await this.saveCampaign(this.memory,p,{isCurrent});}
+  if(!isCurrent())return;
+  try{localStorage.setItem('zn-cambrai-complete','1');}catch{this.warning(message('storage.completeFailed'));}
+ }
 }

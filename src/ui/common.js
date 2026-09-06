@@ -1,0 +1,11 @@
+import {t,text,message,hasKey,getLanguage} from '../i18n/index.js';
+export const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export const html=(value,params={})=>escape(text(value,params)).replaceAll('\n','<br>');
+export const tr=(key,params={})=>html(message(key,params));
+export const keyLabel=code=>hasKey(`key.${code}`)?t(`key.${code}`):String(code??'').replace(/^Key|^Digit/,'');
+export const button=(key,action,{kind='secondary',disabled=false,id='',attributes=''}={})=>`<button type="button" id="${escape(id||'action-'+action)}" class="button-${kind}" data-action="${escape(action)}" ${disabled?'disabled':''} ${attributes}>${tr(key)}</button>`;
+export const primary=(key,action,disabled=false)=>button(key,action,{kind:'primary',disabled});
+export const quiet=(key,action)=>button(key,action,{kind:'quiet'});
+export const back=()=>quiet('action.back','back');
+export const shell=(body,{narrow=false,overlay=false,variant=''}={})=>`<section class="screen ${overlay?'overlay-shade':'panel-screen'} ${escape(variant)}"><main class="panel ${narrow?'narrow':''}">${body}</main></section>`;
+export const docLink=path=>getLanguage()==='en'?path.replace(/\.md$/,'.en.md'):path;

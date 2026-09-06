@@ -1,19 +1,91 @@
-# Ziemia Niczyja — v0.4.3
+# Ziemia Niczyja / No Man’s Land — v0.4.4, rewizja 3
 
-Jednoosobowy FPS przeglądarkowy z I wojny światowej. Grywalna pozostaje **jedna misja:
-nr 04, „Pęknięta linia” — Cambrai, 20 XI 1917**. v0.4 przebudowuje tę misję, nie dodaje
-czterech brakujących części kampanii. Kod, lokalny runtime i zasoby są w paczce.
+Jednoosobowy FPS przeglądarkowy z I wojny światowej. Nadal dostępna jest **jedna misja:
+04, „Pęknięta linia” — Cambrai, 20 listopada 1917**. Pozostałe rozdziały są kontekstem
+kampanii, nie nowymi grywalnymi poziomami.
 
-v0.4.3 dodaje pełną polską i angielską warstwę tekstową na bazie poprawek 0.4.2.
-Przy pierwszym uruchomieniu wybierz **English** (łączona flaga USA/UK) albo **Polski**.
-Dopiero potem otwiera się menu. Kolejne starty pamiętają wybór; opcja Język / Language
-zmienia go natychmiast, także podczas pauzy, bez restartu misji. Brak dostępu do pamięci
-ogranicza zapamiętanie do bieżącej sesji. Reset opcji nie usuwa języka.
+## Rewizja 3 — poprawki funkcjonalne, tła nadal R2
 
-Wersja nie przebudowuje modeli, mapy ani dźwięków. Poprawne checkpointy 0.4.1/0.4.2
-pozostają zgodne (`SAVE_VERSION=1`, `MISSION_VERSION=3`).
-Opis wdrożenia i faktycznej weryfikacji: [0.4.3](docs/V0_4_3_IMPLEMENTATION.md).
-Zasady katalogów tłumaczeń: [LOCALIZATION.md](docs/LOCALIZATION.md).
+Wydanie ma numer **0.4.4**; `ZiemiaNiczyja.uiRevision === 3`.
+English otrzymuje nazwę **No Man’s Land**, osobne logo oraz tytuł karty i opis projektu.
+Trudność nie występuje w Opcjach: wybiera się ją na ekranie Nowej kampanii lub zmienia
+w Kontynuacji kampanii. Zmiana w kontynuacji zapisuje nowy profil razem z checkpointem,
+bez resetu stanu misji. Front i strzałki przechodzą płynnie między datami rozdziałów.
+
+**Regeneracja teł wysokiej rozdzielczości nie jest ukończona.** Nadal używane są
+niskorozdzielcze źródła R2; tej paczki nie traktować jako pełnego odbioru R3.
+
+Instrukcja: `INSTALL_0_4_4_R3.md`. Raport: `docs/V0_4_4_R3_IMPLEMENTATION.md`.
+Przeglądarkowy odbiór na rzeczywistym HTTP:
+
+```sh
+python tools/browser_v044_r3.py --url http://127.0.0.1:5173/ --headed --game
+```
+
+## Menu i kampania 0.4.4
+
+Przy pierwszym uruchomieniu wybierz **English** (USA/UK) lub **Polski**. Flagi są bez
+ramek, wybór zostaje zapamiętany. Język można później zmienić w Opcjach, także z pauzy.
+
+Menu główne: **Kontynuuj kampanię, Nowa kampania, Opcje, O projekcie i zasobach**.
+Nie zawiera już dossier misji ani górnego/dolnego paska. Continue otwiera mapę i pozwala
+wznowić istniejący checkpoint. New otwiera podgląd z animowanym przejściem Ypres→Cambrai;
+przycisk Pomiń jest dostępny od początku. Sam podgląd nie usuwa wcześniejszego zapisu.
+Potwierdzenie zastąpienia pojawia się dopiero po wyborze rozpoczęcia nowej misji.
+
+Mapa kampanii łączy rzeczywistą geografię z autorskimi **datowanymi schematami frontu**,
+nie digitalizacją dokładnej dziennej linii okopów. Somma, Flers, Ypres i Amiens pozostają niegrywalne. Po ukończeniu
+demo można wrócić do tej mapy; nie ma pozornego rozpoczęcia niedostępnego następnego rozdziału.
+
+Opcje mają cztery zakładki: **Rozgrywka, Sterowanie, Dźwięk i Grafika**. Ustawienia działają
+na bieżąco. Przywracanie domyślnych wartości dotyczy tylko kategorii, z potwierdzeniem;
+język i checkpoint są zachowane. Trudność wybierasz lub zmieniasz wyłącznie
+na ekranie kampanii. Kontynuacja zapisuje wybór dla wznawianej misji; Nowa kampania
+nie modyfikuje dotychczasowego checkpointu.
+
+## HUD 0.4.4
+
+Prawa górna minimapa pokazuje rzeczywisty teren ±60 m, gracza, sojuszników i aktualny cel.
+Lokacja/data są częścią jej modułu; opis celu znajduje się pod mapą. Wrogowie są oznaczani
+wyłącznie po wystrzale w zasięgu: **3/2/1 s** dla Rekruta/Żołnierza/Weterana. To ostatnie
+miejsce strzału, nie śledzenie poruszającego się przeciwnika. Pauza zatrzymuje timer.
+
+Sojusznicza piechota ma niewielkie, półprzezroczyste flagi UK z kontrolą zasłonięcia.
+Nazwę broni przy amunicji zastępuje sylwetka, nie zmieniając stanu broni ani liczb.
+Minimapę, flagi i animacje menu można wyłączyć osobno w Rozgrywce. Statystyki są na lewej
+górze, a checkpoint pod kompasem. Nie dodano drugiej kamery WebGL ani nowego renderera.
+
+## Aktualizacja z 0.4.3
+
+Nakładkę scalić z głównym katalogiem istniejącego repo, nie zastępować całych folderów
+niepełną zawartością ZIP. Usunąć wycofany **`src/ui/map.js`** zgodnie z `REMOVE_FILES.txt`;
+patch Git robi to sam. Użyć ZIP **albo** patcha. Nie kopiować starego `dist/`: wykonać
+nowy build. Wersja nie wymaga kasowania preferencji ani prawidłowych checkpointów
+0.4.1/0.4.2/0.4.3 (`SAVE_VERSION=1`, `MISSION_VERSION=3`).
+
+```sh
+npm ci
+npm run check
+npm test
+npm run build
+npm run dev
+```
+
+Test przeglądarkowy na lokalnym originie, w oddzielnym kontekście bez naruszania zwykłego
+profilu gracza:
+
+```sh
+python -m pip install playwright
+python -m playwright install chromium
+python tools/browser_v044_ui.py --url http://127.0.0.1:5173/ --scenario all --headed --game
+```
+
+`--browser firefox` i `--executable` wybierają przeglądarkę. Bez `--game` test obejmuje
+menu/kampanię, nie właściwą scenę 3D. Raport i zrzuty trafiają do `.local/v0.4.4-tests/`.
+
+Wyniki i jawne braki odbioru: [raport 0.4.4](docs/V0_4_4_IMPLEMENTATION.md).
+[Źródła grafiki UI](docs/UI_ART.md) · [lokalizacja](docs/LOCALIZATION.md).
+Nie przebudowano modeli, geometrii poziomu, AI, balansu ani biblioteki audio.
 
 ## Podstawa rozgrywki 0.4–0.4.2
 

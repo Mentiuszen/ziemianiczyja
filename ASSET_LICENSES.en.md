@@ -1,6 +1,19 @@
 # Assets, provenance and licenses
 
-English translation of the project's asset-provenance notice for v0.4.3. Original third-party license files are authoritative and remain unchanged. This translation does not grant additional rights.
+Revision 3 adds the English `logo-en.svg`: the existing motif and DejaVu outlines, covered by the retained DejaVu notice. No new high-resolution backdrops were delivered.
+
+## Interface 0.4.4 — revision 2
+
+- New main, language and options backdrops: adaptations of the concept explicitly selected by the user in this conversation. The reference and prepared crops are in `authoring/ui/`. Baked UI elements were removed; the illustration is not automatically relicensed as MIT or presented as an archival photograph.
+- New wordmark: DejaVu Sans Condensed Bold letter outlines with original layout, wear and soldier silhouette. The existing DejaVu license notice is retained. No font files are included.
+- Geographic base: GSHHG 2.3.6, intermediate resolution, distributed by basemap-data 2.0.0. Coast/lake/river data and derived geography carry LGPL-3.0-or-later separately from the game code. GPL/LGPL texts and editable regional coordinates accompany the release at `public/assets/ui/maps/western-front-geography.json`; the map SVG can be replaced independently. No modern international borders are rendered.
+- Relief: regional crop of basemap-data `shadedrelief.jpg`, distributed under MIT. The MIT notice and regional source crop are retained.
+- Dated front lines, arrows, symbols and selection logic are original generalizations, not copied Call of Duty assets. Historical references and precision limitations are described in `docs/UI_ART.md`.
+
+Older notices below concern prior deliveries. The first 426×352 main crop is no longer the active backdrop.
+
+
+English translation of the project's asset-provenance notice for v0.4.4. Original third-party license files are authoritative and remain unchanged. This translation does not grant additional rights.
 
 ## Project assets
 
@@ -53,3 +66,18 @@ Authors: The Lit Project Contributors; Google LLC. BSD-3-Clause license. Source:
 ## Historical sources
 
 Links in `docs/HISTORY.md` / `docs/HISTORY.en.md` and `docs/CHARACTER_ART.md` are for verifying the text only; they do not imply a license to museum multimedia. No photographs from the referenced sites are included.
+
+
+## 0.4.4 interface assets
+
+Campaign backdrop, UK marker and weapon silhouettes were drawn locally for this
+interface. The logo contains exported DejaVu Sans Condensed Bold outlines; the notice
+is included at `public/assets/ui/licenses/DejaVu-LICENSE.txt`, without any font files.
+
+`main-art.webp` uses the supplied 426×352 crop recovered from the earlier work. No
+separate larger master or original generation record survived; provenance before
+the attachment and rights in the illustration were not independently verified.
+This notice does not assign it an MIT license. Confirm its provenance or replace
+it with an approved original before public distribution. Editable files are under
+`authoring/ui/`; `docs/UI_ART.md` describes them (developer-only, outside dist). The
+map is an original schematic, not a traced museum sheet or a Call of Duty asset.
