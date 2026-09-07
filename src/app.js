@@ -1,3 +1,4 @@
+import {HUD_SETTING_KEYS,resetHud} from './ui/hud/settings.js';
 import {MenuNavigation} from './ui/navigation.js';
 import {OPTIONS_TABS,SETTINGS_SCHEMA,VALID_KEY,normalizeSetting,resetCategory} from './save/settings-schema.js';
 import {createProgress,progressForCheckpoint,completeProgress} from './save/campaign.js';
@@ -13,7 +14,7 @@ import {Input,requestGamePointerLock} from './input/input.js';
 import {BattlefieldAudio} from './audio/audio.js';
 import {UI,keyLabel} from './ui/ui.js';
 export class Application {
- constructor(){this.canvas=document.querySelector('#game');this.navigation=new MenuNavigation();this.campaignIntent='continue';this.campaignSelection='cambrai';this.campaignProgress=null;this.campaignDifficultyPending=false;this.campaignDifficultySequence=0;this.pendingCampaignDifficultyId=null;this.checkpointState='loading';this.sessionOnly=false;this.completionPending=false;this.graphicsDirty=false;this.state='main';this.returnState='main';this.world=null;this.view=null;this.loadGeneration=0;this.enterSequence=0;this.enterPending=false;this.actionSequence=0;this.checkpoint=null;this.storageWarning='';this.errorMessage='';this.lockMessage='';this.store=new Store(message=>{this.storageWarning=message;if(this.settings?.language&&this.state!=='language-select')this.ui?.toast(message,9);});this.settings=this.store.settings();setLanguage(this.settings.language||'pl');this.state=this.settings.language?'main':'language-select';if(this.settings.language)updateDocumentLanguage();else document.documentElement.lang='en';this.checkpointLoadStarted=false;this.audio=new BattlefieldAudio(this.settings);this.clock=new FixedClock();this.ui=new UI(this);this.input=new Input(this.canvas,this.settings,{pause:()=>this.pause(),debug:()=>{this.ui.debug=!this.ui.debug;},lockError:()=>this.lockError(),escape:()=>this.escapeMenu()});this.lastFrame=performance.now();this.performance=new PerformanceMonitor();this.metrics=this.performance.metrics;this.frame=0;this.alive=true;this.frameLimiter=new FrameLimiter();this.lastRender=this.lastFrame;this.pendingCpu=0;this.pendingSimulation=0;
+ constructor(){this.canvas=document.querySelector('#game');this.navigation=new MenuNavigation();this.campaignIntent='continue';this.campaignSelection='cambrai';this.campaignProgress=null;this.campaignDifficultyPending=false;this.campaignDifficultySequence=0;this.pendingCampaignDifficultyId=null;this.checkpointState='loading';this.sessionOnly=false;this.completionPending=false;this.graphicsDirty=false;this.state='main';this.returnState='main';this.world=null;this.view=null;this.loadGeneration=0;this.enterSequence=0;this.enterPending=false;this.actionSequence=0;this.checkpoint=null;this.storageWarning='';this.errorMessage='';this.lockMessage='';this.store=new Store(message=>{this.storageWarning=message;if(this.settings?.language&&this.state!=='language-select')this.ui?.toast(message,9);});this.settings=this.store.settings();setLanguage(this.settings.language||'pl');this.state=this.settings.language?'main':'language-select';if(this.settings.language)updateDocumentLanguage();else document.documentElement.lang='en';this.checkpointLoadStarted=false;this.audio=new BattlefieldAudio(this.settings);this.clock=new FixedClock();this.ui=new UI(this);this.input=new Input(this.canvas,this.settings,{pause:()=>this.pause(),debug:()=>{this.ui.debug=!this.ui.debug;this.resetDiagnostics('F3');},diagnostics:key=>this.diagnosticKey(key),lockError:()=>this.lockError(),escape:()=>this.escapeMenu()});this.lastFrame=performance.now();this.performance=new PerformanceMonitor();this.metrics=this.performance.metrics;this.frame=0;this.alive=true;this.frameLimiter=new FrameLimiter();this.lastRender=this.lastFrame;this.pendingCpu=0;this.pendingSimulation=0;this.pendingAudio=0;this.pendingEvents=0;this.pendingNav=0;this.pendingSteps=0;this.pendingDropped=0;this.frameFlags=0;this.sampleReady=false;
   window.addEventListener('resize',()=>this.view?.resize());window.addEventListener('beforeunload',()=>{this.alive=false;this.disposeMission();this.audio.dispose();this.input.dispose();this.ui.dispose();});
   this.canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();this.disposeMission();this.errorMessage=message('error.context');this.go('error');});
   this.ui.render(this.state);if(this.storageWarning&&this.settings.language)this.ui.toast(this.storageWarning,9);
@@ -21,7 +22,7 @@ export class Application {
   if(this.settings.language)this.loadCheckpoint();
   this.raf=requestAnimationFrame(now=>this.loop(now));
   // Read-only diagnostics are deliberately available for performance and lifecycle checks.
-  const application=this;window.ZiemiaNiczyja={get state(){return application.state;},inspect:()=>this.inspect(),version:VERSION,uiRevision:UI_REVISION};
+  const application=this;window.ZiemiaNiczyja={get state(){return application.state;},inspect:()=>this.inspect(),version:VERSION,uiRevision:UI_REVISION,diagnostics:Object.freeze({reset:()=>this.resetDiagnostics('operator'),start:metadata=>{this.performance.startCapture({...this.captureMetadata(),...metadata});this.resetDiagnostics('capture');},stop:()=>this.performance.stopCapture(),export:()=>this.performance.exportCapture(this.captureMetadata()),setTargetHz:hz=>this.performance.setBudget(hz,this.settings.maxFps)})};
  }
  loadCheckpoint(){
   if(this.checkpointLoadStarted||!isLanguage(this.settings.language))return;
@@ -56,7 +57,7 @@ export class Application {
   }else{this.view?.setLanguage?.(value);this.ui.refreshLanguage();}
   return true;
  }
- go(state){if(this.state==='campaign'&&state!=='campaign')this.cancelCampaignDifficulty();this.state=state;const active=state==='playing';if(!active){this.enterSequence++;this.enterPending=false;}this.input.capture=null;this.input.setActive(active);this.clock.reset();this.performance?.reset();if(this.performance)this.metrics=this.performance.metrics;if(!active)this.view?.setDiagnosticsEnabled(false);this.lastFrame=performance.now();this.lastRender=this.lastFrame;this.frameLimiter?.reset();this.pendingCpu=this.pendingSimulation=0;if(!active){this.audio.pause();if(document.pointerLockElement===this.canvas)document.exitPointerLock();}this.ui.render(state);}
+ go(state){this.view?.resetPresentation?.();if(this.state==='campaign'&&state!=='campaign')this.cancelCampaignDifficulty();this.state=state;const active=state==='playing';if(!active){this.enterSequence++;this.enterPending=false;}this.input.capture=null;this.input.setActive(active);this.clock.reset();this.performance?.reset();if(this.performance)this.metrics=this.performance.metrics;if(!active)this.view?.setDiagnosticsEnabled(false);this.lastFrame=performance.now();this.lastRender=this.lastFrame;this.frameLimiter?.reset();this.clearFrameCounters();this.sampleReady=false;if(!active){this.audio.pause();if(document.pointerLockElement===this.canvas)document.exitPointerLock();}this.ui.render(state);}
  pause(){if(this.state==='playing')this.go('paused');}
  lockError(){
   // The pending request's promise owns its error; the global input listener must
@@ -122,9 +123,10 @@ export class Application {
   if(action==='confirm-modal'){
    const modal=this.ui.modal;if(!modal)return;this.ui.closeModal();this.ui.modal=null;
    if(modal.kind==='reset'){
-    this.input.capture=null;this.settings=resetCategory(this.settings,modal.tab);this.input.settings=this.settings;this.audio.setSettings(this.settings);this.store.saveSettings(this.settings);this.graphicsDirty=modal.tab==='graphics';this.ui.applyMotion?.();this.ui.render('settings');
+    this.input.capture=null;this.settings=resetCategory(this.settings,modal.tab);this.input.settings=this.settings;this.audio.setSettings(this.settings);this.store.saveSettings(this.settings);this.graphicsDirty=modal.tab==='graphics';if(this.view)this.view.settings=this.settings;this.ui.layout?.invalidate('reset');this.ui.applyMotion?.();this.ui.render('settings');
    }else if(modal.kind==='new-campaign'&&this.state==='campaign')return this.start();return;
   }
+  if(action==='hud-reset'&&this.state==='settings'){this.settings=resetHud(this.settings);this.input.settings=this.settings;if(this.view)this.view.settings=this.settings;this.store.saveSettings(this.settings);this.ui.layout?.invalidate('reset');this.ui.render('settings');return;}
   if(action==='enter')return this.enter();
   if(action==='campaign-new'||action==='campaign-continue'){
    if(!['main','campaign'].includes(this.state))return;
@@ -214,6 +216,7 @@ export class Application {
   this.settings[key]=normalizeSetting(key,value);if(key==='maxFps')this.frameLimiter.reset();
   this.input.settings=this.settings;this.audio.setSettings(this.settings);this.store.saveSettings(this.settings);
   if(['quality','renderScale','fov'].includes(key))this.graphicsDirty=true;
+  if(HUD_SETTING_KEYS.includes(key)||['showMinimap','showFps','subtitles'].includes(key))this.ui.refreshHudOptions?.();
   if(key==='uiAnimations'){this.ui.applyMotion?.();this.ui.campaign?.setReducedMotion(this.ui.reducedMotion());}
   // Campaign difficulty has its own validated checkpoint transaction above.
  }
@@ -226,6 +229,7 @@ export class Application {
   const world=this.world;if(!world)return;
   const generation=this.loadGeneration,batch=world.consumeEvents(),dead=world.player.hp<=0||batch.some(e=>e.type==='dead');let complete=false;
   for(const e of batch){
+   if(e.type==='checkpoint')this.frameFlags|=1;if(e.type==='explosion')this.frameFlags|=2;if(e.type==='breach')this.frameFlags|=4;
    if(this.world!==world||generation!==this.loadGeneration)break;
    if(e.type==='complete'&&dead)continue;
    if(e.type==='checkpoint'){
@@ -254,34 +258,60 @@ export class Application {
    if(current()){this.completionPending=false;if(this.state==='complete')this.ui.render('complete');}
   });
  }
+ clearFrameCounters(){this.pendingCpu=this.pendingSimulation=this.pendingAudio=this.pendingEvents=this.pendingNav=this.pendingSteps=this.pendingDropped=0;this.frameFlags=0;}
+ resetDiagnostics(reason='operator'){if(!this.performance)return;this.performance.reset(reason);this.metrics=this.performance.metrics;this.clearFrameCounters();this.sampleReady=false;this.ui.nextDebug=0;}
+ captureMetadata(){return{version:VERSION,baseCommit:'a567537c528e46b89fac0ff94555460f83bc864c',browser:globalThis.navigator?.userAgent||'unknown',device:'not declared',css:this.view?.viewport(),buffer:this.view?{width:this.view.engine.getRenderWidth(),height:this.view.engine.getRenderHeight()}:null,dpr:globalThis.devicePixelRatio||1,quality:this.settings.quality,renderScale:this.settings.renderScale,cap:this.settings.maxFps,targetHz:this.performance?.targetHz,gpuSampleEvery:this.view?.gpuTimer.sampleEvery||4,debugVisible:this.ui.debug};}
+ diagnosticKey(key){
+  if(!this.ui.debug)return;
+  if(key==='F4')this.resetDiagnostics('operator');
+  if(key==='F6'){if(this.performance.capture?.active)this.performance.stopCapture();else{this.performance.startCapture(this.captureMetadata());this.resetDiagnostics('capture');}}
+  if(key==='F7'){
+   const data=this.performance.exportCapture(this.captureMetadata()),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download='ziemianiczyja-0.4.5-performance.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+ }
  loop(now){
   if(!this.alive)return;
   const started=performance.now(),delta=(now-this.lastFrame)/1000;this.lastFrame=now;this.ui.tickUI();this.applyPendingGraphics();
   if(this.state==='playing'&&this.world&&this.view){
    try{
-    const simulationStart=performance.now();let input,first=true;
+    let input,first=true;
     this.clock.advance(delta,true,dt=>{
      if(this.state!=='playing')return;
      if(first)input=this.input.consume();
-     this.world.tick(dt,input);this.audio.update(this.world,dt);this.events();
+     this.view.beforeTick();
+     const simStart=performance.now(),navBefore=this.world.nav.metrics?.pathMs||0;
+     this.world.tick(dt,input);this.pendingSimulation+=performance.now()-simStart;this.pendingNav+=(this.world.nav.metrics?.pathMs||0)-navBefore;
+     this.view.afterTick();
+     const audioStart=performance.now();this.audio.update(this.world,dt);this.pendingAudio+=performance.now()-audioStart;
+     const eventStart=performance.now();this.events();this.pendingEvents+=performance.now()-eventStart;
      if(first){input={...input,fire:input.fireHeld,lookX:0,lookY:0,crouch:false,prone:false,jump:false,interact:false,reload:false,grenade:false,melee:false,wheel:0};delete input.slot;first=false;}
     });
-    const simulation=performance.now()-simulationStart;
-    this.pendingSimulation+=simulation;
-    if(this.frameLimiter.due(now,this.settings.maxFps)){
-     const renderStart=performance.now();
-     this.view.setDiagnosticsEnabled(this.state==='playing'&&(this.settings.showGpu||this.ui.debug));
-     this.view.render(this.state==='playing');
-     const render=performance.now()-renderStart;
-     this.ui.update(this.world,this.view,this.metrics);
-     this.performance.record({frame:now-this.lastRender,cpu:this.pendingCpu+performance.now()-started,simulation:this.pendingSimulation,render},now);
-     this.lastRender=now;this.pendingCpu=this.pendingSimulation=0;this.metrics=this.performance.metrics;this.frame++;
-    }else this.pendingCpu+=performance.now()-started;
+    this.pendingSteps+=this.clock.lastSteps;this.pendingDropped+=this.clock.lastDroppedMs;
+    if(this.state==='playing'&&this.frameLimiter.due(now,this.settings.maxFps)){
+     const frameId=this.frame+1,diagnostics=this.ui.debug||!!this.performance.capture?.active;
+     this.performance.frameCap=this.settings.maxFps;
+     this.view.setDiagnosticsEnabled(diagnostics,this.performance.sessionId);
+     this.view.render(true,{alpha:this.clock.alpha,presentationDt:Math.min(.1,Math.max(0,(now-this.lastRender)/1000)),look:this.input.peekLook(),frameId,sessionId:this.performance.sessionId});
+     for(const sample of this.view.gpuTimer.drainSamples())this.performance.recordGpu(sample);
+     const gpuStatus=this.view.gpuTimer.status;if(gpuStatus!==this.lastGpuStatus&&gpuStatus!=='ready')this.performance.invalidateGpu();this.lastGpuStatus=gpuStatus;
+     const hudStart=performance.now();this.ui.update(this.world,this.view,this.metrics);const hud=performance.now()-hudStart;
+     const profilerStart=performance.now(),rafSample={frameId,interval:delta*1000,cpu:performance.now()-started,steps:this.clock.lastSteps,droppedMs:this.clock.lastDroppedMs};
+     this.performance.recordRaf(rafSample,now);
+     if(this.sampleReady){
+      const slot=this.performance.record({frameId,frame:now-this.lastRender,cpu:this.pendingCpu+performance.now()-started,simulation:this.pendingSimulation,audio:this.pendingAudio,events:this.pendingEvents,nav:this.pendingNav,scene:this.view.renderTimings.scene,render:this.view.renderTimings.render,hud,steps:this.pendingSteps,droppedMs:this.pendingDropped,flags:this.frameFlags},now);
+      this.performance.finishRecord(slot,this.pendingCpu+performance.now()-started,performance.now()-profilerStart);
+     }
+     this.sampleReady=true;this.lastRender=now;this.clearFrameCounters();this.metrics=this.performance.metrics;this.frame++;
+    }else{
+     const cpu=performance.now()-started;this.pendingCpu+=cpu;
+     if(this.state==='playing')this.performance.recordRaf({frameId:this.frame,interval:delta*1000,cpu,steps:this.clock.lastSteps,droppedMs:this.clock.lastDroppedMs},now);
+    }
    }catch(error){console.error(error);this.errorMessage=error;this.go('error');}
   }else this.clock.advance(delta,false,()=>{});
   this.raf=requestAnimationFrame(t=>this.loop(t));
  }
- inspect(){return{state:this.state,campaignStatus:this.campaignProgress?.status??null,optionsTab:this.ui.optionsTab,hud:{contacts:this.ui.contacts?.contacts?.size||0,minimapDraws:this.ui.minimap?.draws||0,minimapRebuilds:this.ui.minimap?.rebuilds||0,markerNodes:this.ui.markers?.nodes.size||0,markerRays:this.ui.markers?.model.rays||0},language:this.settings.language,missionScenes:this.view?1:0,meshes:this.view?.scene.meshes.length||0,activeAudio:this.audio.sources.size,time:this.world?.time||0,phase:this.world?.director.phase??null,npcs:this.world?.npcs.length||0,alive:this.world?.npcs.filter(n=>n.hp>0).length||0,tanks:this.world?.tanks.map(t=>({id:t.id,z:t.pos.z,state:t.state})),stats:this.world?{...this.world.stats}:null,navQueued:this.world?.nav.requests.length||0,navigation:this.world?{...this.world.nav.metrics}:null,contacts:this.world?{...this.world.collision.diagnostics}:null,difficulty:this.world?.difficultyId??this.settings.difficulty,framesRendered:this.frame,frameCap:this.settings.maxFps,fieldGuns:this.world?.fieldGuns.map(g=>({id:g.id,operational:g.operational,ammo:g.ammo})),aircraft:this.world?.air.planes.length,breaches:this.world?.destroyedObstacles,metrics:{...this.metrics,gpu:this.view?.gpuTimer.milliseconds??null,gpuStatus:this.view?.gpuTimer.status??'disabled',...this.view?.renderStats},checkpoint:!!this.checkpoint,storageWarning:this.storageWarning};}
+ inspect(){return{state:this.state,campaignStatus:this.campaignProgress?.status??null,optionsTab:this.ui.optionsTab,hud:{contacts:this.ui.contacts?.contacts?.size||0,minimapDraws:this.ui.minimap?.draws||0,minimapRebuilds:this.ui.minimap?.rebuilds||0,markerNodes:this.ui.markers?.nodes.size||0,markerRays:this.ui.markers?.model.rays||0,layoutReflows:this.ui.layout?.reflows||0,compact:this.ui.layout?.snapshot().compact},language:this.settings.language,missionScenes:this.view?1:0,meshes:this.view?.scene.meshes.length||0,activeAudio:this.audio.sources.size,time:this.world?.time||0,phase:this.world?.director.phase??null,npcs:this.world?.npcs.length||0,alive:this.world?.npcs.filter(n=>n.hp>0).length||0,tanks:this.world?.tanks.map(t=>({id:t.id,z:t.pos.z,state:t.state})),stats:this.world?{...this.world.stats}:null,navQueued:this.world?.nav.requests.length||0,navigation:this.world?{...this.world.nav.metrics}:null,contacts:this.world?{...this.world.collision.diagnostics}:null,difficulty:this.world?.difficultyId??this.settings.difficulty,framesRendered:this.frame,frameCap:this.settings.maxFps,fieldGuns:this.world?.fieldGuns.map(g=>({id:g.id,operational:g.operational,ammo:g.ammo})),aircraft:this.world?.air.planes.length,breaches:this.world?.destroyedObstacles,metrics:{...this.metrics,gpu:this.view?.gpuTimer.milliseconds??null,gpuStatus:this.view?.gpuTimer.status??'disabled',...this.view?.renderStats},checkpoint:!!this.checkpoint,storageWarning:this.storageWarning};}
 }
 // Importing the application in Node does not create a DOM or start a game.
 if(typeof window!=='undefined'&&typeof document!=='undefined'){

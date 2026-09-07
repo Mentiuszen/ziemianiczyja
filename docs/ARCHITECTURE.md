@@ -1,3 +1,16 @@
+# Architektura 0.4.5 — różnice względem poniższego opisu historycznego
+
+`Simulation.damage` emituje potwierdzone zdarzenia hit/kill. Model HUD-u nie rozstrzyga
+trafień. `PresentationState` przechowuje tylko poprzednie/bieżące transformacje;
+`GameView` interpoluje je przez `FixedClock.alpha`. Wejście myszy ma niemutujący podgląd.
+`HudLayout` zarządza przestrzenią i cache prostokątów; znaczniki używają tego samego snapshotu.
+`PerformanceMonitor` rozdziela frame/RAF/CPU/raw GPU i sesje pomiaru.
+`Navigation.processBudget(32)` zastępuje runtime'owe dwa pełne A* co 0,12 s;
+API synchroniczne pozostaje dla testów i narzędzi. Szczegóły: `V0_4_5_IMPLEMENTATION.md`.
+
+---
+## Architektura historyczna 0.4.1
+
 # Architektura v0.4.1
 
 Źródła, testy i narzędzia znajdują się w głównym katalogu repozytorium. `tools/build.mjs`

@@ -40,6 +40,7 @@ export class Input {
         if (!event.repeat) this.callbacks.debug();
         return;
       }
+      if (['F4','F6','F7'].includes(event.code)) { event.preventDefault();if(!event.repeat)this.callbacks.diagnostics?.(event.code);return; }
       if (Object.values(this.settings.keys).includes(event.code)) event.preventDefault();
       if (!this.down.has(event.code)) this.edges.add(event.code);
       this.down.add(event.code);
@@ -117,6 +118,7 @@ export class Input {
     this.fireQueued = false;
   }
   setActive(active) { this.clear(); this.enabled = active; }
+  peekLook() { return {lookX:this.mx,lookY:this.my}; }
   consume() {
     const state = {}, keys = this.settings.keys;
     for (const action of ['forward', 'back', 'left', 'right', 'sprint']) state[action] = this.down.has(keys[action]);

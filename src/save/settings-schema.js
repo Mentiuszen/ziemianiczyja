@@ -1,3 +1,4 @@
+import {HUD_SCALE_KEYS} from '../ui/hud/settings.js';
 /** One source of truth for options, defaults and storage validation. */
 export const DEFAULT_KEYS=Object.freeze({forward:'KeyW',back:'KeyS',left:'KeyA',right:'KeyD',sprint:'ShiftLeft',crouch:'KeyC',prone:'KeyZ',jump:'Space',interact:'KeyE',reload:'KeyR',grenade:'KeyG',melee:'KeyV',slot1:'Digit1',slot2:'Digit2'});
 export const VALID_KEY=/^(Key[A-Z]|Digit[0-9]|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|Space|Arrow(Up|Down|Left|Right))$/;
@@ -12,7 +13,10 @@ export const SETTINGS_SCHEMA=Object.freeze({
  sensitivity:range('controls',1,.2,3),master:range('audio',.7,0,1),effects:range('audio',.85,0,1),ambient:range('audio',.35,0,1),
  quality:choice('graphics','medium',['low','medium','high','ultra']),maxFps:Object.freeze({...range('graphics',0,0,360,1),type:'number'}),
  renderScale:range('graphics',1,.5,1.5),fov:range('graphics',78,60,105,1),
- showFps:toggle('graphics'),showCpu:toggle('graphics',false),showGpu:toggle('graphics',false),
+ showFps:toggle('graphics'),
+ hudScale:range('gameplay',1,.5,2,.05),
+ ...Object.fromEntries(Object.values(HUD_SCALE_KEYS).map(key=>[key,range('gameplay',1,.5,2,.05)])),
+ crosshairStyle:choice('gameplay','cross',['dot','cross','cross-dot','none']),
 });
 export const DEFAULT_SETTINGS=Object.freeze({...Object.fromEntries(Object.entries(SETTINGS_SCHEMA).map(([k,d])=>[k,d.default])),keys:DEFAULT_KEYS});
 export function normalizeSetting(key,value){

@@ -17,8 +17,8 @@ test('round minimap uses one circular clip, a cached background and balanced con
  for(let now=1;now<1000;now+=1000/165)mm.draw(w,[],{},now);assert.ok(mm.draws<=31);assert.equal(mm.rebuilds,1);assert.equal(saves,0);
  const n=mm.draws;mm.draw(w,[],{showMinimap:false},1100);assert.equal(mm.draws,n);assert.equal(canvas.hidden,true);
 });
-test('front definitions cannot be mutated by the screen; default version stays 0.4.4',()=>{
- assert.equal(VERSION,'0.4.4');assert.equal(UI_REVISION,3);const x=FRONT_SNAPSHOTS.cambrai.front[0][0];assert.throws(()=>{FRONT_SNAPSHOTS.cambrai.front[0][0]=123;});assert.equal(campaignFrame('cambrai').front[0][0],x);
+test('front definitions cannot be mutated by the screen; release metadata advances without mutable front definitions',()=>{
+ assert.equal(VERSION,'0.4.5');assert.equal(UI_REVISION,2);const x=FRONT_SNAPSHOTS.cambrai.front[0][0];assert.throws(()=>{FRONT_SNAPSHOTS.cambrai.front[0][0]=123;});assert.equal(campaignFrame('cambrai').front[0][0],x);
  assert.equal(Object.keys(FRONT_SNAPSHOTS).length,Object.keys(MAP_POINTS).length);
 });
 test('the geographic master includes editable high-detail coast/rivers and separate licensing',()=>{

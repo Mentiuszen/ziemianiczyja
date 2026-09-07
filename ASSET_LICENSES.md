@@ -1,5 +1,14 @@
 # Pochodzenie zasobów — Ziemia Niczyja v0.4.3
 
+## Interfejs 0.4.5
+
+`stance-stand.svg`, `stance-crouch.svg` i `stance-prone.svg` są nowymi, oryginalnymi
+rysunkami wektorowymi wykonanymi dla projektu. Celowniki i hitmarker są oryginalną
+geometrią CSS/SVG. Nie kopiowano ikon Call of Duty/CS ani plików fontów. Te elementy
+podlegają licencji projektu w zakresie, w jakim można udzielić praw.
+Istniejące grafiki i noty licencyjne z bazy `a567537` pozostają niezmienione.
+
+
 Rewizja 3 dodaje angielski logotyp `logo-en.svg`: ten sam motyw i kontury DejaVu co wersja PL, z zachowaną notą DejaVu. Nowych teł wysokiej rozdzielczości nie dostarczono.
 
 ## Interfejs 0.4.4 — rewizja 2
@@ -82,3 +91,12 @@ mu przez tę notę licencji MIT. Przed publikacją potwierdzić pochodzenie lub 
 zatwierdzonym własnym obrazem. Edytowalne źródła: `authoring/ui/`; szczegóły w
 `docs/UI_ART.md` (dokument developerski, poza dist). Mapa jest autorskim schematem,
 nie odrysowaniem arkusza muzealnego ani zasobem Call of Duty.
+
+## Rewizja 0.4.5 rew2 — HUD i drzwi
+
+Trzy `public/assets/ui/stance-*.svg` zastąpiono oryginalnymi wypełnionymi sylwetkami
+żołnierza (hełm, mundur, broń), narysowanymi dla tego projektu. Bez trójkąta, znaków
+ani plików z Call of Duty. Zrzuty dostarczone przez użytkownika były odniesieniem
+stylistycznym, nie zasobami gry. Istniejące sylwetki broni mają tylko przycięte `viewBox`.
+Drzwi są autorską geometrią proceduralną wykorzystującą istniejące materiały projektu.
+Nie dodano zewnętrznych fontów, tekstur, modeli ani zależności.

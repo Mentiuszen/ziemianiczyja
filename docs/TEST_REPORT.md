@@ -1,3 +1,18 @@
+# Odbiór 0.4.5 — 7 września 2026
+
+Baza `a567537c528e46b89fac0ff94555460f83bc864c`, wydanie 0.4.5 / UI 1.
+399 testów Node PASS, 0 FAIL, 0 SKIP; check/build PASS. 48 układów DOM HUD-u,
+DPR 2, modele informacji o walce i 5 testów rzeczywistej matematyki GameView PASS.
+Oba autoplay: faza 7, dwa checkpointy. 413 chronionych zasobów bazy niezmienionych.
+
+**Pełne HTTP/WebGL2 i fizyczny benchmark: niewykonane, ograniczenia środowiska.**
+DOM z syntetycznym widokiem nie jest testem finalnego obrazu renderera. Nie wszystkie
+percentyle CPU poprawiły się w trzech próbach. Dane, zakres i ograniczenia:
+`V0_4_5_IMPLEMENTATION.md`, `V0_4_5_VALIDATION.json`, `validation/v045/`.
+
+---
+## Archiwum odbiorów wcześniejszych wydań — nie wyniki 0.4.5
+
 # Raport testów — Ziemia Niczyja v0.4.4
 
 6 września 2026. Baza `a3398c211292e1cd677478ad6c4d456b6d210193` (0.4.3).

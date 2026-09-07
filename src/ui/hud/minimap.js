@@ -9,6 +9,7 @@ export function gatherFriendlies(world){
 /** Cached tactical ground plan with a single 2D canvas; no WebGL camera or A*. */
 export class Minimap {
  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('2d');this.world=null;this.background=null;this.nextDraw=0;this.draws=0;this.rebuilds=0;this.dpr=0;}
+ setSize(finalSize,scale=1){if(!Number.isFinite(finalSize)||finalSize<=0)return;const logical=finalSize/scale;if(this.layoutSize!==logical||this.hudScale!==scale){this.layoutSize=logical;this.hudScale=scale;this.nextDraw=0;}}
  reset(){this.world=null;this.background=null;this.nextDraw=0;}
  build(world){
   const c=document.createElement('canvas');c.width=MAP.width*2;c.height=MAP.depth*2;const g=c.getContext('2d');
@@ -24,7 +25,8 @@ export class Minimap {
  }
  draw(world,contacts,settings,now){
   this.canvas.hidden=settings.showMinimap===false;if(this.canvas.hidden||!this.context)return;
-  const size=this.canvas.clientWidth||220,dpr=Math.min(HUD.maxDpr,globalThis.devicePixelRatio||1);
+  if(now<this.nextDraw&&this.world===world&&this.breachCount===world.destroyedObstacles.length)return;
+  const size=this.layoutSize||this.canvas.clientWidth||220,dpr=Math.min(HUD.maxDpr,globalThis.devicePixelRatio||1)*(this.hudScale||1);
   if(this.size!==size||this.dpr!==dpr){this.size=size;this.dpr=dpr;this.canvas.width=Math.round(size*dpr);this.canvas.height=Math.round(size*dpr);this.nextDraw=0;}
   if(this.world!==world||this.breachCount!==world.destroyedObstacles.length){this.build(world);this.nextDraw=0;}
   if(now<this.nextDraw)return;this.nextDraw=now+1000/HUD.minimapHz;this.draws++;

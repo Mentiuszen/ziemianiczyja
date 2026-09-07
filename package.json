@@ -1,9 +1,9 @@
 {
   "name": "ziemia-niczyja",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "private": true,
   "type": "module",
-  "description": "Ziemia Niczyja / No Man’s Land — WWI FPS v0.4.4 revision 3: localized branding, campaign difficulty and animated fronts",
+  "description": "Ziemia Niczyja / No Man’s Land — WWI FPS v0.4.5 rew2: compact HUD, soldier silhouettes, dialogue subtitles and physical briefing doors",
   "engines": {
     "node": ">=20"
   },
@@ -15,5 +15,5 @@
     "check": "node tools/check.mjs && node tools/check-localization.mjs && node tools/check-ui.mjs"
   },
   "dependencies": {},
-  "uiRevision": 3
+  "uiRevision": 2
 }

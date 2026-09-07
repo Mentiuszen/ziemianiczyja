@@ -1,3 +1,8 @@
+import {HudLayout} from './hud/layout.js';
+import {HitFeedback} from './hud/hit-feedback.js';
+import {CriticalHealth} from './damage-feedback.js';
+import {GrenadeWarnings} from './hud/grenade-warning.js';
+import {refreshHudOptions} from './screens/settings.js';
 import {t,text,message,updateDocumentLanguage} from '../i18n/index.js';
 import {checkpointKey} from '../i18n/legacy.js';
 import {OPTIONS_TABS} from '../save/settings-schema.js';
@@ -27,20 +32,14 @@ export class UI {
   this.menu.addEventListener('error',e=>{if(e.target.matches?.('.main-logo img'))e.target.closest('.main-logo').classList.add('asset-failed');}, {...options,capture:true});
   this.motionQuery=window.matchMedia?.('(prefers-reduced-motion: reduce)');this.motionChanged=()=>{this.applyMotion();this.campaign?.setReducedMotion(this.reducedMotion());};this.motionQuery?.addEventListener?.('change',this.motionChanged,options);
   this.hud.innerHTML=hudMarkup();this.el=Object.fromEntries([...this.hud.querySelectorAll('[id]')].map(e=>[e.id,e]));
-  this.minimap=new Minimap(this.el.minimap);this.markers=new FriendlyMarkers(this.el['friendly-layer']);this.localizeHUD();
+  this.minimap=new Minimap(this.el.minimap);this.markers=new FriendlyMarkers(this.el['friendly-layer']);this.hitFeedback=new HitFeedback();this.criticalHealth=new CriticalHealth();this.grenadeWarnings=new GrenadeWarnings(this.el['grenade-layer']);this.layout=new HudLayout(this.hud,()=>this.app.settings);this.toastHome=this.toastNode.parentNode;this.localizeHUD();
  }
  reducedMotion(){return this.app.settings.uiAnimations===false||!!this.motionQuery?.matches;}
  applyMotion(){this.menu.classList?.toggle('reduced-motion',this.reducedMotion());}
- ensureWorld(world){if(this.world===world)return;this.world=world;this.contacts.reset(++this.sessionId);this.markers?.reset();this.minimap?.reset?.();this.nextHud=this.nextDebug=this.nextPerformance=0;}
- releaseWorld(){this.world=null;this.contacts?.reset(++this.sessionId);this.markers?.dispose();this.minimap?.reset();this.message='';this.messageUntil=this.checkpointUntil=0;this.toastUntil=0;this.toastNode?.classList.remove('visible','checkpoint-active');}
- fitTacticalColumn(){
-  const signature=[innerWidth,innerHeight,this.el.objective.textContent,this.el.hint.textContent,this.el.hold.hidden,this.app.settings.showMinimap].join('|');
-  if(signature===this.layoutSignature)return;this.layoutSignature=signature;
-  const column=this.el['hud-tactical'],map=this.el.minimap;column.style.removeProperty('--map-side');if(map.hidden||this.hud.hidden)return;
-  const ammo=this.hud.querySelector('.ammo-panel').getBoundingClientRect(),rect=column.getBoundingClientRect(),side=map.getBoundingClientRect().height;
-  const overlap=rect.bottom-ammo.top+12;if(overlap>0)column.style.setProperty('--map-side',Math.max(64,side-overlap)+'px');
- }
- reservedHudRects(){const regions=['#hud-tactical','.health-panel','.ammo-panel','#subtitle','#interaction','#grenade-warning','#checkpoint','#performance','#critical-health'];const out=[];for(const sel of regions){const n=this.hud.querySelector(sel);if(n&&!n.hidden&&n.getClientRects().length)out.push(n.getBoundingClientRect());}const x=innerWidth/2,y=innerHeight/2;out.push({left:x-38,right:x+38,top:y-30,bottom:y+30});return out;}
+ ensureWorld(world){if(this.world===world)return;this.world=world;this.contacts.reset(++this.sessionId);this.hitFeedback?.reset(this.sessionId);this.criticalHealth?.reset();this.grenadeWarnings?.reset();this.layout?.invalidate('world');this.markers?.reset();this.minimap?.reset?.();this.nextHud=this.nextDebug=this.nextPerformance=0;}
+ releaseWorld(){this.hitFeedback?.clear();this.criticalHealth?.reset();this.grenadeWarnings?.reset();this.layout?.invalidate('release');this.world=null;this.contacts?.reset(++this.sessionId);this.markers?.dispose();this.minimap?.reset();this.message='';this.messageUntil=this.checkpointUntil=0;this.toastUntil=0;this.toastNode?.classList.remove('visible','checkpoint-active');}
+ reservedHudRects(){return this.layout?.snapshot().reserved||[];}
+ refreshHudOptions(){refreshHudOptions(this.menu,this.app.settings,this.layout?.snapshot());this.layout?.invalidate('settings');}
  campaignModel(){return buildCampaignViewModel({checkpointState:this.app.checkpointState,checkpoint:this.app.checkpoint,progress:this.app.campaignProgress,intent:this.app.campaignIntent||'continue',selectedMissionId:this.app.campaignSelection||'cambrai',newDifficultyId:this.app.settings.difficulty});}
  openCampaign(intent){this.campaign?.unmount();this.campaign=new CampaignScreen(intent);}
  refreshCampaign(){if(this.app.state==='campaign')this.campaign?.update(this.campaignModel(),this.app);}
@@ -52,7 +51,9 @@ export class UI {
  }
  render(state){
   this.nextHud=this.nextDebug=this.nextPerformance=0;this.campaign?.unmount();this.screen=state;
-  this.menu.hidden=state==='playing';this.hud.hidden=state!=='playing';this.toastNode?.classList.toggle('in-game',state==='playing');if(state==='playing')return;
+  this.menu.hidden=state==='playing';this.hud.hidden=state!=='playing';this.toastNode?.classList.toggle('in-game',state==='playing');this.layout?.invalidate('screen');
+  if(state==='playing'){this.el?.['game-toast-host']?.appendChild(this.toastNode);return;}
+  this.hitFeedback?.clear();if(this.toastHome&&this.toastNode?.parentNode!==this.toastHome)this.toastHome.appendChild(this.toastNode);
   if(state==='language-select')this.menu.innerHTML=languageScreen();
   else if(state==='main')this.menu.innerHTML=mainScreen(this.app);
   else if(state==='settings')this.menu.innerHTML=settingsScreen(this.app,this.optionsTab||'gameplay');
@@ -60,6 +61,7 @@ export class UI {
   else if(state==='campaign'){
    this.campaign??=new CampaignScreen(this.app.campaignIntent||'continue');this.campaign.mount(this.menu,this.campaignModel(),this.app,this.reducedMotion());
   }else this.menu.innerHTML=statusScreen(state,this.app);
+  if(state==='settings')this.refreshHudOptions();
   this.applyMotion?.();if(state==='language-select')this.menu.querySelector?.('#choose-en')?.focus({preventScroll:true});
   if(state==='loading'&&typeof document!=='undefined')this.progress(this.loadMessage,this.loadFraction);
   if(this.modal)this.paintModal();
@@ -80,16 +82,17 @@ export class UI {
   e.preventDefault();this.app.action('options-tab',{dataset:{tab:OPTIONS_TABS[next]}});this.menu.querySelector(`#tab-${OPTIONS_TABS[next]}`)?.focus({preventScroll:true});
  }
  progress(value,fraction){this.loadMessage=value;this.loadFraction=fraction;const el=this.menu.querySelector?.('#load-text'),bar=this.menu.querySelector?.('#load-progress');if(el)el.textContent=text(value);if(bar){bar.style.width=Math.round(fraction*100)+'%';bar.parentElement?.setAttribute('aria-valuenow',String(Math.round(fraction*100)));}}
- toast(value,duration=6){this.toastMessage=value;this.toastNode.textContent=text(value);this.toastUntil=performance.now()+duration*1000;this.toastNode.classList.add('visible');}
+ toast(value,duration=6){this.toastMessage=value;this.toastNode.textContent=text(value);this.toastUntil=performance.now()+duration*1000;this.toastNode.classList.add('visible');this.layout?.invalidate('toast');}
  event(e){
   const world=this.app.world;if(world){this.ensureWorld(world);const shot=normalizeShot(e);if(shot)this.contacts.recordShot(shot,{sessionId:this.sessionId,playerFaction:world.player.faction,playerPos:world.player.pos,difficultyId:world.difficultyId});}
+  if(e.type==='combat-feedback')this.hitFeedback?.accept(e,this.sessionId);
   if(e.type==='message'||e.type==='air-warning'){this.message=e.text;this.messageUntil=e.time+8;}
   if(e.type==='toast'||e.type==='pickup')this.toast(e.text,3);
   if(e.type==='checkpoint'){this.checkpointUntil=e.time+5;this.checkpointName=e.name;this.text('checkpoint',t('checkpoint.flash',{name:message(checkpointKey(e.name))}));}
  }
  tickUI(){const now=performance.now();if(this.toastUntil&&now>this.toastUntil){this.toastNode.classList.remove('visible');this.toastUntil=0;}if(this.app.state==='campaign')this.campaign?.tick(now,document.hidden);}
- text(id,value){const node=this.el[id],result=String(value);if(node&&node.textContent!==result)node.textContent=result;}
+ text(id,value){const node=this.el[id],result=String(value);if(node&&node.textContent!==result){node.textContent=result;if(['objective','hint','subtitle','critical-health','checkpoint','goal-label','chapter-label'].includes(id))this.layout?.invalidate('text');}}
  updatePerformance(view,metrics,now){return updatePerformance.call(this,view,metrics,now);}
  update(world,view,metrics){return updateHUD.call(this,world,view,metrics);}
- dispose(){this.abort.abort();this.motionQuery?.removeEventListener?.('change',this.motionChanged);this.campaign?.unmount();this.releaseWorld();this.minimap?.dispose();}
+ dispose(){this.abort.abort();this.motionQuery?.removeEventListener?.('change',this.motionChanged);this.campaign?.unmount();this.releaseWorld();this.minimap?.dispose();this.layout?.dispose();this.grenadeWarnings?.dispose();}
 }

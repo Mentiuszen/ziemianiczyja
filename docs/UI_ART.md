@@ -1,3 +1,13 @@
+# HUD 0.4.5
+
+Nowe oryginalne ikony postawy są SVG; celowniki i hitmarker to odrębna geometria CSS/SVG.
+18 modułów ma osobną skalę i skalę globalną. Układ rezerwuje wynikowy rozmiar, utrzymuje
+odstępy i chroni środek celowania. Nie skaluje menu ani F3. Grafiki tła z bieżącej bazy
+GitHub nie zostały podmienione. Szczegóły i testy: `V0_4_5_IMPLEMENTATION.md`.
+
+---
+## Historyczny opis oprawy 0.4.4
+
 # Interfejs 0.4.4 — źródła i eksport, rewizja 3
 
 ## Status R3
@@ -114,3 +124,15 @@ kopiuje źródłowe SVG/licencje i eksportuje gotowe masters PNG do WebP (wymaga
 Nie trzeba ponownie generować obrazów, mieć całego GSHHG ani plików fontów.
 `authoring/ui/manifest.json` zawiera rozmiary i SHA-256 eksportów. Runtime nie importuje
 plików authoringu, testów ani edytora. Minimapę nadal tworzą dane mapy gry, nie atlas frontu.
+
+## 0.4.5 rew2 — zaakceptowane poprawki HUD
+
+Baza: archiwum użytkownika `ZiemiaNiczyja 0.4.5 rew1.zip`; nie pobierano nowszego brancha.
+Zestaw `stance-stand/crouch/prone.svg` to oryginalne pełne sylwetki na przezroczystym tle,
+we wspólnym polu 64×64 i slocie 42×42 px. Bez trójkątów i ikon z obcych gier.
+`weapons/*.svg` zachowują kształty i kolory; viewBox usuwa wewnętrzne puste marginesy.
+Subtitles: mówca #7fd9d2, tekst #f4f4f0, przezroczyste tło, natywny Arial, 17 px przy 100%.
+HP nie ma dodatkowego paska. Stamina wyrównuje końce do całego wiersza postawa–HP.
+Drzwi: dwa skrzydła, trzy partie materiałowe na skrzydło, geometria LH sprawdzana testem.
+Aktualny manifest assetów: `public/assets/ui/manifest.json` (UI revision 2).
+Raport rewizji: `V0_4_5_REW2_IMPLEMENTATION.md`.

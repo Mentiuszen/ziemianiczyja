@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<!-- Original prone infantry silhouette aiming right; no badge or background. -->
+<g fill="#eef0e9">
+ <path d="M43 39C43 33 54 33 55 39L57 40V42H41V40Z M45 43H54L53 47 49 49 45 47Z"/>
+ <path d="M26 46Q34 41 43 44L44 51 34 54 23 52 14 55 6 54 3 49 5 47 10 50 18 48Z M23 51L32 54 22 59 7 60 3 58V54L8 55 20 55Z"/>
+ <path d="M42 47L48 51 55 50 56 54 46 56 38 52Z M38 48L40 51 36 57 44 58 43 61H31Q28 59 30 56L34 49Z M47 48H62V50H57L55 52 51 51H47Z"/>
+</g>
+</svg>

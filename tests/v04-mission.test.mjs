@@ -9,6 +9,9 @@ test('both sides produce actual positional shots before the main assault',()=>{c
 test('local defense is contested by nearby enemies instead of an unconditional countdown',()=>{const s=new Simulation();s.director.phase=6;s.player.pos={x:4,y:s.terrain.height(4,159),z:159};const enemy=s.npcs.find(n=>n.faction==='de');enemy.pos={x:5,y:s.player.pos.y,z:159};s.director.hold=10;direct(s,3);assert.ok(s.director.hold<=10);assert.equal(s.director.phase,6);});
 test('all four briefing soldiers have an exit route and leave the room without a doorway deadlock',()=>{
  const s=new Simulation();const squad=s.npcs.filter(n=>n.briefingRole);
+ // The exit is deliberately closed during briefing in rew2. Verify routes after it opens.
+ assert.equal(s.nav.path(s.player.pos,{x:6,z:43}).length,0);
+ s.director.skipBriefing(s);for(let i=0;i<60;i++)s.tick(1/60,{});
  for(const n of squad)assert.ok(s.nav.path(n.pos,{x:6,z:43}).length>0,`${n.id} has no path out of the command room`);
  s.director.skipBriefing(s);for(let i=0;i<80*60;i++)s.tick(1/60,{});
  for(const n of squad)assert.ok(n.hp<=0||n.pos.z>2,`${n.id} stuck at ${JSON.stringify(n.pos)}`);

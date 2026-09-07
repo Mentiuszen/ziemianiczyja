@@ -1,5 +1,14 @@
 # Assets, provenance and licenses
 
+## Interface 0.4.5
+
+`stance-stand.svg`, `stance-crouch.svg` and `stance-prone.svg` are original vector
+illustrations created for this project. Crosshairs and hitmarkers use original
+CSS/SVG geometry. No Call of Duty/CS icons or font files were copied. These additions
+use the project license to the extent rights are licensable. Existing artwork and
+third-party license notices from base `a567537` remain unchanged.
+
+
 Revision 3 adds the English `logo-en.svg`: the existing motif and DejaVu outlines, covered by the retained DejaVu notice. No new high-resolution backdrops were delivered.
 
 ## Interface 0.4.4 — revision 2
@@ -81,3 +90,12 @@ This notice does not assign it an MIT license. Confirm its provenance or replace
 it with an approved original before public distribution. Editable files are under
 `authoring/ui/`; `docs/UI_ART.md` describes them (developer-only, outside dist). The
 map is an original schematic, not a traced museum sheet or a Call of Duty asset.
+
+## 0.4.5 rew2 — HUD and doors
+
+The three `public/assets/ui/stance-*.svg` files are original filled infantry silhouettes
+(helmet, uniform, rifle) drawn for this project. No triangle, Call of Duty marks or
+extracted game assets are used. User-supplied screenshots were style references only.
+Existing weapon silhouettes only have trimmed viewboxes. The timber doors are original
+procedural geometry using the existing project materials. No external fonts, textures,
+models or dependencies were added.

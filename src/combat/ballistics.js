@@ -32,7 +32,7 @@ export function fireBullet(world,shooter,weapon,aim,spread){
  world.emit('shot',{from:front,to:end,faction:shooter.faction,weapon:weapon.id,owner:shooter.id});
  world.stats[shooter.faction==='uk'?'britishShots':'germanShots']++;
  world.noises.push({pos:{...shooter.pos},faction:shooter.faction,ttl:.5});
- if(hit?.actor){world.damage(hit.actor,weapon.definition.damage,shooter,{kind:'bullet',hitPart:hit.part,weaponId:weapon.id,origin:shooter.pos});if(shooter.id==='player'&&hit.actor.faction!==shooter.faction){world.player.hitMarker=.16;world.stats.hits++;}}
+ if(hit?.actor){world.damage(hit.actor,weapon.definition.damage,shooter,{kind:'bullet',hitPart:hit.part,weaponId:weapon.id,origin:shooter.pos});if(shooter.id==='player'&&hit.actor.faction!==shooter.faction){world.stats.hits++;}}
  else if(hit)world.emit('impact',{pos:end,kind:hit.kind});
  // Near misses cause a bounded reaction, not permanent suppression.
  suppressAlong(world,shooter,blocked?origin:front,end);

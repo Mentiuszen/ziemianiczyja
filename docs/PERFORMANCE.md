@@ -1,3 +1,73 @@
+# Wydajność 0.4.5
+
+## Co zostało zmierzone
+
+Node.js 22.16.0, trzy przebiegi tego samego scenariusza: seed 112017, Rekrut,
+900 kroków po 1/60 s, takie same wejścia bota. To **czasy kroku symulacji na CPU**,
+nie czas renderowanej klatki, nie pomiar GPU i nie dowód działania 165 Hz.
+Harmonogram wykonywania ścieżek różni się między wersjami, więc nie zakładamy
+bitowej identyczności wszystkich pośrednich stanów AI ani przedstawianych klatek.
+
+| Próba | Wersja | Średnia ms | p95 ms | p99 ms | Maksimum ms |
+|---:|---|---:|---:|---:|---:|
+| 1 | baza 0.4.4 | 1.708 | 2.760 | 5.369 | 46.743 |
+| 1 | 0.4.5 | 1.634 | 2.752 | 4.191 | 21.138 |
+| 2 | baza 0.4.4 | 1.488 | 2.060 | 2.972 | 42.537 |
+| 2 | 0.4.5 | 1.465 | 2.501 | 3.634 | 11.216 |
+| 3 | baza 0.4.4 | 1.485 | 2.088 | 3.280 | 37.945 |
+| 3 | 0.4.5 | 1.349 | 1.997 | 2.686 | 3.343 |
+
+Najdłuższe skoki są mniejsze; średnie są podobne lub niższe. **p95 i p99 nie poprawiły
+się w każdej próbie**. Krótkie okno, JIT, GC i harmonogram systemu wpływają na wynik.
+Nie obiecywać na tej podstawie spadku p99 renderu na fizycznym GPU.
+
+Źródła pomiaru: `validation/v045/cpu-base.json`, `cpu-v045.json`.
+Narzędzie: `node tools/benchmark_v045.mjs <katalog źródeł> <wynik.json>`.
+Pomiar dodatkowych synchronicznych ścieżek w raporcie dotyczy API narzędziowego;
+runtime używa `processBudget`, a nie `path()` wykonywanego w całości.
+
+## Zmienione mechanizmy
+
+A* ma kopiec i tablice robocze wielokrotnego użytku. Runtime ma budżet 32 jednostek
+pracy na tick; rozwinięcie węzła z niewyliczonymi krawędziami kosztuje 8, z cache 1.
+To limit pracy, nie twarda gwarancja czasu w milisekundach. Zachowano sprawdzanie
+przeszkód i anulowanie generacji. Otwarcie drutu unieważnia jedynie pobliskie krawędzie.
+
+Prezentacja interpoluje transformacje, symulacja pozostaje 60 Hz. Ruch myszy jest
+podglądany bez zużycia delty przed kolejnym tickiem; tick korzysta z tej samej walidacji
+obrotu. Wygładzanie oka/FOV używa czasu prezentacji. Krytyczne dane walki pozostają
+wyłącznie w symulacji. HUD nie mierzy całej geometrii przy każdym renderze.
+
+## Jak czytać F3
+
+Podstawą są p95/p99 **czasu klatki**. `1000/frameP99` jest odpowiednikiem FPS dla tego
+percentyla, nie średnią „1% low”. Literalne FPS p95/p99 opisują szybki ogon i są pokazane
+oddzielnie. Próbki CPU zawierają mierzoną pracę aplikacji między renderami; RAF ma osobny
+szereg. Koszt profilera jest dopisywany do próbki CPU po zakończeniu obliczeń.
+
+GPU pochodzi wyłącznie z ważnych wyników zapytania WebGL2, asynchronicznie i z ID klatki.
+Nie obejmuje CSS/DOM/kompozytora. `—` oznacza brak danych. Nie dodawać CPU + GPU do klatki.
+Okno metryk to do 10 s, publikacja co 250 ms. p99 wymaga 100 próbek, <1000 wywołuje
+informację o małej próbie. Wykres pokazuje ostatnie maksymalnie 240 renderów.
+
+F3/F4/F6/F7: panel/reset/rejestracja-stop/JSON. Bufory rejestracji: 65536 klatek,
+65536 RAF, 32768 GPU; przy przekroczeniu zachowywany jest najnowszy zakres, a eksport
+ma `truncated:true`. Rejestracja jest jawna; nie uruchamia się przez samo pokazanie FPS.
+Domyślny budżet jest szacowany z mediany RAF i limitu; znaną częstotliwość celu można
+zadeklarować `ZiemiaNiczyja.diagnostics.setTargetHz(165)`.
+
+## Odbiór sprzętowy
+
+Na tej samej maszynie i wersji przeglądarki porównać bazę i aktualizację, te same
+ustawienia, rozdzielczość, trasę i stan misji. Oddzielić 30 s rozgrzania; następnie
+rejestrować 60–120 s w odprawie, walce, przy wybuchu, otwieraniu drutu i obronie telefonu.
+Sprawdzić 60/120/144/165/240 Hz, dostępne fizycznie tryby, cap 0 i cap zgodny z monitorem.
+Powtórzyć przy F3 wyłączonym i włączonym. Zmiany ustawień, pauzy i ładowania to granice
+sesji, nie próbki gry. Eksport ujawnia brak GPU, małą próbę i obcięcie bufora.
+
+---
+## Historyczny raport 0.4.0 (nie wyniki 0.4.5)
+
 # Wydajność i limiter — v0.4.0
 
 ## Zakres wykonanych pomiarów

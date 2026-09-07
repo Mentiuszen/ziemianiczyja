@@ -1,3 +1,19 @@
+# Status 0.4.5
+
+Logika, źródła, lokalizacja i HUD zostały sprawdzone automatycznie. Pełny lokalny HTTP
+jest blokowany w środowisku przygotowania, a WebGL2 nie jest dostępny. Testy DOM używają
+rzeczywistego UI i Simulation, ale syntetycznego widoku. Rzeczywiste obliczenia kamery
+Babylona są badane osobno, bez GPU. Nie oznacza to odbioru obrazu na fizycznej karcie.
+
+Mały ekran przy wysokich skalach może wejść w tryb kompaktowy. Wyniki p99 GPU wymagają
+ważnych próbek dostępnego rozszerzenia WebGL. CPU i GPU nie sumują się do czasu klatki.
+Pomiary Node wykazują zmniejszenie najdłuższych skoków, nie gwarancję usunięcia wszystkich
+mikroprzycięć. Pełny odbiór Firefox/Chromium, zapisów trwałych i 165 Hz wykonać lokalnie.
+Raport: `V0_4_5_IMPLEMENTATION.md`.
+
+---
+## Historyczne ograniczenia poprzednich wydań
+
 # Ograniczenia 0.4.4 — 6 września 2026
 
 ## Rewizja 3 — aktualny status

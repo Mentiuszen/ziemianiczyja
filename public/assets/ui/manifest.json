@@ -1,0 +1,145 @@
+{
+  "version": "0.4.5",
+  "baseCommit": "a567537c528e46b89fac0ff94555460f83bc864c",
+  "description": "Deployed UI assets for 0.4.5 rew2. New original stance silhouettes; weapon viewboxes trimmed. Other UI artwork preserved from the supplied rew1 archive.",
+  "files": [
+    {
+      "path": "public/assets/ui/ally-uk.svg",
+      "bytes": 584,
+      "sha256": "111eff83cb60393196153d8146acca6f5b57851ed84760c76f526274808671ad"
+    },
+    {
+      "path": "public/assets/ui/campaign-art.webp",
+      "bytes": 451516,
+      "sha256": "26b92bb762ecef3be3f42ab10523220144a052a73ce83404990aaed2b17c74ed"
+    },
+    {
+      "path": "public/assets/ui/campaign-base.svg",
+      "bytes": 34534,
+      "sha256": "c7637e32efe0337f32820e1597db0401a3346ba4bf8876e6a91025a848aa14a2"
+    },
+    {
+      "path": "public/assets/ui/campaign-relief.webp",
+      "bytes": 35096,
+      "sha256": "d236df3459792e2bc6969b21745d71b77431bda973796f6be0817d3702fc99a5"
+    },
+    {
+      "path": "public/assets/ui/flag-en.svg",
+      "bytes": 3453,
+      "sha256": "c033ac7defd230d507c0ebc8be9e8dd38a647b104aeda5d97b2e7d7dd9b10ba4"
+    },
+    {
+      "path": "public/assets/ui/flag-pl.svg",
+      "bytes": 149,
+      "sha256": "8d85313559880d03a6f0d127a764d5e8fb96d125fea59232de86a8dafe842a8c"
+    },
+    {
+      "path": "public/assets/ui/language-art.webp",
+      "bytes": 148444,
+      "sha256": "03e02be8ef4d5575df01bd821dbca9ef5423958ab7d97011c9b8cb71136203d7"
+    },
+    {
+      "path": "public/assets/ui/licenses/Basemap-data-MIT.txt",
+      "bytes": 1060,
+      "sha256": "c2b3d5f8d1a092d1a288186741251b066f9148e68bbf8c01680a84f487cb30b1"
+    },
+    {
+      "path": "public/assets/ui/licenses/DejaVu-LICENSE.txt",
+      "bytes": 2437,
+      "sha256": "203910fb34e4a2c3e338f9b0e922efa8a648de0454b7147f1f60456f4387ae5d"
+    },
+    {
+      "path": "public/assets/ui/licenses/GSHHG-GPL-3.txt",
+      "bytes": 35150,
+      "sha256": "fce02ebb691c768cde194afbe91b8025fd7b1f49031f33996deb246a5926f0e2"
+    },
+    {
+      "path": "public/assets/ui/licenses/GSHHG-LGPL-3.txt",
+      "bytes": 7651,
+      "sha256": "473c6d57b306d336c5e9d0ef42c699d4e2ac1d9ec24727882de9e3508a25e6bb"
+    },
+    {
+      "path": "public/assets/ui/loading-art.webp",
+      "bytes": 274388,
+      "sha256": "6a981b99ec1d17a07ad0875a5c98dec87d50fa8344159d18a3a015a34f5791e6"
+    },
+    {
+      "path": "public/assets/ui/logo-en.svg",
+      "bytes": 100512,
+      "sha256": "39c18c50a5783ea05765b7b874409495146c35d1a508b353e11ceb950b4d0141"
+    },
+    {
+      "path": "public/assets/ui/logo.svg",
+      "bytes": 96855,
+      "sha256": "bc730c9872633ad3a1689ad99224885aefa8189dc8e3742eeea83038d7d4ee21"
+    },
+    {
+      "path": "public/assets/ui/main-art.webp",
+      "bytes": 111446,
+      "sha256": "adc6dda18c8768162dbc77aa1c19a99b9ae1f3be2438c27057daa950aa1deefb"
+    },
+    {
+      "path": "public/assets/ui/maps/SOURCE.txt",
+      "bytes": 674,
+      "sha256": "93433215fa18cc29095414b5ef4ec7148225e90a2958cfc718f65f6bd6cffe6e"
+    },
+    {
+      "path": "public/assets/ui/maps/western-front-geography.json",
+      "bytes": 74995,
+      "sha256": "16cf41c688fc63b1a9de79354ce919d865f15e6c3bbdd2a338f8e42b00b780c9"
+    },
+    {
+      "path": "public/assets/ui/options-art.webp",
+      "bytes": 132794,
+      "sha256": "40a7d9b8bfb1a6a9f05c653c85b23fa207f2db2370903327bc9841558fb7f8cf"
+    },
+    {
+      "path": "public/assets/ui/stance-crouch.svg",
+      "bytes": 596,
+      "sha256": "1248a878d2fc2e5957f8838b635f1bb021512e64f6ef48875304996133441744"
+    },
+    {
+      "path": "public/assets/ui/stance-prone.svg",
+      "bytes": 521,
+      "sha256": "6bea410c3429763acad0991639e0760380662bdc280e0dce640d39c8d231af37"
+    },
+    {
+      "path": "public/assets/ui/stance-stand.svg",
+      "bytes": 737,
+      "sha256": "890a744624d765273400dc067d2991f7696bd506e6b7bc22c006752b7a484305"
+    },
+    {
+      "path": "public/assets/ui/weapons/gewehr.svg",
+      "bytes": 249,
+      "sha256": "8a635d0a36d92667afb9573bec41c634e4aa62c2513b186928eea9808e7584b9"
+    },
+    {
+      "path": "public/assets/ui/weapons/lewis.svg",
+      "bytes": 274,
+      "sha256": "fe6ce4d2502f5edd646a7bc13f13fb132a2972a002c5c91cd9622e300b006d85"
+    },
+    {
+      "path": "public/assets/ui/weapons/mg08.svg",
+      "bytes": 254,
+      "sha256": "5ae6210b5ecc43b00e339f20caae0494815090f44089c400aa8a38e6b98aefd9"
+    },
+    {
+      "path": "public/assets/ui/weapons/smle.svg",
+      "bytes": 260,
+      "sha256": "da575e5fb105bdd2a512ce6154f62a6a8a60282d084eb6a9c5864e37ec8a5bf3"
+    },
+    {
+      "path": "public/assets/ui/weapons/unknown.svg",
+      "bytes": 162,
+      "sha256": "3ca13dabb019f8b10deb9cf346556a4c618a8f200aa90a39f86db0c710ce9873"
+    },
+    {
+      "path": "public/assets/ui/weapons/webley.svg",
+      "bytes": 215,
+      "sha256": "916f31a86c23d3f0b46136f8d13dfc290d4843f7145e2d7ad9c4091bc399ca32"
+    }
+  ],
+  "baseArchive": "ZiemiaNiczyja 0.4.5 rew1.zip",
+  "baseArchiveSha256": "fde001cbe78bc526b2fb2eea1e0cd47be3d6b01a8a07d027c2f7eb39428ab280",
+  "uiRevision": 2
+}

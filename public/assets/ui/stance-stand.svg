@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<!-- Original filled infantry silhouette: helmet, tunic, webbing, rifle and boots. -->
+<g fill="#eef0e9">
+ <path d="M24 9C24 2 37 2 38 9L40 10V12H22V10Z M25 13H37L36 18 33 20H29L26 18Z"/>
+ <path d="M25 20L28 19H34L38 21 40 31 38 39 23 39 21 30Z M23 39H30L29 49 25 59 19 59 22 47Z M31 39H38L39 49 43 58 37 60 33 50Z"/>
+ <path d="M23 21L20 20Q17 21 16 25L13 34Q13 37 17 37L25 32 23 28 18 31 21 25Z M38 21Q42 21 43 25L47 30Q48 33 45 34L35 31 36 27 41 28Z M19 57H26L26 62H16V60Z M37 57L43 56 49 60V62H37Z"/>
+ <path d="M16 37L19 33 43 23 51 21 52 23 44 27 25 35 20 41H17Z"/>
+</g>
+<!-- Small transparent breaks keep the elbow and belt readable without thin limb strokes. -->
+</svg>

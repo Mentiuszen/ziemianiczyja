@@ -1,26 +1,52 @@
-# Ziemia Niczyja / No Man’s Land — v0.4.4, rewizja 3
+# Ziemia Niczyja / No Man’s Land — v0.4.5
 
-Jednoosobowy FPS przeglądarkowy z I wojny światowej. Nadal dostępna jest **jedna misja:
-04, „Pęknięta linia” — Cambrai, 20 listopada 1917**. Pozostałe rozdziały są kontekstem
-kampanii, nie nowymi grywalnymi poziomami.
+Jednoosobowy FPS przeglądarkowy z I wojny światowej. Nadal dostępna jest jedna misja:
+**04, „Pęknięta linia” — Cambrai, 20 listopada 1917**. Wersja `0.4.5`, UI revision `2`.
 
-## Rewizja 3 — poprawki funkcjonalne, tła nadal R2
+## Rewizja 2 (0.4.5)
 
-Wydanie ma numer **0.4.4**; `ZiemiaNiczyja.uiRevision === 3`.
-English otrzymuje nazwę **No Man’s Land**, osobne logo oraz tytuł karty i opis projektu.
-Trudność nie występuje w Opcjach: wybiera się ją na ekranie Nowej kampanii lub zmienia
-w Kontynuacji kampanii. Zmiana w kontynuacji zapisuje nowy profil razem z checkpointem,
-bez resetu stanu misji. Front i strzałki przechodzą płynnie między datami rozdziałów.
+HUD zdrowia zawiera ikonę postawy, krzyż i liczbę HP — bez dodatkowego paska życia.
+Wytrzymałość biegnie pod całym wierszem; jej suwak zmienia grubość, a końce pozostają
+wyrównane do postawy i HP przy mieszanych skalach. Nowe ikony są wypełnionymi sylwetkami
+żołnierza bez obramowania. Broń i amunicja są dosunięte, również dla pistoletu.
+Napisy mają turkusowego mówcę i jasną wypowiedź w jednym toku tekstu, bez ciemnego panelu.
 
-**Regeneracja teł wysokiej rozdzielczości nie jest ukończona.** Nadal używane są
-niskorozdzielcze źródła R2; tej paczki nie traktować jako pełnego odbioru R3.
+Wschodnie drzwi stanowiska dowodzenia są fizycznie zamknięte podczas odprawy.
+Podejdź na około 2 m, skieruj wzrok w ich stronę i użyj klawisza interakcji, aby
+je otworzyć i pominąć odprawę. Normalny koniec rozmowy lub alarm również otwiera drzwi.
+Nie ma globalnego skrótu pomijania odprawy; zapis gry i ustawienia pozostają kompatybilne.
 
-Instrukcja: `INSTALL_0_4_4_R3.md`. Raport: `docs/V0_4_4_R3_IMPLEMENTATION.md`.
-Przeglądarkowy odbiór na rzeczywistym HTTP:
+Nakładka: `INSTALL_0_4_5_REW2.md`. Raport: `docs/V0_4_5_REW2_IMPLEMENTATION.md`.
+Testy DOM: `python tools/browser_v045_r2.py --executable /ścieżka/do/chromium`.
+Ten test DOM nie zastępuje odbioru renderera WebGL2.
+
+## Aktualizacja 0.4.5
+
+Skalowalny HUD (globalnie i 18 osobnych modułów, wynikowo maks. 200%), ikony postawy,
+cztery warianty celownika, niezależne potwierdzenie trafienia/zabójstwa w ADS,
+ostrzeżenie poniżej 20% HP i kierunkowe znaczniki granatów. Menu i F3 nie są skalowane.
+
+F3 zawiera p95/p99 klatki, CPU i GPU, rozbicie pracy i eksport surowych próbek.
+F4 resetuje, F6 rejestruje/zatrzymuje, F7 pobiera JSON. Prosty FPS pozostaje osobną opcją.
+Interpolacja transformacji poprawia prezentację symulacji 60 Hz przy wyższym odświeżaniu;
+nawigacja jest porcjowana i korzysta z lokalnego unieważniania cache.
+
+Instrukcja nakładki: `INSTALL_0_4_5.md`. Historia: `CHANGELOG.md`.
+Wyniki i ograniczenia odbioru: `docs/V0_4_5_IMPLEMENTATION.md`.
+Modele, tekstury świata, profile walki, checkpointy i aktualna poprawka tła z GitHuba
+zostały zachowane. Nie dodano nowej kampanii ani zależności runtime.
 
 ```sh
-python tools/browser_v044_r3.py --url http://127.0.0.1:5173/ --headed --game
+npm ci
+npm run check
+npm test
+npm run build
+npm run dev
 ```
+
+Pomiary Node są testami CPU, nie benchmarkiem fizycznego GPU. Wydanie nie zawiera
+obietnicy stałych 165 FPS ani potwierdzenia usunięcia każdego mikroprzycięcia.
+Odbiór na zwykłym hostingu, WebGL2 i Firefoxie użytkownika pozostaje konieczny.
 
 ## Menu i kampania 0.4.4
 
@@ -43,7 +69,7 @@ język i checkpoint są zachowane. Trudność wybierasz lub zmieniasz wyłączni
 na ekranie kampanii. Kontynuacja zapisuje wybór dla wznawianej misji; Nowa kampania
 nie modyfikuje dotychczasowego checkpointu.
 
-## HUD 0.4.4
+## Informacje HUD-u zachowane z 0.4.4
 
 Prawa górna minimapa pokazuje rzeczywisty teren ±60 m, gracza, sojuszników i aktualny cel.
 Lokacja/data są częścią jej modułu; opis celu znajduje się pod mapą. Wrogowie są oznaczani
@@ -55,21 +81,12 @@ Nazwę broni przy amunicji zastępuje sylwetka, nie zmieniając stanu broni ani 
 Minimapę, flagi i animacje menu można wyłączyć osobno w Rozgrywce. Statystyki są na lewej
 górze, a checkpoint pod kompasem. Nie dodano drugiej kamery WebGL ani nowego renderera.
 
-## Aktualizacja z 0.4.3
+## Aktualizacja z bieżącej 0.4.4
 
-Nakładkę scalić z głównym katalogiem istniejącego repo, nie zastępować całych folderów
-niepełną zawartością ZIP. Usunąć wycofany **`src/ui/map.js`** zgodnie z `REMOVE_FILES.txt`;
-patch Git robi to sam. Użyć ZIP **albo** patcha. Nie kopiować starego `dist/`: wykonać
-nowy build. Wersja nie wymaga kasowania preferencji ani prawidłowych checkpointów
-0.4.1/0.4.2/0.4.3 (`SAVE_VERSION=1`, `MISSION_VERSION=3`).
-
-```sh
-npm ci
-npm run check
-npm test
-npm run build
-npm run dev
-```
+Nałożyć pliki z ZIP zgodnie z `INSTALL_0_4_5.md`, bez usuwania innych źródeł.
+Nie kopiować starego `dist`; wykonać nowy build. Ustawienia i prawidłowe checkpointy
+są zachowane (`SAVE_VERSION=1`, `MISSION_VERSION=3`). Historyczne instrukcje usuwania
+plików z dawnych wydań nie są krokami wymaganymi przez nakładkę 0.4.5.
 
 Test przeglądarkowy na lokalnym originie, w oddzielnym kontekście bez naruszania zwykłego
 profilu gracza:

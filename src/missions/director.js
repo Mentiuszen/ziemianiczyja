@@ -1,3 +1,4 @@
+import {canUseBriefingDoor,BRIEFING_DOOR} from '../world/briefing-door.js';
 import {checkpointKey} from '../i18n/legacy.js';
 import {LocalizedError} from '../i18n/index.js';
 import {message} from '../i18n/message.js';
@@ -83,7 +84,7 @@ export class Director {
  }
  interaction(w){
   const p=w.player.pos,o=this.objective;if(w.player.hp<=0||this.phase===PHASE.COMPLETE)return null;
-  if(this.phase===PHASE.BRIEFING)return{key:'interact',kind:'briefing',label:message('interaction.briefing')};
+  if(this.phase===PHASE.BRIEFING)return canUseBriefingDoor(w)?{key:'interact',kind:'briefing-door',id:BRIEFING_DOOR.id,label:message('interaction.briefing')}:null;
   for(const gun of w.fieldGuns){
    const point={x:gun.pos.x,y:gun.pos.y+1.05,z:gun.pos.z+.5};
    if(!isFieldGunNeutralized(w,gun)&&p.z>gun.pos.z+.4&&canReach(w,point,3.3,gun.id))return{key:'interact',kind:'fieldgun',id:gun.id,label:message('interaction.fieldgun')};
@@ -94,7 +95,7 @@ export class Director {
  }
  interact(w){
   const action=this.interaction(w);if(!action)return false;
-  if(action.kind==='briefing')return this.skipBriefing(w);
+  if(action.kind==='briefing-door')return this.skipBriefing(w);
   if(action.kind==='mg'){
    const gun=w.npcs.find(n=>n.id==='de-mg');
    if(gun&&gun.hp>0){gun.fixed=false;gun.weapon.mag=0;gun.weapon.reserve=0;gun.weapon.cancelReload();gun.state='retreat';w.nav.request(gun,{x:31,y:0,z:127},'retreat');}

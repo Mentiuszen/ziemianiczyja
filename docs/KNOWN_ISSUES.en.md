@@ -1,3 +1,19 @@
+# v0.4.5 status
+
+Logic, sources, localization and HUD have automated coverage. Local HTTP is blocked
+and WebGL2 is unavailable in the preparation environment. DOM tests use the real UI
+and Simulation with a synthetic view. Actual Babylon camera calculations are tested
+separately without a GPU. This is not physical-GPU visual acceptance.
+
+High HUD scales on small screens may activate compact layout. GPU p99 needs valid
+samples from the optional WebGL extension. CPU and GPU times must not be added to
+frame time. Node measurements show reduced longest spikes, not removal of every
+micro-stutter. Complete Firefox/Chromium, durable-save and 165 Hz checks locally.
+See `V0_4_5_IMPLEMENTATION.md` (Polish implementation and validation report).
+
+---
+## Historical limitations from earlier versions
+
 # 0.4.4 limitations — 6 September 2026
 
 ## Revision 3 — current status

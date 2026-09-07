@@ -1,4 +1,5 @@
 import {clamp} from '../core/math.js';
+export const MAX_HEALTH=100;
 export class Health {
  constructor(hp=100,delay=0){this.hp=clamp(hp,0,100);this.delay=delay;this.regenDelay=6;this.regenRate=12;}
  configure(profile){

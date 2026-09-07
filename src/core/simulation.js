@@ -1,3 +1,4 @@
+import {BriefingDoor} from '../world/briefing-door.js';
 import {LocalizedError} from '../i18n/index.js';
 import {message} from '../i18n/message.js';
 import {PHASE} from '../data/briefing.js';
@@ -25,13 +26,13 @@ import {updateGrenades} from '../combat/ballistics.js';
 import {validateSnapshot,SAVE_VERSION} from '../save/schema.js';
 export class Simulation {
  constructor(snapshot=null,difficulty='soldier',seed=112017){
-  validateObjectives();this.time=0;this.random=rng(seed);this.nextId=100;this.difficultyId=Object.hasOwn(DIFFICULTIES,difficulty)?difficulty:'soldier';this.difficulty=DIFFICULTIES[this.difficultyId];
-  this.terrain=new Terrain();this.layout=makeLayout(this.terrain);this.collision=new CollisionWorld(this.terrain,this.layout);this.nav=new Navigation(this.collision);this.player=new Player(this.terrain);this.player.health.configure(this.difficulty);this.director=new Director();
+  validateObjectives();this.feedbackSerial=0;this.time=0;this.random=rng(seed);this.nextId=100;this.difficultyId=Object.hasOwn(DIFFICULTIES,difficulty)?difficulty:'soldier';this.difficulty=DIFFICULTIES[this.difficultyId];
+  this.terrain=new Terrain();this.layout=makeLayout(this.terrain);this.collision=new CollisionWorld(this.terrain,this.layout);this.nav=new Navigation(this.collision);this.player=new Player(this.terrain);this.player.health.configure(this.difficulty);this.director=new Director();this.briefingDoor=new BriefingDoor(this.terrain);
   this.npcs=initialSoldiers().map(d=>createSoldier(d,this.terrain,this.random));this.tanks=TANK_ROUTES.map(d=>createTank(d,this.terrain));this.fieldGuns=FIELD_GUNS.map(d=>createFieldGun(d,this.terrain));this.air=createAirSupport();this.destroyedObstacles=[];this.items=INITIAL_ITEMS.map(d=>({...d,pos:v3(d.x,this.terrain.height(d.x,d.z),d.z),used:false}));this.grenades=[];this.shells=[];this.events=[];this.noises=[];this.stats={britishShots:0,germanShots:0,playerShots:0,hits:0,kills:0,alliedLost:0,enemyLost:0,reloads:0,replans:0,tankHits:0,tankMGShots:0,tankCannonShots:0,fieldGunShots:0,airBombs:0,breaches:0};this.actors=[this.player,...this.npcs];this.navBudget=0;
   for(const actor of this.actors)actor.pos.y=this.collision.ground(actor.pos.x,actor.pos.z,actor.pos.y,.29);
   if(snapshot)this.restore(snapshot);else{this.refreshDynamic();this.collision.actors=this.actors;this.validateActorPositions(true);}
  }
- refreshDynamic(){this.collision.dynamic=[...this.tanks.map(tankBounds),...this.fieldGuns.flatMap(fieldGunBounds)];}
+ refreshDynamic(){this.briefingDoor.sync(this.director,this.time);this.collision.dynamic=[...this.tanks.map(tankBounds),...this.fieldGuns.flatMap(fieldGunBounds),...this.briefingDoor.colliders];}
  breakObstacle(id){
   const box=this.layout.find(b=>b.id===id&&b.breakable);if(!box||this.destroyedObstacles.includes(id))return false;
   this.destroyedObstacles.push(id);this.collision.boxes=this.layout.filter(b=>!this.destroyedObstacles.includes(b.id));this.nav.invalidate(box);
@@ -57,14 +58,15 @@ export class Simulation {
   if(!this.collision.recover(actor,1.25))throw new LocalizedError('error.spawn',{id:actor.id});
   this.npcs.push(actor);this.actors=[this.player,...this.npcs];this.collision.actors=this.actors;
  }
- tick(dt,input){if(this.player.hp<=0||this.director.phase===PHASE.COMPLETE)return;dt=Math.min(dt,.05);this.time+=dt;this.player.update(this,dt,input);if(this.player.collisionBlocked)throw new LocalizedError('error.playerPosition');this.refreshDynamic();this.collision.actors=this.actors;
-  this.navBudget+=dt;if(this.navBudget>=.12){this.navBudget=0;this.nav.process(2);}
+ tick(dt,input){if(this.player.hp<=0||this.director.phase===PHASE.COMPLETE)return;dt=Math.min(dt,.05);this.time+=dt;this.briefingDoor.sync(this.director,this.time);this.player.update(this,dt,input);if(this.player.collisionBlocked)throw new LocalizedError('error.playerPosition');this.refreshDynamic();this.collision.actors=this.actors;
+  this.nav.processBudget(32);
   for(const n of this.npcs)updateSoldier(this,n,dt);for(const t of this.tanks){updateTank(this,t,dt);this.refreshDynamic();}this.refreshDynamic();for(const g of this.fieldGuns)updateFieldGun(this,g,dt);updateGrenades(this,dt);updateShells(this,dt);updateAirSupport(this,dt);if(this.player.hp>0)this.director.update(this,dt);
   for(const noise of this.noises)noise.ttl-=dt;this.noises=this.noises.filter(n=>n.ttl>0);
  }
  /** The only HP commit point. Callers supply base damage, never a pre-scaled hit. */
  damage(target,amount,source,context={kind:'melee'}){
   if(!target||target.hp<=0||!Number.isFinite(amount)||amount<=0||!source||target.faction===source.faction)return 0;
+  const hpBefore=target.hp;
   const kind=context.kind||'melee';
   if(!['bullet','explosion','melee'].includes(kind))throw new TypeError(`Invalid damage kind ${kind}`);
   if(source.id==='player'&&target.faction==='de'&&this.director.phase===PHASE.BRIEFING)this.director.alert(this);
@@ -87,7 +89,10 @@ export class Simulation {
     if(target.faction==='uk')this.stats.alliedLost++;else this.stats.enemyLost++;
     if(source.id==='player')this.stats.kills++;
    }
-  }return result;
+  }
+  const actualDamage=hpBefore-target.hp;
+  if(source.id==='player'&&actualDamage>0)this.emit('combat-feedback',{feedbackId:++this.feedbackSerial,sourceId:source.id,targetId:target.id,damage:actualDamage,kind,killed:target.hp<=0,...(kind==='bullet'?{hitPart:context.hitPart}: {})});
+  return result;
  }
  nearbyItem(){return this.items.filter(i=>!i.used&&canReach(this,{...i.pos,y:i.pos.y+.3},2.1)).sort((a,b)=>flatDist(a.pos,this.player.pos)-flatDist(b.pos,this.player.pos))[0];}
  interact(){if(this.director.interact(this))return;const item=this.nearbyItem();if(!item)return;
@@ -128,8 +133,8 @@ export class Simulation {
   this.destroyedObstacles=s.destroyedObstacles;this.collision.boxes=this.layout.filter(b=>!this.destroyedObstacles.includes(b.id));
   for(const id of this.destroyedObstacles)this.nav.invalidate(this.layout.find(b=>b.id===id));
   this.items=s.items;this.director.restore(s.director);this.stats=s.stats;this.actors=[this.player,...this.npcs];
-  this.grenades=[];this.shells=[];this.events=[];this.noises=[];this.navBudget=0;this.collision.actors=this.actors;this.refreshDynamic();
-  this.nav.requests.length=0;this.nav.coverOwners.clear();for(const c of this.nav.cover)c.owner=null;
+  this.feedbackSerial=0;this.grenades=[];this.shells=[];this.events=[];this.noises=[];this.navBudget=0;this.collision.actors=this.actors;this.refreshDynamic();
+  this.nav.activeJob=null;this.nav.search=null;this.nav.requests.length=0;this.nav.coverOwners.clear();for(const c of this.nav.cover)c.owner=null;
   for(const n of this.npcs){
    if(n.coverId&&n.hp>0){const cover=this.nav.cover.find(c=>c.id===n.coverId);if(!cover)throw new LocalizedError('error.cover');this.nav.reserveCover(n,cover);}
    else n.coverId=null;

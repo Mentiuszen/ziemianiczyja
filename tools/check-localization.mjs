@@ -32,7 +32,7 @@ async function scan(dir){for(const entry of await readdir(dir,{withFileTypes:tru
   referenceCount++;assert.ok(Object.hasOwn(CATALOGUES.en,match[1]),`Missing static key ${match[1]} in ${path}`);
  }
  for(const match of source.matchAll(/['"](save\.[A-Za-z]+)['"]/g))assert.ok(Object.hasOwn(CATALOGUES.en,match[1]),`Missing validation key ${match[1]}`);
- for(const match of source.matchAll(/(label|hint|title|text)\s*:\s*['"]([A-Za-z][A-Za-z ]{5,})['"]/g)){
+ for(const match of source.matchAll(/\b(label|hint|title|text)\s*:\s*['"]([A-Za-z][A-Za-z ]{5,})['"]/g)){
   // These legacy tokens drive render budgets; the UI displays quality.<id> instead.
   const internalQuality=path.pathname.endsWith('/render/quality.js')&&match[1]==='label'&&['Low','Medium','High','Ultra'].includes(match[2]);
   assert.ok(internalQuality,`Unkeyed presentation field ${match[2]} in ${path}`);

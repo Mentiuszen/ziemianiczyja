@@ -39,7 +39,7 @@ export class Effects {
   if(e.type==='breach'){for(let i=0;i<8;i++)this.particle(e.pos,'debris',.7,.65,{x:(i-4)*.7,y:1.2,z:.8});}
   if(e.type==='tank-hit'){this.particle(e.pos,'flash',.48,.09);this.particle(e.pos,'dust',.70,1.2,{x:.1,y:.5,z:.1});}
  }
- update(world,dt){this.world=world;this.trauma=Math.max(0,this.trauma-dt*2.6);let keep=0;
+ update(world,dt,poses){this.world=world;this.trauma=Math.max(0,this.trauma-dt*2.6);let keep=0;
   for(const p of this.active){p.ttl-=dt;if(p.ttl<=0){this.release(p.kind,p.mesh);continue;}const t=1-p.ttl/p.life;
    if(p.kind==='dust'){p.mesh.position.x+=p.vx*dt;p.mesh.position.y+=p.vy*dt;p.mesh.position.z+=p.vz*dt;p.vx*=Math.exp(-dt*2);p.vz*=Math.exp(-dt*2);p.mesh.scaling.setAll(p.size*(1+t*2.5));p.mesh.visibility=Math.min(1,t*15)*(1-t)*.52;}
    if(p.kind==='debris'){p.vy-=12*dt;p.mesh.position.x+=p.vx*dt;p.mesh.position.y+=p.vy*dt;p.mesh.position.z+=p.vz*dt;p.mesh.rotation.x+=dt*7;p.mesh.rotation.z+=dt*5;const floor=world.terrain.height(p.mesh.position.x,p.mesh.position.z)+.027;if(p.mesh.position.y<floor){p.mesh.position.y=floor;p.vy=Math.abs(p.vy)*.25;p.vx*=.35;p.vz*=.35;}p.mesh.visibility=Math.min(1,p.ttl*3);}
@@ -47,7 +47,7 @@ export class Effects {
    if(p.kind==='mark')p.mesh.visibility=Math.min(.65,p.ttl/8);
    this.active[keep++]=p;
   }this.active.length=keep;
-  const live=new Set();for(const p of [...world.grenades,...world.shells,...world.air.bombs]){live.add(p.id);let mesh=this.projectiles.get(p.id);if(!mesh){mesh=this.acquire('projectile');if(!mesh)continue;this.projectiles.set(p.id,mesh);}mesh.position.set(p.pos.x,p.pos.y,p.pos.z);mesh.rotation.x+=dt*3;mesh.rotation.z+=dt*2;}
+  const live=new Set();for(const p of [...world.grenades,...world.shells,...world.air.bombs]){live.add(p.id);let mesh=this.projectiles.get(p.id);if(!mesh){mesh=this.acquire('projectile');if(!mesh)continue;this.projectiles.set(p.id,mesh);}const pos=poses?.get(p.id)?.pos||p.pos;mesh.position.set(pos.x,pos.y,pos.z);mesh.rotation.x+=dt*3;mesh.rotation.z+=dt*2;}
   for(const [id,mesh] of this.projectiles)if(!live.has(id)){this.release('projectile',mesh);this.projectiles.delete(id);}
  }
  dispose(){this.active.length=0;this.projectiles.clear();for(const pool of Object.values(this.pools))pool.dispose();for(const mesh of Object.values(this.templates))mesh.dispose();for(const m of [this.smokeMat,this.fireMat,this.tracerMat,this.markMat])m.dispose();}

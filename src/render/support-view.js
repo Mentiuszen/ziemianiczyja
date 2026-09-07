@@ -1,3 +1,4 @@
+import {BriefingDoorView} from './briefing-door-view.js';
 import {Geometry,boxMesh} from './geometry.js';
 import {StandardMaterial,Texture,Color3} from './babylon.js';
 import {assetURL} from './assets.js';
@@ -6,6 +7,7 @@ import {HQ} from '../data/world-map.js';
 /** Render-only support layer. Ownership of trajectories and damage remains in Simulation. */
 export class SupportView {
  constructor(scene,assets,mats,world,language='pl'){
+  this.door=new BriefingDoorView(scene,mats,world.briefingDoor);
   this.scene=scene;this.assets=assets;this.mats=mats;this.guns=new Map();this.planes=new Map();this.wire=new Map();this.lastDust=-1;
   for(const g of world.fieldGuns){const m=assets.instantiate(g.model,g.id);for(const mesh of m.meshes)mesh.receiveShadows=true;this.guns.set(g.id,m);}
   for(const b of world.layout.filter(b=>b.breakable)){
@@ -28,17 +30,18 @@ export class SupportView {
   const papers=new Geometry();for(let i=0;i<4;i++)papers.box(31.82+i*.025,y+1.17+i*.006,-5.48,.30,.008,.30,-.15);papers.mesh('briefing-orders',scene,mats.paper);
  }
  setLanguage(language){this.mapMaterial.diffuseTexture=this.mapTextures[language==='en'?'en':'pl'];}
- sync(w,dt,effects,profile){
+ sync(w,dt,effects,profile,poses){
+  this.door.sync(w.briefingDoor);
   for(const [id,mesh] of this.wire)mesh.setEnabled(!w.destroyedObstacles.includes(id));
-  for(const g of w.fieldGuns){const model=this.guns.get(g.id);model.root.position.set(g.pos.x-Math.sin(g.yaw)*g.recoil*.07,g.pos.y,g.pos.z-Math.cos(g.yaw)*g.recoil*.07);model.root.rotation.y=g.yaw;}
+  for(const g of w.fieldGuns){const model=this.guns.get(g.id),gp=poses?.get(g.id)||g;model.root.position.set(gp.pos.x-Math.sin(gp.yaw)*g.recoil*.07,gp.pos.y,gp.pos.z-Math.cos(gp.yaw)*g.recoil*.07);model.root.rotation.y=gp.yaw;}
   const live=new Set();for(const p of w.air.planes){
    live.add(p.id);let model=this.planes.get(p.id);
    if(!model){model=this.assets.instantiate(p.model,p.id);const anchor=model.root.getDescendants().find(n=>n.name.endsWith(':Propeller'));
     if(anchor){const prop=new Geometry();prop.ellipsoid(0,0,0,1.03,.065,.025,12,6);prop.ellipsoid(0,0,0,.065,1.03,.025,12,6);const mesh=prop.mesh(p.id+'-propeller',this.scene,this.mats.darkwood);mesh.parent=anchor;model.propeller=mesh;}
     this.planes.set(p.id,model);
    }
-   model.root.position.set(p.pos.x,p.pos.y,p.pos.z);model.root.rotation.set(-Math.atan2(p.velocity.y,Math.hypot(p.velocity.x,p.velocity.z)),p.yaw,p.bank+Math.sin(p.age*.6)*.02);
-   if(model.propeller)model.propeller.rotation.z=p.age*73;
+   const pp=poses?.get(p.id)||p;model.root.position.set(pp.pos.x,pp.pos.y,pp.pos.z);model.root.rotation.set(-Math.atan2(p.velocity.y,Math.hypot(p.velocity.x,p.velocity.z)),pp.yaw,pp.bank+Math.sin(pp.age*.6)*.02);
+   if(model.propeller)model.propeller.rotation.z=pp.age*73;
   }
   for(const [id,model] of this.planes)if(!live.has(id)){model.entry.dispose();model.root.dispose();this.planes.delete(id);}
   if(dt>0&&w.time>=this.lastDust){
@@ -50,5 +53,5 @@ export class SupportView {
    }
   }
  }
- dispose(){for(const model of [...this.guns.values(),...this.planes.values()]){model.entry.dispose();model.root.dispose();}this.guns.clear();this.planes.clear();this.wire.clear();}
+ dispose(){this.door.dispose();for(const model of [...this.guns.values(),...this.planes.values()]){model.entry.dispose();model.root.dispose();}this.guns.clear();this.planes.clear();this.wire.clear();}
 }

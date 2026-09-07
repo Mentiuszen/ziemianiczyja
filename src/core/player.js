@@ -1,3 +1,4 @@
+import {resolvePlayerLook} from './player-look.js';
 import {message} from '../i18n/message.js';
 import {HQ} from '../data/world-map.js';
 import {Health} from '../combat/health.js';
@@ -6,10 +7,10 @@ import {v3,clamp,direction,norm,add,mul,flatDist} from './math.js';
 import {eye} from '../world/collision.js';
 import {fireBullet} from '../combat/ballistics.js';
 export class Player {
- constructor(terrain){this.id='player';this.faction='uk';this.pos=v3(HQ.spawn.x,terrain.height(HQ.spawn.x,HQ.spawn.z),HQ.spawn.z);this.yaw=.15;this.pitch=0;this.stance='stand';this.vy=0;this.grounded=true;this.health=new Health();this.weapons=[new Weapon('smle',10,60),new Weapon('webley',6,24)];this.slot=0;this.grenades=3;this.stamina=6;this.ads=false;this.speed=0;this.recoil=0;this.damageYaw=0;this.hurt=0;this.hitMarker=0;this.meleeLeft=0;this.grenadeLeft=0;this.stepTime=0;this.vaultLeft=0;this.distance=0;}
+ constructor(terrain){this.id='player';this.faction='uk';this.pos=v3(HQ.spawn.x,terrain.height(HQ.spawn.x,HQ.spawn.z),HQ.spawn.z);this.yaw=.15;this.pitch=0;this.stance='stand';this.vy=0;this.grounded=true;this.health=new Health();this.weapons=[new Weapon('smle',10,60),new Weapon('webley',6,24)];this.slot=0;this.grenades=3;this.stamina=6;this.ads=false;this.speed=0;this.recoil=0;this.damageYaw=0;this.hurt=0;this.meleeLeft=0;this.grenadeLeft=0;this.stepTime=0;this.vaultLeft=0;this.distance=0;}
  get hp(){return this.health.hp;}get weapon(){return this.weapons[this.slot];}
- update(world,dt,input={}){this.health.tick(dt);for(const w of this.weapons)w.tick(dt);this.hurt=Math.max(0,this.hurt-dt);this.hitMarker=Math.max(0,this.hitMarker-dt);this.recoil*=Math.exp(-dt*12);this.meleeLeft=Math.max(0,this.meleeLeft-dt);this.grenadeLeft=Math.max(0,this.grenadeLeft-dt);this.vaultLeft=Math.max(0,this.vaultLeft-dt);
-  const desiredYaw=this.yaw+(Number.isFinite(input.lookX)?input.lookX:0);if(this.stance!=='prone'||world.collision.canTurn(this,desiredYaw))this.yaw=desiredYaw;this.pitch=clamp(this.pitch+(input.lookY||0),-1.4,1.4);this.ads=!!input.aim;
+ update(world,dt,input={}){this.health.tick(dt);for(const w of this.weapons)w.tick(dt);this.hurt=Math.max(0,this.hurt-dt);this.recoil*=Math.exp(-dt*12);this.meleeLeft=Math.max(0,this.meleeLeft-dt);this.grenadeLeft=Math.max(0,this.grenadeLeft-dt);this.vaultLeft=Math.max(0,this.vaultLeft-dt);
+  const look=resolvePlayerLook(this,world.collision,input);this.yaw=look.yaw;this.pitch=look.pitch;this.ads=!!input.aim;
   if(input.slot!==undefined&&input.slot!==this.slot){this.weapon.cancelReload();this.slot=clamp(input.slot,0,1);world.emit('switch',{owner:this.id});}
   if(input.wheel){this.weapon.cancelReload();this.slot=1-this.slot;world.emit('switch',{owner:this.id});}
   const posture=input.prone?(this.stance==='prone'?'stand':'prone'):input.crouch?(this.stance==='crouch'?'stand':'crouch'):null;
@@ -40,6 +41,6 @@ export class Player {
   // Copy the saved contract, not arbitrary keys onto a live object with methods/getters.
   this.pos={...data.pos};for(const key of ['yaw','pitch','stance','vy','slot','grenades','stamina','meleeLeft','grenadeLeft','distance'])this[key]=data[key];
   this.health=new Health(data.health.hp,data.health.delay);this.weapons=data.weapons.map(Weapon.restore);
-  this.grounded=false;this.ads=false;this.hurt=0;this.recoil=0;this.stepTime=0;this.hitMarker=0;this.damageYaw=0;this.vaultLeft=0;this.moving=false;this.moveIntent=false;this.lastSafePosition=null;this.collisionBlocked=false;
+  this.grounded=false;this.ads=false;this.hurt=0;this.recoil=0;this.stepTime=0;this.damageYaw=0;this.vaultLeft=0;this.moving=false;this.moveIntent=false;this.lastSafePosition=null;this.collisionBlocked=false;
  }
 }

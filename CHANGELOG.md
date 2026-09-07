@@ -1,3 +1,143 @@
+# Zmiany v0.4.5 — rewizja 2: HUD, napisy i drzwi odprawy
+
+**Wersja: 0.4.5, UI_REVISION: 2. Baza: dostarczone archiwum `ZiemiaNiczyja 0.4.5 rew1.zip`.**
+To poprawki rew1, nie nowa wersja 0.4.6. Wpisy wcześniejszych wydań poniżej pozostają historyczne.
+
+## HUD i napisy
+
+- Usunięto dodatkowy poziomy pasek HP z markupu, aktualizacji i CSS. Zdrowie pokazują
+  krzyż i liczba; pod nimi pozostaje tylko pasek wytrzymałości.
+- Pasek wytrzymałości biegnie od lewego brzegu pola ikony postawy do prawego brzegu
+  liczby HP. Szerokość wynika z rzeczywistych rozmiarów całego rzędu, także przy
+  różnych skalach postawy i HP. Lokalna skala wytrzymałości reguluje grubość paska,
+  nie rozrywa tego wyrównania. Wyświetlanie jednej/dwóch/trzech cyfr nie przesuwa końca.
+- Zastąpiono liniowe „patyczaki” trzema oryginalnymi, pełnymi sylwetkami żołnierza
+  z hełmem i karabinem: stojącego, kucającego i leżącego. Bez trójkąta, tła ani
+  kopiowania grafiki z CoD. Ikona nadal wynika z zatwierdzonej postawy gracza.
+- Ikona broni i amunicja tworzą zwarty rząd z odstępem 10 px przy skali 100%.
+  Usunięto rozpychanie rzędu i stałą pustą szerokość modułu. Przycięto marginesy
+  viewBox dotychczasowych SVG broni; samych kształtów broni nie podmieniano.
+- Napisy mają wyróżnione turkusowo imię mówcy i jasną wypowiedź w tej samej linii,
+  z zawijaniem i ciemnym cieniem zamiast panelu tła. Tekst jest wstawiany do stałych
+  elementów przez textContent, nie interpretowany jako HTML. Komunikaty bez mówcy
+  nie odziedziczają nazwiska z poprzedniej kwestii. Zachowano PL/EN i opcję napisów.
+- Zachowano istniejący układ mierzący powiększone elementy, limit skali wynikowej 200%,
+  podpowiedzi interakcji, ostrzeżenie o niskim HP, minimapę i osobne skalowanie F3.
+
+## Odprawa i drzwi
+
+- W istniejącym wschodnim wyjściu pomieszczenia odprawy umieszczono drewniane,
+  dwuskrzydłowe drzwi z belkami, zawiasami i uchwytami. Wykorzystują istniejące
+  materiały i sześć partii geometrii, bez nowego pakietu modeli lub zależności.
+- Usunięto globalną interakcję pomijania odprawy i powtarzającą ją podpowiedź celu.
+  „Otwórz drzwi i pomiń odprawę” pojawia się dopiero w pobliżu drzwi, gdy gracz
+  jest zwrócony w ich stronę i nie oddziela go inna przeszkoda. Używany jest aktualnie
+  przypisany klawisz interakcji, nie zakodowane na sztywno E.
+- Interakcja uruchamia dotychczasowy start natarcia i otwiera skrzydła na zewnątrz
+  przez 0,65 s. Naturalny koniec odprawy i wcześniejszy alarm otwierają te same drzwi.
+  Ponowne naciśnięcie nie powtarza fazy ani gwizdka.
+- Zamknięte skrzydła mają rzeczywistą kolizję dla ruchu, nawigacji i pocisków.
+  Wizualizacja i kolizja używają wspólnych pozycji/kątów. Stan otwarcia wynika
+  z zapisywanych już fazy misji i czasu początku szturmu; bez nowej wersji zapisu,
+  kasowania checkpointów albo resetowania ustawień.
+- Testowy autoplayer podchodzi do drzwi i używa zwykłej interakcji. Ponawia trasę,
+  gdy rozpoczęcie natarcia wyprzedza koniec animacji otwarcia. Nie zmieniono przez
+  to zachowania produkcyjnego AI, obrażeń, poziomów trudności ani liczby żołnierzy.
+
+## Utrzymanie
+
+- Dodano regresje układu HP/wytrzymałości, bezpiecznych napisów, fizycznych drzwi,
+  końca/skipu/alarmu odprawy, stanu zapisu, geometrii i wychodzenia przez ruchome skrzydła.
+- Zaktualizowano metadane rewizji, manifest zasobów UI, opisy autorstwa oraz instrukcję.
+  Zachowano grafikę nieba i inne zmiany dostarczonego rew1.
+- Raport faktycznie wykonanych prób i ograniczeń: `docs/V0_4_5_REW2_IMPLEMENTATION.md`.
+  Zmiany nie zawierają deklaracji pomiaru na fizycznym GPU ani testu gry przy 165 Hz.
+
+---
+
+# Zmiany v0.4.5 — HUD, informacje o walce i płynność
+
+**Wersja: 0.4.5, UI_REVISION: 1. Ostatnia aktualizacja funkcjonalna serii 0.4.**
+Baza: GitHub `Mentiuszen/ziemianiczyja`, commit
+`a567537c528e46b89fac0ff94555460f83bc864c` („fix tatooine”).
+Paczka aktualizacyjna nie publikuje gry ani nie zmienia repozytorium zdalnego.
+
+## HUD i opcje
+
+- Dodano skalę globalną i 18 niezależnych mnożników modułów HUD-u: 50–200%,
+  z limitem **wynikowym 200%**. Wynik i osiągnięcie limitu są widoczne w opcjach.
+  Menu oraz F3 nie są skalowane. Reset HUD-u zachowuje kampanię, język, dźwięk i klawisze.
+- Układ rezerwuje rzeczywiste rozmiary powiększonych modułów, zawija tekst i przenosi
+  elementy między strefami. Na zbyt małym ekranie ogranicza treści pomocnicze;
+  status kompaktowy jest opisany w opcjach. Nie zmienia zapisanej skali po cichu.
+- Minimapa ma bufor dopasowany do końcowego rozmiaru i DPR (limit 2), a nie tylko
+  rozciągnięty obraz. Niewidoczna przez układ minimapa nie jest ponownie rysowana.
+- Dodano trzy oryginalne wektorowe ikony postawy obok zdrowia. Odczytują zatwierdzony
+  stan gracza, również gdy kolizja nie pozwala wstać.
+
+## Informacje o walce
+
+- Dopracowano czerwone krawędzie ekranu przy obrażeniach, z wolnym środkiem i obsługą
+  ograniczenia animacji. Usunięto filtr saturacji nakładany na cały Canvas WebGL.
+- Ostrzeżenie „Jesteś ranny! Znajdź osłonę!” / “You’re hurt! Get to cover!” pojawia się
+  wyłącznie u żywego gracza poniżej 20% HP. Pozostaje czytelne przy `damageEffects=0`.
+- Zastąpiono stary celownik wyborem: kropka, krzyżak, krzyżak z kropką, brak.
+  Dostępny jest podgląd w opcjach. Wybór nie wpływa na rozrzut ani obrażenia.
+- Hitmarker jest oddzielną warstwą działającą również w ADS i przy wyłączonym celowniku.
+  Cztery kreski są odsunięte od środka; odległość uwzględnia rozmiar celownika.
+- Białe potwierdzenie trafienia i czerwone zabójstwa pochodzą ze wspólnego punktu
+  zatwierdzenia obrażeń. Obejmują pocisk, melee i granat gracza; nie potwierdzają
+  friendly fire, trafień w zwłoki ani zabójstw dokonanych przez NPC.
+  Kolejne zwykłe trafienie nie kasuje aktywnego czerwonego potwierdzenia.
+- Kierunkowe znaczniki wskazują rzeczywistą pozycję wrogiego granatu lub kierunek
+  poza ekranem, także za plecami. Uwzględniają zasłanianie eksplozji, wysokość,
+  zatwierdzoną kamerę, kilka zagrożeń, dodatkowy licznik oraz usunięcie po wybuchu.
+
+## F3 i czas klatki
+
+- Usunięto CPU/GPU z opcji i zwykłego overlayu. Zachowano prosty FPS.
+  Stare zapisane `showCpu`/`showGpu` są ignorowane bez resetowania preferencji.
+- F3 pokazuje średnią, p95/p99 czasu klatki, CPU i GPU, maksimum, rozbicie CPU,
+  odstępy RAF, kroki symulacji, porzucony czas, nawigację, przekroczenia budżetu
+  i wykres ostatnich klatek. Zachowano informacje o scenie, misji i wsparciu.
+- Okno próbek wynosi do 10 s, publikacja co 250 ms. p99 wymaga co najmniej 100
+  ważnych próbek; mniejsze próby są jawnie oznaczane. FPS odpowiadający p99 czasu
+  klatki nie jest podpisywany jako średnia „1% low”.
+- GPU używa surowych, asynchronicznych wyników z ID klatki i sesji. Brak rozszerzenia,
+  disjoint i utrata kontekstu nie stają się zerowym czasem GPU. Rytm próbkowania
+  domyślnie zmienia się 3/4/5 klatek, bez używania RNG gry.
+- F4 resetuje pomiar, F6 rozpoczyna/zatrzymuje rejestrację, F7 eksportuje JSON.
+  Bufory są ograniczone; eksport ujawnia obcięcie najstarszych próbek.
+
+## Płynność i utrzymanie
+
+- Dodano interpolację transformacji między krokami symulacji 60 Hz. Nie interpoluje
+  HP, amunicji, trafień ani AI i nie klonuje checkpointów co klatkę.
+  Obrót myszy ma odczyt prezentacyjny bez podwójnego zużycia delty; FOV i wysokość
+  oka używają rzeczywistego czasu prezentacji, bez minimum 16 ms na render.
+- Nawigacja wykonuje porcje pracy zamiast dwóch pełnych A* w jednym skoku. Zimne
+  rozwinięcia grafu kosztują więcej budżetu niż cache. Zachowano priorytety,
+  generacje/anulowanie i kontrolę aktualnych przeszkód przed przyjęciem ścieżki.
+- Bufory i kopiec A* są wielokrotnego użytku. Zniszczenie pojedynczego drutu
+  unieważnia lokalne krawędzie, zamiast czyścić cache całego pola walki.
+- Stały HUD ma cache geometrii; ruch świata nie uruchamia kolejnego pełnego pomiaru DOM.
+- Naprawiono kontrolę zasobów: baza nie zawierała `authoring/ui/manifest.json`.
+  Sprawdzany manifest znajduje się teraz przy rzeczywiście dostarczanych zasobach,
+  w `public/assets/ui/manifest.json`; weryfikacja hashy nie została wyłączona.
+- Zachowano obecne tła, modele, tekstury świata, vendor, profile obrażeń, liczbę
+  jednostek, wersję zapisu i schemat misji. Nie dodano zależności npm.
+
+## Weryfikacja i granice wyniku
+
+Wyniki: `docs/V0_4_5_VALIDATION.json`, `docs/V0_4_5_IMPLEMENTATION.md` oraz surowe
+raporty w `docs/validation/v045/`. Testy logiki i DOM nie zastępują odbioru GPU.
+W tym środowisku lokalny HTTP jest blokowany, a WebGL2 jest niedostępny.
+Pełny obraz gry, sterownik i p95/p99 na fizycznym GPU wymagają lokalnej weryfikacji.
+Porównanie Node wykazało mniejsze najdłuższe skoki CPU; p95/p99 nie poprawiły się
+w każdej próbie. Nie deklarujemy usunięcia wszystkich mikroprzycięć ani stałych 165 FPS.
+
+---
+
 # Zmiany v0.4.4 — rewizja 3A (grafiki kampanii i ładowania)
 
 **Wersja: 0.4.4, UI_REVISION: 3. Bez publikacji.**
