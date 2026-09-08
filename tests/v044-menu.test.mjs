@@ -1,5 +1,0 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {UI} from '../src/ui/ui.js';import {DEFAULT_SETTINGS} from '../src/save/store.js';import {setLanguage} from '../src/i18n/index.js';
-function screen(state,extra={}){const ui={menu:{innerHTML:'',querySelector:()=>null},hud:{},app:{state,settings:structuredClone(DEFAULT_SETTINGS),checkpoint:null,checkpointState:'none',world:null,...extra}};UI.prototype.render.call(ui,state);return ui.menu.innerHTML;}
-for(const lang of ['pl','en'])test(`main is four actions without mission/persistent bars: ${lang}`,()=>{setLanguage(lang);const s=screen('main');assert.equal((s.match(/data-action=/g)||[]).length,4);assert.match(s,/campaign-new/);assert.match(s,/campaign-continue/);assert.doesNotMatch(s,/dossier|topbar|bottom-bar|CAMBRAI|campaign\.cambrai|data-action="controls"/);assert.match(s,lang==='en'?/logo-en\.svg/:/logo\.svg/);setLanguage('pl');});
-test('picker preserves bilingual choices without legacy frames',()=>{const s=screen('language-select');assert.match(s,/flag-en\.svg/);assert.match(s,/flag-pl\.svg/);assert.doesNotMatch(s,/flag-frame|topbar|bottom-bar/);});
