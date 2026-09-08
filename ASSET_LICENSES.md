@@ -17,7 +17,7 @@ Rewizja 3 dodaje angielski logotyp `logo-en.svg`: ten sam motyw i kontury DejaVu
 - Nowy logotyp: ścieżki liter DejaVu Sans Condensed Bold z własnym układem, zużyciem i sylwetką. Zachowano `public/assets/ui/licenses/DejaVu-LICENSE.txt`; nie dołączono plików fontów.
 - Podkład geograficzny: wycinek GSHHG 2.3.6, rozdzielczość intermediate, dostarczony przez basemap-data 2.0.0. Dane wybrzeża, jezior i rzek oraz ich pochodne są objęte LGPL-3.0-or-later, oddzielnie od licencji kodu gry. W paczce i release są teksty GPL/LGPL oraz edytowalny wycinek `public/assets/ui/maps/western-front-geography.json`; jego SVG można niezależnie podmienić. Nie kopiowano współczesnych granic państw.
 - Rzeźba podkładu: regionalny kadr `shadedrelief.jpg` z basemap-data, dostarczony pod MIT; zachowano `Basemap-data-MIT.txt` i źródłowy kadr.
-- Datowane linie frontu, strzałki, oznaczenia i logika ich wyboru: własna generalizacja, nie kopia mapy ani aktywów Call of Duty. Opis źródeł historycznych i ograniczeń: `docs/UI_ART.md`.
+- Datowane linie frontu, strzałki, oznaczenia i logika ich wyboru: własna generalizacja, nie kopia mapy ani aktywów Call of Duty. Opis źródeł historycznych i ograniczeń: `docs/PROJECT.md`.
 
 Starsze noty poniżej dotyczą poprzednich dostaw; pierwsza grafika main 426×352 nie jest już bieżącym tłem.
 
@@ -30,10 +30,12 @@ fontów systemowych. Nowe modele, materiały i efekty są przygotowane lokalnie 
 |---|---|---|
 | 6 plików `british*.glb`, `german*.glb` | projekt z pomocą AI; poprawione eksporty Blender/ZiemiaNiczyja/models | Oryginalne części projektu MIT w zakresie praw podlegających licencjonowaniu; fragmenty uszu/dłoni MakeHuman CC0; 3 LOD/19 kości/13 klipów |
 | SMLE, Gewehr, Webley, Lewis, hands | generate_weapons_v03.py | MIT; własne siatki i atlas; zastępują starsze proste bryły |
-| mark-iv.glb | generate_assets.py + generate_tank_v03.py | MIT; własne profile, poprawiona triangulacja, atlas i detale |
+| mark-iv.glb | authoring/vehicles/build-mark-iv.py, refine-mark-iv.py, materials_mark_iv.py, bake_pbr.py | Oryginalna geometria projektu, pięć stanowisk, dwie pętle po 89 ogniw, trzy LOD, wypalone mapy base/normal/ORM. Licencja projektu w zakresie praw podlegających licencjonowaniu; fotografie muzealne wyłącznie jako referencje, bez kopiowania do tekstur |
+| cambrai-overcast.hdr | authoring/vehicles/review-pbr-lighting.py | Oryginalne proceduralne promieniowanie nieba i gruntu dla PBR; bez zewnętrznej fotografii HDR |
 | Atlasy infantry albedo/normal/ORM | generate_characters.py | MIT; proceduralna tkanina, skóra, metal; kopie source i models/textures |
 | Cztery atlasy `infantry-*-refined-*.png` / `infantry-refined-*.png` | Blender/ZiemiaNiczyja; tekstury twarzy wygenerowane na potrzeby projektu | 2048 × 2048, osobne twarze obu frakcji; bez zasobów komercyjnych gier |
 | Earth/wood/brick/bags/concrete, normal/ORM | generate_materials_v03.py | MIT; własny szum, wzory i obróbka; albedo/normal używane, ORM otoczenia pomocnicze |
+| `blast-dust-volume.png` | `authoring/effects/build-dust-sprite.py`, edytowalny `Dust_Impact_050.blend` | MIT; własny render objętości pyłu dla efektów trafienia |
 | Grass-tuft, blast-smoke, scorch | generate_materials_v03.py | MIT; autorskie PNG alpha, bez fotografii |
 | Sky-v02 i odziedziczone tekstury | generate_sky.py, generate_atmosphere.py, generate_assets.py | MIT; autorski szum/rysowanie, bez zewnętrznych zdjęć |
 | Modele proceduralne świata | world/layout.js, render/landscape.js, geometry-data.js | MIT; własne siatki i rozmieszczenie |
@@ -75,7 +77,7 @@ Autorzy: The Lit Project Contributors; Google LLC. Licencja BSD-3-Clause. Źród
 
 ## Źródła historyczne
 
-Linki w `docs/HISTORY.md` i `docs/CHARACTER_ART.md` służą wyłącznie weryfikacji tekstu i nie oznaczają licencji na muzealne multimedia. Żadne zdjęcie ze wskazanych stron nie zostało dołączone.
+Linki w `docs/PROJECT.md` i `docs/PROJECT.md` służą wyłącznie weryfikacji tekstu i nie oznaczają licencji na muzealne multimedia. Żadne zdjęcie ze wskazanych stron nie zostało dołączone.
 
 
 ## Aktywa UI 0.4.4
@@ -89,7 +91,7 @@ Nie ma osobnego zachowanego mastera/rejestru pierwotnej generacji; źródło prz
 załącznikiem i prawa do ilustracji nie zostały niezależnie potwierdzone. Nie nadajemy
 mu przez tę notę licencji MIT. Przed publikacją potwierdzić pochodzenie lub zastąpić
 zatwierdzonym własnym obrazem. Edytowalne źródła: `authoring/ui/`; szczegóły w
-`docs/UI_ART.md` (dokument developerski, poza dist). Mapa jest autorskim schematem,
+`docs/PROJECT.md` (dokument developerski, poza dist). Mapa jest autorskim schematem,
 nie odrysowaniem arkusza muzealnego ani zasobem Call of Duty.
 
 ## Rewizja 0.4.5 rew2 — HUD i drzwi

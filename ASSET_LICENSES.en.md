@@ -17,7 +17,7 @@ Revision 3 adds the English `logo-en.svg`: the existing motif and DejaVu outline
 - New wordmark: DejaVu Sans Condensed Bold letter outlines with original layout, wear and soldier silhouette. The existing DejaVu license notice is retained. No font files are included.
 - Geographic base: GSHHG 2.3.6, intermediate resolution, distributed by basemap-data 2.0.0. Coast/lake/river data and derived geography carry LGPL-3.0-or-later separately from the game code. GPL/LGPL texts and editable regional coordinates accompany the release at `public/assets/ui/maps/western-front-geography.json`; the map SVG can be replaced independently. No modern international borders are rendered.
 - Relief: regional crop of basemap-data `shadedrelief.jpg`, distributed under MIT. The MIT notice and regional source crop are retained.
-- Dated front lines, arrows, symbols and selection logic are original generalizations, not copied Call of Duty assets. Historical references and precision limitations are described in `docs/UI_ART.md`.
+- Dated front lines, arrows, symbols and selection logic are original generalizations, not copied Call of Duty assets. Historical references and precision limitations are described in `docs/PROJECT.md`.
 
 Older notices below concern prior deliveries. The first 426×352 main crop is no longer the active backdrop.
 
@@ -32,10 +32,12 @@ No assets were downloaded from commercial games or marketplaces. No museum photo
 |---|---|---|
 | Six `british*.glb`, `german*.glb` files | Project work with AI assistance; refined Blender/ZiemiaNiczyja/models exports | Original project parts under MIT to the extent rights are licensable; MakeHuman CC0 ear/hand components; 3 LODs / 19 bones / 13 clips |
 | SMLE, Gewehr, Webley, Lewis, hands | `generate_weapons_v03.py` | MIT; original meshes and atlas; replaces the older simple shapes |
-| mark-iv.glb | `generate_assets.py` + `generate_tank_v03.py` | MIT; original profiles, improved triangulation, atlas and details |
+| mark-iv.glb | `authoring/vehicles/` Blender sources and export scripts | MIT; original articulated geometry, three LODs, baked base/normal/ORM PBR maps; final visual acceptance pending |
 | Infantry albedo/normal/ORM atlases | `generate_characters.py` | MIT; procedural cloth, skin and metal; copies in source and models/textures |
 | Four `infantry-*-refined-*.png` / `infantry-refined-*.png` atlases | Blender/ZiemiaNiczyja project; face textures generated for the project | 2048 × 2048, separate faces for both factions; no commercial-game assets |
 | Earth/wood/brick/bags/concrete, normal/ORM maps | `generate_materials_v03.py` | MIT; original noise, patterns and processing; albedo/normal maps are used, environment ORM is auxiliary |
+| `cambrai-overcast.hdr` | `authoring/vehicles/review-pbr-lighting.py` | MIT; original procedural field radiance, no photographs |
+| `blast-dust-volume.png` | `authoring/effects/build-dust-sprite.py`, editable `Dust_Impact_050.blend` | MIT; original neutral-lit volume render for impact VFX |
 | Grass-tuft, blast-smoke, scorch | `generate_materials_v03.py` | MIT; original alpha PNGs, no photographs |
 | Sky-v02 and inherited textures | `generate_sky.py`, `generate_atmosphere.py`, `generate_assets.py` | MIT; original noise/drawing, no external photographs |
 | Procedural world models | `world/layout.js`, `render/landscape.js`, `geometry-data.js` | MIT; original meshes and placement |
@@ -74,7 +76,7 @@ Authors: The Lit Project Contributors; Google LLC. BSD-3-Clause license. Source:
 
 ## Historical sources
 
-Links in `docs/HISTORY.md` / `docs/HISTORY.en.md` and `docs/CHARACTER_ART.md` are for verifying the text only; they do not imply a license to museum multimedia. No photographs from the referenced sites are included.
+Links in `docs/PROJECT.md` / `docs/PROJECT.md` and `docs/PROJECT.md` are for verifying the text only; they do not imply a license to museum multimedia. No photographs from the referenced sites are included.
 
 
 ## 0.4.4 interface assets
@@ -88,7 +90,7 @@ separate larger master or original generation record survived; provenance before
 the attachment and rights in the illustration were not independently verified.
 This notice does not assign it an MIT license. Confirm its provenance or replace
 it with an approved original before public distribution. Editable files are under
-`authoring/ui/`; `docs/UI_ART.md` describes them (developer-only, outside dist). The
+`authoring/ui/`; `docs/PROJECT.md` describes them (developer-only, outside dist). The
 map is an original schematic, not a traced museum sheet or a Call of Duty asset.
 
 ## 0.4.5 rew2 — HUD and doors
