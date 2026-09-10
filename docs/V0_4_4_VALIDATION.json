@@ -1,0 +1,149 @@
+{
+  "version": "0.4.4",
+  "date": "2026-09-06",
+  "baseCommit": "a3398c211292e1cd677478ad6c4d456b6d210193",
+  "status": "implementation delivered for local acceptance; no publication",
+  "environment": {
+    "node": "v22.16.0",
+    "chromium": "144.0.7559.96",
+    "python": "3.13.5",
+    "pillow": "12.3.0"
+  },
+  "baseline": {
+    "gitTrees": {
+      "commit": "a3398c211292e1cd677478ad6c4d456b6d210193",
+      "expected": {
+        "src": "223ba0d888f887b6af7fb2a0073627a16c2b0ba7",
+        "tests": "d70e22caa4e3c11ee75c55589a3f08e4f63b26e1",
+        "tools": "0558fcd96d47958e79f684078f740f35c286f72c",
+        "public": "c9136c66930423d81087d2c92167e5cde5dba436",
+        "vendor": "0c6aa8f94200a9ce12d9af23b95e3c61d39f93d7"
+      },
+      "actual": {
+        "src": "223ba0d888f887b6af7fb2a0073627a16c2b0ba7",
+        "tests": "d70e22caa4e3c11ee75c55589a3f08e4f63b26e1",
+        "tools": "0558fcd96d47958e79f684078f740f35c286f72c",
+        "public": "c9136c66930423d81087d2c92167e5cde5dba436",
+        "vendor": "0c6aa8f94200a9ce12d9af23b95e3c61d39f93d7"
+      }
+    },
+    "nodeTests": {
+      "passed": 274,
+      "failed": 0
+    }
+  },
+  "nodeTests": {
+    "command": "npm test",
+    "passed": 331,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "durationMs": 25258.75465
+  },
+  "check": {
+    "status": "PASS",
+    "syntaxJsMjsFiles": 85,
+    "gltfModels": 15,
+    "localeKeysEach": 463,
+    "localeSourceFiles": 73,
+    "uiAssetHashes": 11
+  },
+  "autoplay": {
+    "standard": {
+      "status": "PASS",
+      "complete": true,
+      "simulationSeconds": 161.73333333335418,
+      "checkpoints": 2
+    },
+    "destroyedTanks": {
+      "status": "PASS",
+      "complete": true,
+      "simulationSeconds": 158.3166666666848,
+      "checkpoints": 2
+    }
+  },
+  "build": {
+    "status": "PASS",
+    "files": 496,
+    "totalBytes": 51781361,
+    "reproducibleManifest": true,
+    "scope": "two final builds with updated runtime documents; exact manifest equality"
+  },
+  "http": {
+    "status": "PASS",
+    "configurations": 3,
+    "responses200": 96,
+    "intentional404": 3,
+    "webpMime": "image/webp",
+    "scope": "Python HTTP client, not browser execution or native IndexedDB"
+  },
+  "isolatedChromium": {
+    "status": "PASS",
+    "results": [
+      "options/gameplay",
+      "options/controls",
+      "options/audio",
+      "options/graphics",
+      "screen/paused",
+      "screen/ready",
+      "screen/dead",
+      "screen/complete",
+      "screen/error"
+    ],
+    "worldUnchanged": true,
+    "contactsPreserved": true,
+    "browserScope": "DOM + actual Simulation; view projection and persistence are fixtures, not WebGL/IndexedDB",
+    "hud-1280x720": {
+      "bottom": 321.328125,
+      "ammoTop": 558,
+      "overlap": false
+    },
+    "hud-844x390": {
+      "bottom": 264,
+      "ammoTop": 276,
+      "overlap": false
+    },
+    "hud-1920x1080": {
+      "bottom": 402.15625,
+      "ammoTop": 913,
+      "overlap": false
+    },
+    "pageErrors": []
+  },
+  "realBrowserGame": {
+    "status": "BLOCKED",
+    "scenario": "all",
+    "gameRequested": true,
+    "checks": [],
+    "browserVersion": "144.0.7559.96",
+    "reason": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:5173/\nCall log:\n  - navigating to \"http://127.0.0.1:5173/\", waiting until \"networkidle\"\n"
+  },
+  "protectedFiles": {
+    "protectedPaths": 410,
+    "modifiedProtectedPaths": [],
+    "existingPublicUnchanged": 54,
+    "existingVendorUnchanged": 337,
+    "onlyVehicleChange": "faction added to emitted cannon payload",
+    "shaderModelsMapAiDamageChanged": false
+  },
+  "notExecuted": [
+    "Full GameView at an ordinary HTTP origin",
+    "Native IndexedDB persistence/atomicity across browser restart",
+    "Firefox/Edge acceptance",
+    "Physical GPU/FPS/p95/p99 benchmark",
+    "10 complete real browser start-play-options-exit cycles",
+    "Independent visual/human acceptance"
+  ],
+  "assetNotes": {
+    "mainArt": "Recovered 426x352 crop, not new high-resolution art; original provenance before the conversation attachment was not independently established",
+    "campaignMap": "Original schematic, not digitized full historical frontline coordinates",
+    "fontsDistributed": false
+  },
+  "repoWrites": {
+    "commit": false,
+    "push": false,
+    "branches": false,
+    "worktrees": false,
+    "publication": false
+  }
+}

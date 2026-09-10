@@ -1,0 +1,174 @@
+{
+  "source": "Blender/ZiemiaNiczyja/models",
+  "imported": "2026-09-05",
+  "models": {
+    "british": {
+      "sha256": "5bea2d98512e6742933fb18a46e434501fd5d1952e045b9d1f91b3bd5b96138f",
+      "bytes": 2134348,
+      "triangles": [
+        24490,
+        8790,
+        2390
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    },
+    "british-v1": {
+      "sha256": "bedd8221adca704731edaf36374e0c921adf58b42ab08dd938d80c86b76e2e26",
+      "bytes": 2132192,
+      "triangles": [
+        24489,
+        8790,
+        2390
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    },
+    "british-v2": {
+      "sha256": "63281a6105f5f587a2adaf3c31d6576620186d82d6b8b3aa49b4cf3bc77356e8",
+      "bytes": 2130276,
+      "triangles": [
+        24400,
+        8758,
+        2381
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    },
+    "german": {
+      "sha256": "dd8cd638d7392d245101e88325b1aabeff0f62b64b512d63736874e81cd2c368",
+      "bytes": 2066788,
+      "triangles": [
+        24489,
+        8789,
+        2390
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    },
+    "german-v1": {
+      "sha256": "16deba1e4df51927b75abffcc1a1e4809799eabafb99fe3aeb8374744e73722c",
+      "bytes": 2063376,
+      "triangles": [
+        24490,
+        8790,
+        2390
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    },
+    "german-v2": {
+      "sha256": "2a28b7f1916a2e0cfa320a1850384d09e0d647b2def5b8b37624b849feb57a3d",
+      "bytes": 2068392,
+      "triangles": [
+        24489,
+        8789,
+        2390
+      ],
+      "joints": 19,
+      "clips": [
+        "idle",
+        "walk",
+        "run",
+        "crouch",
+        "prone",
+        "aim",
+        "fire",
+        "reload",
+        "hit",
+        "death",
+        "vault",
+        "grenade",
+        "melee"
+      ]
+    }
+  },
+  "textures": {
+    "textures/infantry-refined-color.png": {
+      "sha256": "72595b9d70d007838f009978f66ac72bdc16bb93a83941e259d48831c21f6570",
+      "bytes": 5030404
+    },
+    "textures/infantry-refined-normal.png": {
+      "sha256": "be1b06bd667299d0166d2388213bab71731c6a178000ccd9975818986af0fd53",
+      "bytes": 1731240
+    },
+    "textures/infantry-refined-orm.png": {
+      "sha256": "51d6c815771589b8faf717091ac01b6e8aef2e107de8439fd335cf9f9a7e55f1",
+      "bytes": 1183724
+    },
+    "textures/infantry-german-refined-color.png": {
+      "sha256": "68866cc9a93837f85d1d20f3de8fd41a9a83f20f91583717f6cb4d229e4c21e5",
+      "bytes": 5123506
+    }
+  }
+}
